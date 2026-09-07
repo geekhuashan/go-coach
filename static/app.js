@@ -1,0 +1,193 @@
+const $ = id => document.getElementById(id);
+const cols = 'ABCDEFGHJKLMNOPQRST';
+let boardZoom=false;
+let state = null, lessons = [], tool = 'play', inspection = null, busy = false, toastTimer;
+let selectedMode='lesson', selectionPending=false, aiAttemptKey=null, aiFailedKey=null;
+let llmSettings={enabled:false},llmBusy=false,llmAutoSeen=new Set(),llmResult=null,llmError=null,llmSettingsBusy=false;
+const svgNS = 'http://www.w3.org/2000/svg';
+function svg(tag, attrs={}, text='') { const el=document.createElementNS(svgNS,tag); Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v)); if(text)el.textContent=text;return el; }
+function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
+function connected(online){$('connection').className='connection '+(online?'online':'offline');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?'本地棋盘已连接':'连接中断，正在重试'));}
+async function request(url, options={}){const response=await fetch(url,{...options,headers:{'Content-Type':'application/json',...options.headers}});const result=await response.json();if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}throw new Error(result.error||result.message||'暂时没有完成，请再试一次。')}connected(true);return result;}
+async function refresh(){try{const next=await request('/api/state');if(!state||next.revision!==state.revision||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){inspection=null;setState(next)}}catch(error){connected(false)}}
+function feedbackText(value){return typeof value==='string'?value:Array.isArray(value)?value.at(-1)?.text||'':value?.text||''}
+function setState(next){
+ const switched=state?.profile?.id!==next.profile?.id;
+ const pickerSkill=$('skill-select').value;
+ const autoDifficultyChanged=$('difficulty-select').value==='auto'&&(state?.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1)!==(next.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1);
+ const reset=switched||state?.match?.id!==next.match?.id||state?.lesson?.id!==next.lesson?.id||(state?.lesson_attempted&&!next.lesson_attempted)||(state?.move_number>0&&next.move_number===0);
+ if(!state||reset){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。';tool='play';for(const t of ['play','inspect']){$('tool-'+t).classList.toggle('active',t==='play');$('tool-'+t).setAttribute('aria-pressed',String(t==='play'))}}
+ if(!state||switched||state?.match?.id!==next.match?.id||state?.mode!==next.mode){selectedMode=next.match?.mode||'lesson';selectionPending=false;}if(switched||reset){$('llm-question').value='';llmError=null;}state=next;inspection=next.inspection||null;render();if(lessons.length&&(switched||autoDifficultyChanged))renderLessonPicker();scheduleComputer();scheduleExplanation();
+}
+async function act(type,extra={}){
+ if(busy||!state)return;busy=true;if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
+ try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra})});setState(next);
+ if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
+ if(['switch_profile','add_profile','retry','lesson','next_lesson','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。'}
+ if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
+ if(type==='play'&&next.assessment){if(matchMedia('(max-width:740px)').matches)requestAnimationFrame(()=>$('coach-card').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth',block:'nearest'}));toast(next.assessment.summary);$('coach-card').classList.remove('feedback-flash');requestAnimationFrame(()=>$('coach-card').classList.add('feedback-flash'))}
+ if(type==='add_profile'){$('profile-name').value='';document.querySelector('.add-profile').open=false}
+ }catch(error){if(type==='ai_move')aiFailedKey=computerKey();toast(error.message)}finally{busy=false;document.body.removeAttribute('aria-busy');render();scheduleComputer();scheduleExplanation()}
+}
+function textEl(tag,text,className=''){const node=document.createElement(tag);node.textContent=text;if(className)node.className=className;return node}
+function renderLearning(){
+ const profile=state.profile||{name:'我'}, learning=state.learning||{}, recommendation=learning.recommendation||state.recommendation;
+ $('profiles').replaceChildren(...(state.profiles||[]).map(p=>{const b=textEl('button',p.name,p.id===profile.id?'profile-option selected':'profile-option');b.setAttribute('aria-pressed',String(p.id===profile.id));b.onclick=()=>{if(p.id!==profile.id)act('switch_profile',{profile_id:p.id})};return b}));
+ $('active-profile').textContent=`正在为「${profile.name}」保存进度`;
+ $('learning-title').textContent=`${profile.name}的学习进度`;$('learning-stage').textContent=learning.stage||'等待第一次练习';
+ $('learning-count').textContent=learning.attempts_count?`已记录 ${learning.attempts_count} 次作答 · 独立答对 ${learning.independent_correct||0} 次`:'先做几道小题，慢慢了解适合你的练习。';
+ $('skills').replaceChildren(...(learning.skills||[]).map(s=>{const row=textEl('div','','skill-row');const top=textEl('div','','skill-row-heading');top.append(textEl('strong',s.name),textEl('span',s.stage||'待评估'));row.append(top,textEl('small',s.independent_attempts?`独立作答 ${s.independent_attempts} 次 · 答对 ${s.correct||0} 次`:'独立作答样本不足，继续练习看看'));return row}));
+ $('recommendation-title').textContent=recommendation?.title||'从基础题开始';
+ const skillName=(learning.skills||[]).find(s=>s.id===recommendation?.skill)?.name||recommendation?.skill||'';
+ $('recommendation-reason').textContent=recommendation?`${skillName} · 难度 ${recommendation.difficulty}\n${recommendation.reason}`:'做一道题后，推荐会随你的练习记录调整。';
+ $('history-title').textContent=`${profile.name}的最近练习`;
+ const attempts=(state.recent_attempts||[]).slice(0,10);
+ $('attempts').replaceChildren(...(attempts.length?attempts.map(a=>{const li=textEl('li');const date=new Date(a.created_at);const when=Number.isNaN(date.getTime())?'':date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});li.append(textEl('strong',a.title),textEl('span',`${a.correct?'答对了':'再练一练'} · ${a.assisted?'提示后作答':a.attempt_no>1?'再次尝试':'独立作答'}`,a.correct?'history-success':'history-retry'),textEl('small',`${when} · 难度 ${a.difficulty}`));return li}):[textEl('li','第一道题完成后，记录会出现在这里。','empty-history')]));
+ const a=state.match?.mode==='human_ai'?(state.last_human_assessment||state.assessment):state.assessment, isResult=!!a&&!state.demo_active;
+ $('assessment').hidden=!isResult;$('inline-assessment').hidden=!isResult;
+ $('assessment-summary').textContent=a?.summary||'';$('assessment-explanation').textContent=Array.isArray(a?.explanation)?a.explanation.join(' '):a?.explanation||'';
+ $('inline-assessment').textContent=a?`${a.correct===true?'✓ ':a.correct===false?'再试试 · ':''}${a.summary}`:'';
+ $('assessment').className='assessment '+(a?.correct===true?'success':a?.correct===false?'retry':'neutral');
+ $('inline-assessment').className='inline-assessment '+(a?.correct===true?'success':a?.correct===false?'retry':'neutral');
+ $('retry-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;$('next-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;
+ $('hint').hidden=!state.lesson||state.lesson_attempted||state.demo_active;
+ $('coach-eyebrow').textContent=state.lesson?.sequence?'多手练习 · 对手自动应手':isResult?'这一手 · 本地自动反馈':'这一题 · 落子后自动讲解';
+ const progress=state.lesson_progress;$('lesson-progress').hidden=!progress||state.mode!=='lesson'||state.demo_active;$('lesson-progress').textContent=progress?`${progress.status==='solved'?'✓ 变化完成':progress.status==='failed'?'本次变化结束':progress.status==='unlisted'?'变化待复核':'继续计算'} · 已走 ${progress.ply||0} 手${progress.total_min?' / 至少 '+progress.total_min+' 手':''}${progress.message?' · '+progress.message:''}`:'';
+ $('lesson-source').hidden=!state.lesson;$('lesson-source').textContent=state.lesson?lessonSource(state.lesson):'';
+ if(state.lesson_attempted&&!state.demo_active){$('turn-pill').querySelector('span').textContent='本题已作答';$('turn-pill').className='turn-pill answered';if(!inspection)$('inspection').textContent='反馈已生成。可以查看气，再选“重练这一题”或“练下一题”。'}
+ if(a&&state.message?.includes(a.summary))$('message').hidden=true;
+}
+function lessonFamily(l){return l.base_id||l.family_id||(l.variant!==undefined?l.id.replace(/-\d+$/,''):l.id)}
+function sourceText(source){if(typeof source==='string')return source;if(!source)return '内置练习';return [source.title||source.book||source.name,source.page?'第 '+source.page+' 页':'',source.problem||source.problem_number||source.number?'题号 '+(source.problem||source.problem_number||source.number):'',source.note].filter(Boolean).join(' · ')||'内置练习'}
+function lessonSource(l){return `${l.size||9} 路 · ${sourceText(l.source)} · ${l.variant>1?'旋转 / 镜像变式 '+l.variant:l.variant===1?'原始局面':l.sequence?'多手局面':'基础局面'}`}
+function renderSkillPicker(){const previous=$('skill-select').value;const names=Object.fromEntries((state?.learning?.skills||[]).map(s=>[s.id,s.name]));const ids=[...new Set(lessons.map(l=>l.skill))];$('skill-select').replaceChildren(...ids.map(id=>{const o=textEl('option',names[id]||id);o.value=id;return o}));if(ids.includes(previous))$('skill-select').value=previous;else if(state?.lesson?.skill)$('skill-select').value=state.lesson.skill;renderLessonPicker();}
+function renderLessonPicker(){
+ const skill=$('skill-select').value,choice=$('difficulty-select').value;
+ const target=choice==='auto'?(state?.learning?.skills?.find(s=>s.id===skill)?.next_difficulty||1):Number(choice);
+ const options=lessons.filter(l=>l.skill===skill&&l.difficulty===target),previous=$('lesson-select').value;
+ $('lesson-select').replaceChildren(...options.map(l=>{const o=textEl('option',`${l.title} · ${l.size||9} 路${l.sequence?' · 连续应手':''}`);o.value=l.id;return o}));
+ if(options.some(l=>l.id===previous))$('lesson-select').value=previous;
+ else {const recent=new Set((state?.recent_attempts||[]).map(a=>a.lesson_id));const candidate=options.find(l=>!recent.has(l.id)&&l.id!==state?.lesson?.id)||options[0];if(candidate)$('lesson-select').value=candidate.id;}
+ $('start-skill').disabled=!options.length;$('lesson-select').disabled=!options.length;
+ const families=new Set(options.map(lessonFamily));const chosen=options.find(l=>l.id===$('lesson-select').value);
+ $('lesson-count').textContent=options.length?`${families.size} 个独立局面 · ${options.length} 个可练版本（含旋转 / 镜像）${chosen?'\n'+lessonSource(chosen):''}`:'这个知识点暂没有此难度，换一个难度或选择“吃子”。';
+}
+function renderBoard(){const root=$('board');root.replaceChildren();const defs=svg('defs');for(const [id,c1,c2]of[['blackStone','#48504a','#151c19'],['whiteStone','#fffefa','#d7d8cc']]){const g=svg('radialGradient',{id,cx:'33%',cy:'26%',r:'75%'});g.append(svg('stop',{offset:'0%','stop-color':c1}),svg('stop',{offset:'100%','stop-color':c2}));defs.append(g)}root.append(defs);const size=state.size||9,step=432/(size-1),at=n=>54+n*step;root.setAttribute('aria-label',`${size} 路围棋棋盘`);for(let i=0;i<size;i++){root.append(svg('line',{x1:at(0),y1:at(i),x2:at(size-1),y2:at(i),class:'board-line'}),svg('line',{x1:at(i),y1:at(0),x2:at(i),y2:at(size-1),class:'board-line'}));for(const yy of[24,516])root.append(svg('text',{x:at(i),y:yy,class:'coord'},cols[i]));for(const xx of[24,516])root.append(svg('text',{x:xx,y:at(i),class:'coord'},String(size-i)))}for(const [x,y]of(size===19?[3,9,15].flatMap(x=>[3,9,15].map(y=>[x,y])):[[2,2],[6,2],[4,4],[2,6],[6,6]]))root.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(3.1,step*.09),fill:'#6c583c'}));for(let y=0;y<size;y++)for(let x=0;x<size;x++){const color=state.board[y][x],g=svg('g',{class:'intersection',role:'button',tabindex:'0','aria-label':`${cols[x]}${size-y} ${color===1?'黑子':color===2?'白子':'空位'}`});g.append(svg('rect',{x:at(x)-step/2,y:at(y)-step/2,width:step,height:step,fill:'transparent',rx:7,class:'hit'}));if(color){g.append(svg('ellipse',{cx:at(x)+1,cy:at(y)+3,rx:step*.445,ry:step*.43,fill:'#5c48243a'}),svg('circle',{cx:at(x),cy:at(y),r:step*.435,fill:`url(#${color===1?'blackStone':'whiteStone'})`,stroke:color===1?'#1c2620':'#b7b6a4','stroke-width':.6}));if(state.last_move?.x===x&&state.last_move?.y===y)g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(5,step*.13),fill:'none',stroke:color===1?'#f1e7cc':'#526957','stroke-width':2}));}if(inspection?.stones?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx:at(x),cy:at(y),r:step*.46,fill:'none',stroke:'#58896d','stroke-width':3}));if(inspection?.liberties?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(9,step*.2),fill:'#f4fbdb',stroke:'#597a42','stroke-width':2}));const mark=state.marks?.find(m=>m.x===x&&m.y===y);if(mark && !(mark.label==='气' && inspection)){g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:at(x),y:at(y)+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'))}const onClick=()=>{if(busy)return;if(tool==='play'&&state.computer_turn){toast('现在轮到电脑，请等它落子。');return}if(tool==='play'&&(state.lesson_attempted||state.demo_active)){toast(state.demo_active?'请先返回原局面，再落子。':'这一题已作答，可以重练或开始下一题。');return}act(tool==='inspect'?'inspect':'play',{x,y})};g.addEventListener('click',onClick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick()}});root.append(g)}}
+function render(){$('board-zoom').hidden=state.size!==19;document.querySelector('.board-shell').classList.toggle('board-zoomed',state.size===19&&boardZoom);$('board-zoom').textContent=boardZoom?'缩回棋盘':'放大棋盘';$('board-zoom').setAttribute('aria-pressed',String(boardZoom));$('board-prompt').textContent=state.lesson?.prompt||'';$('board-prompt').hidden=!state.lesson;renderBoard();$('board-title').textContent=state.demo_active?'看一看这段变化':state.lesson?.title||'自在落子，慢慢看清';$('board-eyebrow').textContent=`${state.size||9} 路 · ${state.mode==='lesson'?`练习 · 难度 ${state.lesson?.difficulty||1}`:'自由对弈'}`;$('turn-pill').className='turn-pill'+(state.to_play===2?' white':'');$('turn-pill').querySelector('span').textContent=state.ended?'本局已结束':`轮到${state.to_play===1?'黑':'白'}棋`;$('move-count').textContent=`第 ${state.move_number||0} 手`;$('captures').textContent=`黑提 ${state.captures?.black||0} 子 · 白提 ${state.captures?.white||0} 子`;$('prompt-title').textContent=state.lesson?.title||'每一手，都可以停下来想';$('prompt').textContent=state.lesson?.prompt||'黑白交替落子，试着观察棋子的气。需要对手时，点击“请陪练下一手”；想讨论时，把你的想法写下来。';$('message').textContent=state.message||'';$('message').hidden=!state.message||state.message===state.lesson?.prompt;$('hint').hidden=!state.lesson;$('restore-demo').hidden=!state.demo_active;$('demo-next').hidden=!state.demo_active;$('demo-next').disabled=(state.demo_step||0)>=(state.demo_total||0);$('demo-next').textContent=`演示下一手 · ${state.demo_step||0}/${state.demo_total||0}`;$('ai-move').hidden=state.mode!=='free'||state.demo_active;$('ai-move').disabled=!state.engine?.available||state.ended;$('pass').disabled=state.ended||state.demo_active||state.mode==='lesson';$('undo').disabled=!state.history?.length||state.demo_active;$('restart').textContent=state.mode==='lesson'?'重练这一题':'新开一局';$('inspection').textContent=inspection?.stones?.length?`${inspection.color===1?'黑':'白'}棋这一块：${inspection.stones.length} 颗棋子，${inspection.liberties.length} 口气。绿色小圆点标出了它们的气。`:tool==='inspect'?'点击任意一颗棋子，看看整块棋共有几口气。':'点击交叉点落子；也可以切换“查看棋子的气”。';$('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。${state.engine.note||'点击按钮才会下下一手。'}${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题、数气、黑白交替下棋。';document.querySelectorAll('.lesson-option').forEach(b=>b.classList.toggle('selected',b.dataset.id===state.lesson?.id));$('saved').textContent='已保存到本机';renderLearning();renderMatch();renderLLM();}
+function selectTool(next){tool=next;inspection=null;for(const t of['play','inspect']){$('tool-'+t).classList.toggle('active',t===next);$('tool-'+t).setAttribute('aria-pressed',String(t===next))}if(state)render()}
+$('board-zoom').onclick=()=>{boardZoom=!boardZoom;if(state)render()};
+$('tool-play').onclick=()=>selectTool('play');$('tool-inspect').onclick=()=>selectTool('inspect');$('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').onclick=()=>act('hint');$('restart').onclick=()=>{if(state.lesson)act('retry');else startMatch(true)};$('ai-move').onclick=()=>{aiAttemptKey=null;aiFailedKey=null;act('ai_move')};$('restore-demo').onclick=()=>act('restore_demo');$('demo-next').onclick=()=>act('demo_next');$('send-feedback').onclick=()=>{const text=$('feedback').value.trim();if(!text){toast('先写一点你的想法吧，一句话也可以。');$('feedback').focus();return}act('feedback',{text})};
+$('retry-result').onclick=()=>act('retry');$('next-result').onclick=()=>act('next_lesson');$('next-lesson').onclick=()=>act('next_lesson');
+$('profile-form').onsubmit=e=>{e.preventDefault();const name=$('profile-name').value.trim();if(name)act('add_profile',{name})};
+$('skill-select').onchange=renderLessonPicker;$('difficulty-select').onchange=()=>{const difficulty=Number($('difficulty-select').value);if(difficulty&&!lessons.some(l=>l.skill===$('skill-select').value&&l.difficulty===difficulty)){const candidate=lessons.find(l=>l.difficulty===difficulty);if(candidate)$('skill-select').value=candidate.skill;}renderLessonPicker()};$('lesson-select').onchange=renderLessonPicker;
+$('start-skill').onclick=()=>{const id=$('lesson-select').value;if(id){selectTool('play');act('lesson',{id})}};
+$('lesson-import-form').onsubmit=async e=>{
+ e.preventDefault();if(busy||!state)return;const file=$('lesson-file').files[0];if(!file)return;
+ if(file.size>240*1024){$('import-status').textContent='文件过大，请选择不超过 240 KiB 的单题 JSON。';return}
+ busy=true;$('import-lesson').disabled=true;$('import-status').textContent='正在核对并导入…';
+ try{const parsed=JSON.parse(await file.text());const result=await request('/api/lessons/import',{method:'POST',body:JSON.stringify({lesson:parsed.lesson||parsed,revision:state.revision})});
+ const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];if(result.state)setState(result.state);renderSkillPicker();
+ const imported=result.lesson; if(imported){$('skill-select').value=imported.skill;$('difficulty-select').value=String(imported.difficulty);renderLessonPicker();$('lesson-select').value=imported.id;renderLessonPicker();busy=false;await act('lesson',{id:imported.id});}
+ $('import-status').textContent='已导入本机题库，可在具体题目中重新选择。';$('lesson-file').value='';
+ }catch(error){$('import-status').textContent=error instanceof SyntaxError?'无法读取 JSON，请使用 Codex 生成并核对的题库文件。':error.message}
+ finally{busy=false;$('import-lesson').disabled=false;}
+};
+function computerKey(){return state?.computer_turn?`${state.match?.id||state.match_id}:${state.move_number}:${state.to_play}`:null}
+function scheduleComputer(){setTimeout(()=>{const key=computerKey();if(!busy&&key&&!state.demo_active&&!state.ended&&state.engine?.available&&`${key}:${state.revision}`!==aiAttemptKey&&key!==aiFailedKey)act('ai_move')},0)}
+function selectMode(mode){if(busy)return;selectedMode=mode;selectionPending=true;if(mode==='lesson'){if(state.mode!=='lesson')act('next_lesson');else {selectionPending=false;renderMatch()}}else renderMatch()}
+function startMatch(useCurrent=false){
+ const match=useCurrent?state.match:null, mode=match?.mode||selectedMode;
+ const size=useCurrent?(state.size||9):Number($('board-size').value);
+ if(mode==='human_ai')act('new',{match_mode:mode,size,human_color:match?.human_color||(match?.black?.type==='ai'?2:match?.white?.type==='ai'?1:Number($('human-color').value))});
+ else if(mode==='two_player'){
+  const black=match?.black?.profile_id||$('black-player').value,white=match?.white?.profile_id||$('white-player').value;
+  if(black===white){toast('请为黑方和白方选择不同的学习者。');return}
+  act('new',{match_mode:mode,size,black_profile_id:black,white_profile_id:white});
+ }
+}
+function renderMatch(){
+ const match=state.match,profiles=state.profiles||[];
+ for(const [id,mode] of [['mode-lesson','lesson'],['mode-human-ai','human_ai'],['mode-two-player','two_player']]){$(id).classList.toggle('selected',selectedMode===mode);$(id).setAttribute('aria-pressed',String(selectedMode===mode))}
+ $('match-form').hidden=selectedMode==='lesson';$('human-settings').hidden=selectedMode!=='human_ai';$('two-player-settings').hidden=selectedMode!=='two_player';
+ for(const [id,fallback] of [['black-player',0],['white-player',1]]){const selected=$(id).value;$(id).replaceChildren(...profiles.map(p=>{const o=textEl('option',p.name);o.value=p.id;return o}));$(id).value=profiles.some(p=>p.id===selected)?selected:profiles[fallback]?.id||profiles[0]?.id||''}
+ $('mode-description').textContent=selectedMode==='lesson'?'做题后自动讲解，按照各自的练习记录推荐下一题。':selectedMode==='human_ai'?'选好执黑或执白后开始。电脑会自动应手；当前引擎较强，可随时悔棋。':'两个人共用棋盘，按黑白轮流落子，无需切换档案。对局会同时保存在双方档案中。';
+ if(selectionPending&&selectedMode!=='lesson')$('mode-description').textContent+=' 当前棋盘保持原局，点击“开始新对局”进入所选模式。';
+ if(match&&state.mode!=='lesson'){
+  const black=match.black?.name||'黑方',white=match.white?.name||'白方';const player=state.to_play===1?black:white;
+  $('board-title').textContent=state.demo_active?'看一看这段变化':`${black} · 对 · ${white}`;
+  $('board-eyebrow').textContent=`${state.size||9} 路 · ${match.mode==='human_ai'?'人机对弈':'双人对弈'}`;
+  $('board-prompt').hidden=false;$('board-prompt').textContent=`黑棋：${black}　白棋：${white}`;
+  $('turn-pill').querySelector('span').textContent=state.ended?'本局已结束':`${player} · ${state.to_play===1?'黑':'白'}棋`;
+  $('prompt-title').textContent=state.ended?'这一局先下到这里':state.computer_turn?'电脑正在接着想':`轮到${player}落子`;
+  $('prompt').textContent=state.ended?'双方连续停一手，本局结束。棋谱已保存；当前版本不自动数目判胜负。':match.mode==='human_ai'?'你下一手，电脑自动应一手。这里会反馈气数、提子等规则事实；它不是完整的棋力评判。':'按黑白轮流落子。双方的对局记录会各自保存，棋盘上方会提示下一位。';
+  $('coach-eyebrow').textContent='对局 · 本地规则反馈';
+  $('pass').disabled=state.ended||state.demo_active||state.computer_turn;
+  $('ai-move').hidden=!state.computer_turn||state.demo_active||state.ended;
+  $('ai-move').textContent=busy?'电脑思考中…':aiFailedKey===computerKey()?'重试电脑落子':'电脑准备落子…';
+  $('ai-move').disabled=busy||!state.engine?.available;
+  if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'电脑暂时没有完成落子。可点击“重试电脑落子”，或悔棋后继续。':'现在轮到电脑，落子后会自动回到你。';
+ }else if(state.mode==='lesson'){$('ai-move').hidden=true}
+ $('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。人机模式自动应手，双人模式不调用引擎。${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题与双人对弈。';
+ $('matches-title').textContent=`${state.profile?.name||'我'}的对局`;
+ const matches=(state.recent_matches||[]).slice(0,5);
+ $('matches').replaceChildren(...(matches.length?matches.map(m=>{
+  const li=textEl('li'),black=m.players?.black||m.black,white=m.players?.white||m.white;
+  li.append(textEl('strong',`${black?.name||'黑方'}（黑）· ${white?.name||'白方'}（白）`));
+  const date=new Date(m.updated_at),when=Number.isNaN(date.getTime())?'':date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  li.append(textEl('small',`${m.mode==='human_ai'?'人机':'双人'} · ${m.move_number||0} 手 · ${m.ended?'已结束':'进行中'} · ${when}`));
+  const actions=textEl('div','','match-history-actions'),resume=textEl('button',m.ended?'查看棋局':'继续这局','secondary');resume.onclick=()=>act('resume_match',{match_id:m.id});
+  const link=textEl('a','导出棋谱');link.href=`/api/sgf?match_id=${encodeURIComponent(m.id)}`;link.download=`${m.id}.sgf`;actions.append(resume,link);li.append(actions);return li;
+ }):[textEl('li','开始对弈后，这里会保存你的对局。','empty-history')]));
+}
+$('mode-lesson').onclick=()=>selectMode('lesson');$('mode-human-ai').onclick=()=>selectMode('human_ai');$('mode-two-player').onclick=()=>selectMode('two_player');$('match-form').onsubmit=e=>{e.preventDefault();startMatch()};
+
+function explanationContext(){return state?`${state.profile?.id}:${state.match?.id||state.lesson?.id||state.mode}:${state.move_number}:${state.lesson_attempted}:${JSON.stringify(state.board)}`:null}
+function renderLLM(){
+ if(!state)return;
+ const saved=state.llm_explanation;
+ const result=llmResult?.profile_id===state.profile?.id&&llmResult.revision===state.revision?llmResult:saved?.profile_id===state.profile?.id&&!saved.stale?saved:null;
+ $('llm-mode').textContent=llmSettings.enabled?`已启用 · ${llmSettings.model||'语言模型'}`:'本地反馈模式';
+ $('llm-answer').textContent=result?.text||(llmSettings.enabled?'完成这一手后，老师会结合当前棋局讲解。也可以直接提问。':'尚未启用语言模型。你可以继续做题，使用本地规则反馈。');
+ const error=llmError?.profile_id===state.profile?.id&&llmError.revision===state.revision?llmError:null;
+ $('llm-status').textContent=error?`${error.message} 本地规则反馈仍可使用。`:llmBusy?'老师正在组织讲解，你可以继续操作棋盘。':result?`讲解来源：${result.model||'语言模型'} · 请结合棋盘验证`:'讲解会记录到当前学习者的档案。';
+ $('llm-retry').hidden=!error;$('llm-retry').disabled=llmBusy||!llmSettings.enabled;
+ $('llm-ask').disabled=llmBusy||!llmSettings.enabled;$('llm-ask').textContent=llmBusy?'正在讲解…':'请老师讲解';
+}
+function scheduleExplanation(){setTimeout(()=>{
+ if(!state||!llmSettings.enabled||llmBusy||busy||state.demo_active||state.computer_turn)return;
+ const eligible=state.mode==='lesson'?state.lesson_attempted:state.move_number>0;
+ const key=explanationContext();if(!eligible||llmAutoSeen.has(key))return;
+ if(state.llm_explanation?.text){llmAutoSeen.add(key);return}
+ explainCurrent('');
+},0)}
+async function explainCurrent(question){
+ if(!state||llmBusy||!llmSettings.enabled)return;
+ const revision=state.revision,profile_id=state.profile?.id;llmAutoSeen.add(explanationContext());llmBusy=true;llmError=null;renderLLM();
+ try{const result=await request('/api/llm/explain',{method:'POST',body:JSON.stringify({revision,...(question?{question}:{})})});
+ if(!result.stale&&state.revision===revision&&state.profile?.id===profile_id&&result.revision===revision&&result.profile_id===profile_id){llmResult=result;$('llm-question').value=''}
+ }catch(error){if(state.revision===revision&&state.profile?.id===profile_id)llmError={revision,profile_id,message:'这次模型讲解暂时没有完成，请重试。'};}
+ finally{llmBusy=false;renderLLM();scheduleExplanation()}
+}
+function fillLLMSettings(){
+ $('llm-base').value=llmSettings.base_url||'';$('llm-model').value=llmSettings.model||'';$('llm-enabled').checked=!!llmSettings.enabled;
+ $('llm-key').value='';$('llm-key-status').textContent=llmSettings.has_api_key?'已保存密钥，留空可保留；更换服务地址后需重新填写。':'尚未保存 API Key。';renderLLM();
+}
+async function loadLLMSettings(){try{llmSettings=await request('/api/llm/settings');fillLLMSettings();scheduleExplanation()}catch(error){$('llm-settings-status').textContent='模型设置暂时无法读取；本地练习和对弈仍可用。';renderLLM()}}
+function settingsPending(value){llmSettingsBusy=value;$('llm-save').disabled=value;$('llm-test').disabled=value;}
+$('llm-question-form').onsubmit=e=>{e.preventDefault();explainCurrent($('llm-question').value.trim())};
+$('llm-retry').onclick=()=>explainCurrent($('llm-question').value.trim());
+$('llm-settings-form').onsubmit=async e=>{
+ e.preventDefault();if(llmSettingsBusy)return;settingsPending(true);$('llm-settings-status').textContent='正在保存…';
+ try{llmSettings=await request('/api/llm/settings',{method:'POST',body:JSON.stringify({base_url:$('llm-base').value.trim(),model:$('llm-model').value.trim(),api_key:$('llm-key').value,enabled:$('llm-enabled').checked})});fillLLMSettings();llmAutoSeen.clear();llmError=null;$('llm-settings-status').textContent=llmSettings.enabled?'设置已保存，AI 讲解已启用。':'设置已保存，当前使用本地反馈。';scheduleExplanation();}
+ catch(error){$('llm-settings-status').textContent='设置未保存，请检查服务地址与模型名后重试。';}
+ finally{$('llm-key').value='';settingsPending(false);renderLLM()}
+};
+$('llm-test').onclick=async()=>{
+ if(llmSettingsBusy)return;settingsPending(true);$('llm-settings-status').textContent='正在测试已保存的连接（不发送棋盘）…';
+ try{const result=await request('/api/llm/test',{method:'POST',body:'{}'});$('llm-settings-status').textContent=result.ok?'连接测试通过。':'连接测试未通过，请核对已保存的地址、模型和密钥。';}
+ catch(error){$('llm-settings-status').textContent='连接测试未完成，请核对已保存的地址、模型和密钥。';}
+ finally{settingsPending(false)}
+};
+
+async function init(){await refresh();await loadLLMSettings();try{const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];renderSkillPicker();if(state)render()}catch(error){toast('练习列表暂时未载入，请刷新重试。')}setInterval(()=>{if(!busy)refresh()},1200)}
+init();
