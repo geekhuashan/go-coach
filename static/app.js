@@ -2,12 +2,23 @@ const $ = id => document.getElementById(id);
 let activeView='board';
 function showView(view,{focus=false}={}){
  if(!['board','library','records','settings'].includes(view))view='board';
+ closeDrawers();
  activeView=view;
  document.querySelectorAll('.app-view').forEach(el=>el.hidden=el.id!=='view-'+view);
  document.querySelectorAll('.page-nav button').forEach(el=>{if(el.dataset.openView===view)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current')});
- if(focus){const target=view==='board'?$('board-title'):$('view-'+view).querySelector('h2');target.setAttribute('tabindex','-1');target.focus({preventScroll:true});document.querySelector('.page-nav').scrollIntoView({block:'start'});}
+ if(focus){const target=view==='board'?$('board-title'):$('view-'+view).querySelector('h2');target.setAttribute('tabindex','-1');target.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 }
 document.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView,{focus:true})));
+function closeDrawers(){document.querySelectorAll('.app-drawer[open]').forEach(dialog=>dialog.close());}
+function openDrawer(id){closeDrawers();$(id).showModal();document.body.classList.add('drawer-open');}
+$('open-menu').onclick=()=>openDrawer('menu-drawer');
+$('open-coach').onclick=()=>{if($('open-coach').dataset.aiReady==='true')$('explain-panel').open=true;openDrawer('coach-drawer');};
+document.querySelectorAll('[data-close-dialog]').forEach(button=>button.onclick=()=>$(button.dataset.closeDialog).close());
+document.querySelectorAll('.app-drawer').forEach(dialog=>{
+ dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
+ dialog.addEventListener('close',()=>{if(dialog.contains($('toast'))){$('toast').hidden=true;document.body.append($('toast'));}document.body.classList.toggle('drawer-open',!!document.querySelector('.app-drawer[open]'));});
+ dialog.addEventListener('toggle',()=>document.body.classList.toggle('drawer-open',!!document.querySelector('.app-drawer[open]')));
+});
 const cols = 'ABCDEFGHJKLMNOPQRST';
 let boardZoom=false, pendingMove=null;
 let cloudMode=false,authenticated=false,authEpoch=0,pollTimer=null,installPrompt=null;
@@ -17,11 +28,11 @@ let selectedMode='lesson', selectionPending=false, aiAttemptKey=null, aiFailedKe
 let llmSettings={enabled:false},llmBusy=false,llmAutoSeen=new Set(),llmResult=null,llmError=null,llmSettingsBusy=false;
 const svgNS = 'http://www.w3.org/2000/svg';
 function svg(tag, attrs={}, text='') { const el=document.createElementNS(svgNS,tag); Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v)); if(text)el.textContent=text;return el; }
-function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
+function toast(text){(document.querySelector('.app-drawer[open]')||document.body).append($('toast'));$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
 function connected(online){$('connection').className='connection '+(online?'online':'offline');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?(cloudMode?'家庭棋盘已连接':'本地棋盘已连接'):'当前离线或连接中断'));}
 async function request(url, options={}){if(options.method==='POST'&&options.body&&state?.profile?.id){const payload=JSON.parse(options.body);if(!payload.expected_profile_id)payload.expected_profile_id=state.profile.id;options={...options,body:JSON.stringify(payload)};}const epoch=authEpoch;const response=await fetch(url,{cache:'no-store',...options,headers:{'Content-Type':'application/json',...options.headers}});if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(response.status===401){lockSession();throw new Error('请重新输入家庭密码。')}const result=await response.json();if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}throw new Error(result.error||result.message||'暂时没有完成，请再试一次。')}connected(true);return result;}
 async function refresh(){if(!authenticated||!navigator.onLine)return;try{const next=await request('/api/state');if(!state||next.revision!==state.revision||next.profile?.id!==state.profile?.id||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){inspection=null;setState(next)}}catch(error){connected(false)}}
-function clearPrivateUI(){showView('board');document.querySelectorAll('.compact-disclosure').forEach(el=>el.open=false);state=null;lessons=[];inspection=null;pendingMove=null;llmResult=null;llmError=null;llmSettings={enabled:false};llmAutoSeen.clear();$('private-app').hidden=true;for(const id of ['board','profiles','attempts','matches','skills','skill-select','lesson-select','black-player','white-player','rating-sizes'])$(id).replaceChildren();document.querySelectorAll('#private-app input,#private-app textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=''});document.querySelectorAll('#private-app p[id],#private-app h2[id],#private-app h3[id],#private-app strong[id],#private-app .llm-answer,#private-app .inline-assessment,#private-app .inspection').forEach(el=>el.textContent='');document.querySelectorAll('#private-app span[id]').forEach(el=>{if(el.id==='turn-pill'){el.querySelector('span').textContent='';}else el.textContent='';});$('pending-move').hidden=true;$('resign-confirmation').hidden=true;$('toast').hidden=true;}
+function clearPrivateUI(){closeDrawers();document.body.classList.remove('session-ready','drawer-open');showView('board');document.querySelectorAll('.compact-disclosure').forEach(el=>el.open=false);state=null;lessons=[];inspection=null;pendingMove=null;llmResult=null;llmError=null;llmSettings={enabled:false};llmAutoSeen.clear();$('private-app').hidden=true;for(const id of ['board','profiles','attempts','matches','skills','skill-select','lesson-select','black-player','white-player','rating-sizes'])$(id).replaceChildren();document.querySelectorAll('#private-app input,#private-app textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=''});document.querySelectorAll('#private-app p[id],#private-app h2[id]:not(#menu-title):not(#coach-title),#private-app h3[id],#private-app strong[id],#private-app .llm-answer,#private-app .inline-assessment,#private-app .inspection').forEach(el=>el.textContent='');document.querySelectorAll('#private-app span[id]').forEach(el=>{if(el.id==='turn-pill'){el.querySelector('span').textContent='';}else el.textContent='';});$('pending-move').hidden=true;$('resign-confirmation').hidden=true;$('toast').hidden=true;}
 function lockSession(){authEpoch++;authenticated=false;clearTimeout(pollTimer);clearPrivateUI();$('login-panel').hidden=false;$('logout').hidden=true;navigator.serviceWorker?.controller?.postMessage({type:'CLEAR_PRIVATE_CACHE'});}
 function schedulePoll(){clearTimeout(pollTimer);if(authenticated&&!document.hidden)pollTimer=setTimeout(async()=>{if(!busy)await refresh();schedulePoll()},8000);}
 function feedbackText(value){return typeof value==='string'?value:Array.isArray(value)?value.at(-1)?.text||'':value?.text||''}
@@ -38,11 +49,10 @@ function setState(next){
 async function act(type,extra={}){
  if(busy||!state)return;if(!navigator.onLine){toast('当前离线，联网后继续。');return}pendingMove=null;busy=true;if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
  try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra})});setState(next);
- if(['lesson','next_lesson','practice_mode','resume_match','new'].includes(type))showView('board',{focus:true});
+ if(['lesson','next_lesson','practice_mode','resume_match','new','solution','retry'].includes(type))showView('board',{focus:true});
  if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
  if(['switch_profile','add_profile','retry','lesson','next_lesson','practice_mode','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。'}
  if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
- if(type==='play'&&next.assessment){if(matchMedia('(max-width:740px)').matches)requestAnimationFrame(()=>$('coach-card').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth',block:'nearest'}));toast(next.assessment.summary);$('coach-card').classList.remove('feedback-flash');requestAnimationFrame(()=>$('coach-card').classList.add('feedback-flash'))}
  if(type==='add_profile'){$('profile-name').value='';document.querySelector('.add-profile').open=false}
  }catch(error){if(type==='ai_move')aiFailedKey=computerKey();toast(error.message)}finally{busy=false;document.body.removeAttribute('aria-busy');render();scheduleComputer();scheduleExplanation()}
 }
@@ -66,7 +76,7 @@ function renderLearning(){
  $('inline-assessment').textContent=a?`${a.correct===true?'✓ ':a.correct===false?'再试试 · ':''}${a.summary}`:'';
  $('assessment').className='assessment '+(a?.correct===true?'success':a?.correct===false?'retry':'neutral');
  $('inline-assessment').className='inline-assessment '+(a?.correct===true?'success':a?.correct===false?'retry':'neutral');
- $('retry-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;$('next-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;
+ $('retry-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;$('next-result').hidden=state.mode!=='lesson'||!state.lesson_attempted||state.demo_active;
  $('hint').hidden=!state.lesson||state.lesson_attempted||state.demo_active;
  $('coach-eyebrow').textContent=state.lesson?.sequence?'多手练习 · 对手自动应手':isResult?'这一手 · 本地自动反馈':'这一题 · 落子后自动讲解';
  const progress=state.lesson_progress;$('lesson-progress').hidden=!progress||state.mode!=='lesson'||state.demo_active;$('lesson-progress').textContent=progress?`${progress.status==='solved'?'✓ 变化完成':progress.status==='failed'?'本次变化结束':progress.status==='unlisted'?'变化待复核':'继续计算'} · 已走 ${progress.ply||0} 手${progress.total_min?' / 至少 '+progress.total_min+' 手':''}${progress.message?' · '+progress.message:''}`:'';
@@ -158,7 +168,7 @@ function renderBoard(){
   g.addEventListener('click',onClick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick()}});root.append(g);
  }
 }
-function render(){if(!state)return;renderPending();$('board-zoom').hidden=state.size!==19;document.querySelector('.board-shell').classList.toggle('board-zoomed',state.size===19&&boardZoom);$('board-zoom').textContent=boardZoom?'缩回棋盘':'放大棋盘';$('board-zoom').setAttribute('aria-pressed',String(boardZoom));$('board-prompt').textContent=state.lesson?.prompt||'';$('board-prompt').hidden=!state.lesson;renderBoard();$('board-title').textContent=state.demo_active?'看一看这段变化':state.lesson?.title||'自在落子，慢慢看清';$('board-eyebrow').textContent=`${state.size||9} 路 · ${state.mode==='lesson'?`练习 · 难度 ${state.lesson?.difficulty||1}`:'自由对弈'}`;$('turn-pill').className='turn-pill'+(state.to_play===2?' white':'');$('turn-pill').querySelector('span').textContent=state.ended?'本局已结束':`轮到${state.to_play===1?'黑':'白'}棋`;$('move-count').textContent=`第 ${state.move_number||0} 手`;$('captures').textContent=`黑提 ${state.captures?.black||0} 子 · 白提 ${state.captures?.white||0} 子`;$('prompt-title').textContent=state.lesson?.title||'每一手，都可以停下来想';$('prompt').textContent=state.lesson?.prompt||'黑白交替落子，试着观察棋子的气。需要对手时，点击“请陪练下一手”；想讨论时，把你的想法写下来。';$('message').textContent=state.message||'';$('message').hidden=!state.message||state.message===state.lesson?.prompt;$('hint').hidden=!state.lesson;$('restore-demo').hidden=!state.demo_active;$('demo-next').hidden=!state.demo_active;$('demo-next').disabled=(state.demo_step||0)>=(state.demo_total||0);$('demo-next').textContent=`演示下一手 · ${state.demo_step||0}/${state.demo_total||0}`;$('ai-move').hidden=state.mode!=='free'||state.demo_active;$('ai-move').disabled=!state.engine?.available||state.ended;$('pass').disabled=state.ended||state.demo_active||state.mode==='lesson';$('undo').disabled=!state.history?.length||state.demo_active;$('restart').textContent=state.mode==='lesson'?'重练这一题':'新开一局';$('inspection').textContent=inspection?.stones?.length?`${inspection.color===1?'黑':'白'}棋这一块：${inspection.stones.length} 颗棋子，${inspection.liberties.length} 口气。绿色小圆点标出了它们的气。`:tool==='inspect'?'点击任意一颗棋子，看看整块棋共有几口气。':'点击交叉点落子；也可以切换“查看棋子的气”。';$('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。${state.engine.note||'点击按钮才会下下一手。'}${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题、数气、黑白交替下棋。';document.querySelectorAll('.lesson-option').forEach(b=>b.classList.toggle('selected',b.dataset.id===state.lesson?.id));$('saved').textContent=cloudMode?'已保存到家庭账号':'已保存到本机';renderLearning();renderMatch();renderLLM();renderRating();}
+function render(){if(!state)return;renderPending();$('board-zoom').hidden=state.size!==19;document.querySelector('.board-shell').classList.toggle('board-zoomed',state.size===19&&boardZoom);$('board-zoom').textContent=boardZoom?'缩回棋盘':'放大棋盘';$('board-zoom').setAttribute('aria-pressed',String(boardZoom));$('board-prompt').textContent=state.lesson?.prompt||'';$('board-prompt').hidden=!state.lesson;renderBoard();$('board-title').textContent=state.demo_active?'看一看这段变化':state.lesson?.title||'自在落子，慢慢看清';$('board-eyebrow').textContent=`${state.size||9} 路 · ${state.mode==='lesson'?`练习 · 难度 ${state.lesson?.difficulty||1}`:'自由对弈'}`;$('turn-pill').className='turn-pill'+(state.to_play===2?' white':'');$('turn-pill').querySelector('span').textContent=state.ended?'本局已结束':`轮到${state.to_play===1?'黑':'白'}棋`;$('move-count').textContent=`第 ${state.move_number||0} 手`;$('captures').textContent=`黑提 ${state.captures?.black||0} 子 · 白提 ${state.captures?.white||0} 子`;$('prompt-title').textContent=state.lesson?.title||'每一手，都可以停下来想';$('prompt').textContent=state.lesson?.prompt||'黑白交替落子，试着观察棋子的气。需要对手时，点击“请陪练下一手”；想讨论时，把你的想法写下来。';$('message').textContent=state.message||'';$('message').hidden=!state.message||state.message===state.lesson?.prompt;$('hint').hidden=!state.lesson;$('restore-demo').hidden=!state.demo_active;$('demo-next').hidden=!state.demo_active;$('demo-next').disabled=(state.demo_step||0)>=(state.demo_total||0);$('demo-next').textContent=`演示下一手 · ${state.demo_step||0}/${state.demo_total||0}`;$('ai-move').hidden=state.mode!=='free'||state.demo_active;$('ai-move').disabled=!state.engine?.available||state.ended;$('pass').disabled=state.ended||state.demo_active||state.mode==='lesson';$('undo').disabled=!state.history?.length||state.demo_active;$('restart').textContent=state.mode==='lesson'?'重练这一题':'新开一局';$('inspection').textContent=inspection?.stones?.length?`${inspection.color===1?'黑':'白'}棋这一块：${inspection.stones.length} 颗棋子，${inspection.liberties.length} 口气。绿色小圆点标出了它们的气。`:tool==='inspect'?'点击任意一颗棋子，看看整块棋共有几口气。':'点击交叉点落子；也可以切换“查看棋子的气”。';$('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。${state.engine.note||'点击按钮才会下下一手。'}${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题、数气、黑白交替下棋。';document.querySelectorAll('.lesson-option').forEach(b=>b.classList.toggle('selected',b.dataset.id===state.lesson?.id));$('saved').textContent=cloudMode?'已保存到家庭账号':'已保存到本机';renderLearning();renderMatch();renderLLM();renderRating();renderBoardChrome();}
 function selectTool(next){pendingMove=null;tool=next;inspection=null;for(const t of['play','inspect']){$('tool-'+t).classList.toggle('active',t===next);$('tool-'+t).setAttribute('aria-pressed',String(t===next))}if(state)render()}
 function renderPending(){$('pending-move').hidden=!pendingMove;$('pending-label').textContent=pendingMove?`准备落在 ${cols[pendingMove.x]}${state.size-pendingMove.y}`:'';}
 $('confirm-enabled').checked=confirmDefault;
@@ -266,6 +276,7 @@ function renderLLM(){
  $('llm-status').textContent=error?`${error.message} 本地规则反馈仍可使用。`:llmBusy?'老师正在组织讲解，你可以继续操作棋盘。':result?`讲解来源：${result.model||'语言模型'} · 请结合棋盘验证`:'讲解会记录到当前学习者的档案。';
  $('llm-retry').hidden=!error;$('llm-retry').disabled=llmBusy||!llmSettings.enabled;
  $('llm-ask').disabled=llmBusy||!llmSettings.enabled;$('llm-ask').textContent=llmBusy?'正在讲解…':'请老师讲解';
+ renderBoardChrome();
 }
 function scheduleExplanation(){setTimeout(()=>{
  if(!state||!llmSettings.enabled||llmBusy||busy||state.demo_active||state.computer_turn)return;
@@ -313,3 +324,21 @@ window.addEventListener('online',networkState);window.addEventListener('offline'
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install-app').hidden=false;});$('install-app').onclick=async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;$('install-app').hidden=true;}};
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
 checkSession();
+
+function renderBoardChrome(){
+ document.body.classList.add('session-ready');
+ const board=$('board');
+ if(board.dataset.focused==='true'){const [minX,minY,maxX,maxY]=board.dataset.visibleBounds.split(',').map(Number);$('board-eyebrow').textContent=`${state.size} 路 · 局部 ${cols[minX]}${state.size-minY}–${cols[maxX]}${state.size-maxY} · 虚线非边界`;}
+ $('current-learner').textContent=state.profile?.name||'学习者';
+ const practiceNames={recommended:'智能推荐',sequential:'顺序闯关',review:'错题复习'};
+ $('current-mode').textContent=state.mode==='lesson'?(practiceNames[state.practice_mode]||'智能推荐'):state.match?.mode==='human_ai'?'人机对弈':state.match?.mode==='two_player'?'双人对弈':'自由对弈';
+ const hasFeedback=!$('inline-assessment').hidden;
+ const saved=state.llm_explanation;
+ const aiReady=!!(llmResult?.profile_id===state.profile?.id&&llmResult.revision===state.revision?llmResult:saved?.profile_id===state.profile?.id&&!saved.stale?saved:null);
+ $('open-coach').dataset.aiReady=String(aiReady);
+ $('open-coach').textContent=aiReady?'讲解已就绪':llmBusy?'讲解中…':hasFeedback?'讲解 · 有反馈':'讲解';
+ $('open-coach').classList.toggle('has-feedback',hasFeedback||aiReady);
+ $('open-coach').setAttribute('aria-label',aiReady?'讲解已就绪':hasFeedback?'讲解，有新的落子反馈':'打开讲解');
+ $('inspection').hidden=tool!=='inspect'&&!inspection&&!state.computer_turn;
+ $('pass').hidden=state.mode==='lesson';
+}
