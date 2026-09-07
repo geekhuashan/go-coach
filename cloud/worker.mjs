@@ -1,3 +1,4 @@
+import {videoResponse} from './video.mjs';
 import builtins from './builtin-lessons.json' with {type:'json'};
 import {clone} from './rules.mjs';
 import {learning,recommend,publicLesson,validateLesson,practice,availableLesson} from './curriculum.mjs';
@@ -114,6 +115,7 @@ export default {async fetch(request,env){const url=new URL(request.url),path=url
  if(path==='/api/session'&&request.method==='GET')return json({authenticated:await authenticated(request,env),cloud:true});
  if(path==='/api/login'&&request.method==='POST')return await login(env,request,await body(request));
  if(!await authenticated(request,env))return error('请先输入家庭密码登录。',401);
+ if(path.startsWith('/api/videos/'))return await videoResponse(request,env);
  if(path==='/api/logout'&&request.method==='POST')return json({authenticated:false,cloud:true},200,{'Set-Cookie':'go_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0'});
  const ctx=await load(env,request);
  if(request.method==='GET'){

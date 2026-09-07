@@ -1,5 +1,6 @@
 const $ = id => document.getElementById(id);
 let activeView='board';
+let teachingPlayback=null,teachingPlaybackEpoch=0,teachingPlaybackRequest=null;
 function showView(view,{focus=false}={}){
  if(!['board','library','records','settings'].includes(view))view='board';
  closeDrawers();
@@ -9,11 +10,11 @@ function showView(view,{focus=false}={}){
  if(focus){const target=view==='board'?$('board-title'):$('view-'+view).querySelector('h2');target.setAttribute('tabindex','-1');target.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
 }
 document.querySelectorAll('[data-open-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.openView,{focus:true})));
-function closeDrawers(){document.querySelectorAll('.app-drawer[open]').forEach(dialog=>dialog.close());}
+function closeDrawers(){stopTeachingPlayback();[...document.querySelectorAll('.app-drawer[open]')].reverse().forEach(dialog=>dialog.close());}
 function openDrawer(id){closeDrawers();$(id).showModal();document.body.classList.add('drawer-open');}
 $('open-menu').onclick=()=>openDrawer('menu-drawer');
 $('open-coach').onclick=()=>{if($('open-coach').dataset.aiReady==='true')$('explain-panel').open=true;openDrawer('coach-drawer');};
-document.querySelectorAll('[data-close-dialog]').forEach(button=>button.onclick=()=>$(button.dataset.closeDialog).close());
+document.querySelectorAll('[data-close-dialog]').forEach(button=>button.onclick=()=>{if(button.dataset.closeDialog==='video-player-dialog')stopTeachingPlayback();$(button.dataset.closeDialog).close();});
 document.querySelectorAll('.app-drawer').forEach(dialog=>{
  dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();});
  dialog.addEventListener('close',()=>{if(dialog.contains($('toast'))){$('toast').hidden=true;document.body.append($('toast'));}document.body.classList.toggle('drawer-open',!!document.querySelector('.app-drawer[open]'));});
@@ -28,7 +29,7 @@ let selectedMode='lesson', selectionPending=false, aiAttemptKey=null, aiFailedKe
 let llmSettings={enabled:false},llmBusy=false,llmAutoSeen=new Set(),llmResult=null,llmError=null,llmSettingsBusy=false;
 const svgNS = 'http://www.w3.org/2000/svg';
 function svg(tag, attrs={}, text='') { const el=document.createElementNS(svgNS,tag); Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v)); if(text)el.textContent=text;return el; }
-function toast(text){(document.querySelector('.app-drawer[open]')||document.body).append($('toast'));$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
+function toast(text){([...document.querySelectorAll('.app-drawer[open]')].at(-1)||document.body).append($('toast'));$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
 function connected(online){$('connection').className='connection '+(online?'online':'offline');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?(cloudMode?'家庭棋盘已连接':'本地棋盘已连接'):'当前离线或连接中断'));}
 async function request(url, options={}){if(options.method==='POST'&&options.body&&state?.profile?.id){const payload=JSON.parse(options.body);if(!payload.expected_profile_id)payload.expected_profile_id=state.profile.id;options={...options,body:JSON.stringify(payload)};}const epoch=authEpoch;const response=await fetch(url,{cache:'no-store',...options,headers:{'Content-Type':'application/json',...options.headers}});if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(response.status===401){lockSession();throw new Error('请重新输入家庭密码。')}const result=await response.json();if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}throw new Error(result.error||result.message||'暂时没有完成，请再试一次。')}connected(true);return result;}
 async function refresh(){if(!authenticated||!navigator.onLine)return;try{const next=await request('/api/state');if(!state||next.revision!==state.revision||next.profile?.id!==state.profile?.id||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){inspection=null;setState(next)}}catch(error){connected(false)}}
@@ -323,9 +324,55 @@ let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teac
 const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形'};
 function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
 function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
+function teachingPlaybackUrl(video){
+ try{const url=new URL(video.playback_url,location.origin);return video.playback_url&&url.origin===location.origin&&/^\/api\/videos\/[A-Za-z0-9_-]+\.mp4$/.test(url.pathname)&&!url.search&&!url.hash?url.pathname:null;}catch{return null;}
+}
+function stopTeachingPlayback(){
+ teachingPlaybackEpoch++;teachingPlaybackRequest?.abort();teachingPlaybackRequest=null;teachingPlayback=null;
+ const player=$('teaching-video');player.pause();player.removeAttribute('src');player.load();
+ $('video-player-retry').hidden=true;
+}
+function teachingVideoAuthExpired(){
+ lockSession();$('login-status').textContent='视频播放需要重新登录，请输入家庭密码后再试。';
+}
+async function checkTeachingPlayback(url,epoch){
+ teachingPlaybackRequest?.abort();const controller=new AbortController();teachingPlaybackRequest=controller;
+ try{
+  const response=await fetch(url,{method:'HEAD',credentials:'same-origin',cache:'no-store',signal:controller.signal});
+  if(epoch!==teachingPlaybackEpoch)return false;
+  if(response.status===401){teachingVideoAuthExpired();return false;}
+  if(!response.ok){$('video-player-status').textContent=response.status===404?'这段视频暂时不可用，可以查看原网页。':'视频暂时无法加载，请稍后重试或查看原网页。';$('video-player-retry').hidden=false;return false;}
+  return true;
+ }catch(error){if(epoch===teachingPlaybackEpoch&&error.name!=='AbortError'){$('video-player-status').textContent='视频暂时无法连接，请检查网络后重试。';$('video-player-retry').hidden=false;}return false;}
+ finally{if(teachingPlaybackRequest===controller)teachingPlaybackRequest=null;}
+}
+async function openTeachingVideo(video){
+ const url=teachingPlaybackUrl(video);if(!url||!authenticated)return;
+ stopTeachingPlayback();teachingPlayback=video;const epoch=teachingPlaybackEpoch;
+ $('video-player-title').textContent=video.title;$('video-player-author').textContent=video.author||'教学视频';
+ $('video-original-link').href=video.url;$('video-player-status').textContent='正在准备视频…';
+ if(!$('video-player-dialog').open)$('video-player-dialog').showModal();document.body.classList.add('drawer-open');
+ if(await checkTeachingPlayback(url,epoch)){
+  if(epoch!==teachingPlaybackEpoch||!$('video-player-dialog').open)return;
+  $('teaching-video').src=url;$('video-player-status').textContent='点击播放器的播放按钮开始观看。';
+ }
+}
+$('video-player-retry').onclick=()=>{if(teachingPlayback)openTeachingVideo(teachingPlayback);};
+$('video-player-dialog').addEventListener('cancel',stopTeachingPlayback);
+$('video-player-dialog').addEventListener('close',()=>{if(!$('video-player-dialog').open)stopTeachingPlayback();});
+$('teaching-video').addEventListener('playing',()=>{$('video-player-status').textContent='';});
+$('teaching-video').addEventListener('error',async()=>{
+ if(!teachingPlayback||!$('teaching-video').hasAttribute('src'))return;
+ const epoch=teachingPlaybackEpoch,url=teachingPlaybackUrl(teachingPlayback);
+ if(await checkTeachingPlayback(url,epoch)){
+  $('video-player-status').textContent='这段视频暂时无法播放，请重试或查看原网页。';$('video-player-retry').hidden=false;
+ }
+});
+window.addEventListener('pagehide',stopTeachingPlayback);
 function videoItem(video){
- const li=textEl('li'),link=textEl('a',video.title);link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';
+ const li=textEl('li'),playback=teachingPlaybackUrl(video),link=textEl('a',playback?'查看原网页 ↗':video.title);link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';
  const seconds=Number(video.duration_seconds),duration=seconds>0?`${Math.floor(seconds/60)}:${String(Math.floor(seconds%60)).padStart(2,'0')}`:'时长未提供';
+ if(playback){const play=textEl('button',`▶ ${video.title}`,'video-play-button');play.setAttribute('aria-haspopup','dialog');play.setAttribute('aria-controls','video-player-dialog');play.onclick=()=>openTeachingVideo(video);li.append(play);link.className='video-original';}
  li.append(link,textEl('small',`${video.author||'教学视频'} · ${new URL(video.url).hostname.replace(/^www\./,'')} · ${duration}`));return li;
 }
 function renderTeachingVideos(){

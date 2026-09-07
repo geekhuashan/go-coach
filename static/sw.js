@@ -1,4 +1,4 @@
-// Public app shell only. Authenticated responses and API requests never enter Cache Storage.
+// Public app shell only. Authenticated responses and API requests, including /api/videos/ media, never enter Cache Storage.
 const CACHE='go-coach-public-v1';
 const PUBLIC=['/','/index.html','/app.js','/style.css','/teaching-videos.json','/favicon.svg','/manifest.webmanifest','/icons/icon-192.png','/icons/icon-512.png','/icons/apple-touch-icon.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PUBLIC.map(url=>new Request(url,{credentials:'omit'})))).then(()=>self.skipWaiting()));});

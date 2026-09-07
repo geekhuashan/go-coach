@@ -28,5 +28,11 @@
   ],
   "vars": {
     "HOUSEHOLD_ID": "home"
-  }
+  },
+  "r2_buckets": [
+    {
+      "binding": "VIDEOS",
+      "bucket_name": "go-coach-videos"
+    }
+  ]
 }

@@ -13,7 +13,8 @@
       "liberties"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/count-liberties.mp4"
   },
   {
     "id": "atari-capture",
@@ -29,7 +30,8 @@
       "atari"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/atari-capture.mp4"
   },
   {
     "id": "escape",
@@ -44,7 +46,8 @@
       "escape"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/escape.mp4"
   },
   {
     "id": "connect-cut",
@@ -61,7 +64,8 @@
       "cut"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/connect-cut.mp4"
   },
   {
     "id": "double-atari",
@@ -76,7 +80,8 @@
       "double_atari"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/double-atari.mp4"
   },
   {
     "id": "net",
@@ -92,7 +97,8 @@
       "net"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/net.mp4"
   },
   {
     "id": "gate",
@@ -107,7 +113,8 @@
       "gate"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/gate.mp4"
   },
   {
     "id": "ladder",
@@ -122,7 +129,8 @@
       "ladder"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/ladder.mp4"
   },
   {
     "id": "ladder-direction",
@@ -137,7 +145,8 @@
       "ladder"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/ladder-direction.mp4"
   },
   {
     "id": "snapback",
@@ -152,7 +161,8 @@
       "snapback"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/snapback.mp4"
   },
   {
     "id": "connection-trap",
@@ -167,7 +177,8 @@
       "connection_trap"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/connection-trap.mp4"
   },
   {
     "id": "edge-capture",
@@ -182,7 +193,8 @@
       "edge_chase"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/edge-capture.mp4"
   },
   {
     "id": "eyes",
@@ -197,7 +209,8 @@
       "eyes"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/eyes.mp4"
   },
   {
     "id": "life-shapes",
@@ -212,7 +225,8 @@
       "life_shapes"
     ],
     "checked_at": "2026-09-07",
-    "verification": "页面元数据与作者已核对；未逐集观看"
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/life-shapes.mp4"
   },
   {
     "id": "chen-1",
@@ -228,7 +242,8 @@
       "rules"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-1.mp4"
   },
   {
     "id": "chen-2",
@@ -244,7 +259,8 @@
       "atari"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-2.mp4"
   },
   {
     "id": "chen-4",
@@ -259,7 +275,8 @@
       "ko"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-4.mp4"
   },
   {
     "id": "chen-8",
@@ -274,7 +291,8 @@
       "double_atari"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-8.mp4"
   },
   {
     "id": "chen-10",
@@ -289,7 +307,8 @@
       "gate"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-10.mp4"
   },
   {
     "id": "chen-11",
@@ -304,7 +323,8 @@
       "net"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-11.mp4"
   },
   {
     "id": "chen-12",
@@ -319,7 +339,8 @@
       "ladder"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-12.mp4"
   },
   {
     "id": "chen-13",
@@ -334,7 +355,8 @@
       "edge_chase"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-13.mp4"
   },
   {
     "id": "chen-14",
@@ -349,7 +371,8 @@
       "snapback"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-14.mp4"
   },
   {
     "id": "chen-15",
@@ -364,7 +387,8 @@
       "connection_trap"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-15.mp4"
   },
   {
     "id": "chen-30",
@@ -380,7 +404,8 @@
       "eyes"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-30.mp4"
   },
   {
     "id": "chen-31",
@@ -396,7 +421,8 @@
       "eyes"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-31.mp4"
   },
   {
     "id": "chen-32",
@@ -412,7 +438,8 @@
       "life_shapes"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-32.mp4"
   },
   {
     "id": "chen-52",
@@ -427,7 +454,8 @@
       "escape"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-52.mp4"
   },
   {
     "id": "chen-53",
@@ -442,7 +470,8 @@
       "connection"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-53.mp4"
   },
   {
     "id": "chen-54",
@@ -457,7 +486,8 @@
       "cutting"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-54.mp4"
   },
   {
     "id": "peiqi-1",
@@ -472,7 +502,8 @@
       "liberties"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-1.mp4"
   },
   {
     "id": "peiqi-3",
@@ -487,7 +518,8 @@
       "escape"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-3.mp4"
   },
   {
     "id": "peiqi-4",
@@ -502,7 +534,8 @@
       "escape"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-4.mp4"
   },
   {
     "id": "peiqi-7",
@@ -517,7 +550,8 @@
       "gate"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-7.mp4"
   },
   {
     "id": "peiqi-9",
@@ -532,7 +566,8 @@
       "double_atari"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-9.mp4"
   },
   {
     "id": "peiqi-10",
@@ -547,7 +582,8 @@
       "ladder"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-10.mp4"
   },
   {
     "id": "peiqi-12",
@@ -562,6 +598,7 @@
       "connection_trap"
     ],
     "checked_at": "2026-09-07",
-    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看"
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-12.mp4"
   }
 ]
