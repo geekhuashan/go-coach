@@ -330,18 +330,26 @@ function videoItem(video){
 }
 function renderTeachingVideos(){
  const lesson=state?.lesson,concepts=new Set([...videoTags(lesson?.concept),...videoTags(lesson?.concepts)]);
- const related=teachingVideos.map(video=>({video,score:videoTags(video.concepts).reduce((sum,c)=>sum+(concepts.has(c)?3:0),0)+(videoTags(video.skills).includes(lesson?.skill)?1:0)})).filter(item=>item.score>0).sort((a,b)=>b.score-a.score).slice(0,3).map(item=>item.video);
+ const ranked=teachingVideos.map(video=>({video,score:videoTags(video.concepts).reduce((sum,c)=>sum+(concepts.has(c)?3:0),0)+(videoTags(video.skills).includes(lesson?.skill)?1:0)})).filter(item=>item.score>0).sort((a,b)=>b.score-a.score);
+ const related=[],authors=new Set();
+ while(ranked.length&&related.length<3){
+  // Diversity only breaks relevance ties; a lower score never displaces a higher one.
+  const next=ranked.findIndex(item=>item.score===ranked[0].score&&!authors.has(item.video.author||'教学视频'));
+  const {video}=ranked.splice(next<0?0:next,1)[0];related.push(video);authors.add(video.author||'教学视频');
+ }
  $('lesson-video-list').replaceChildren(...related.map(videoItem));
  $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?'': '当前题目暂无匹配视频，可到题库查看基础视频目录。';
  renderVideoLibrary();
 }
 function renderVideoLibrary(){
- const previous=$('video-topic').value,topics=[...new Set(teachingVideos.flatMap(videoTopics))];
+ const previous=$('video-topic').value,previousAuthor=$('video-author').value,topics=[...new Set(teachingVideos.flatMap(videoTopics))],authors=[...new Set(teachingVideos.map(video=>video.author||'教学视频'))];
  $('video-topic').replaceChildren(...['all',...topics].map(topic=>{const o=textEl('option',topic==='all'?'全部主题':videoTopicNames[topic]||topic);o.value=topic;return o}));
  $('video-topic').value=topics.includes(previous)?previous:'all';
- const selected=$('video-topic').value,videos=teachingVideos.filter(video=>selected==='all'||videoTopics(video).includes(selected));
+ $('video-author').replaceChildren(...['all',...authors].map(author=>{const o=textEl('option',author==='all'?'全部作者':author);o.value=author;return o}));
+ $('video-author').value=authors.includes(previousAuthor)?previousAuthor:'all';
+ const selected=$('video-topic').value,author=$('video-author').value,videos=teachingVideos.filter(video=>(selected==='all'||videoTopics(video).includes(selected))&&(author==='all'||(video.author||'教学视频')===author));
  $('video-library-list').replaceChildren(...videos.map(videoItem));
- $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?`${videos.length} 条中文视频`:'正在载入视频目录…';
+ $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?(videos.length?`${videos.length} 条中文视频`:'当前主题与作者组合暂无视频，可切换筛选。'):'正在载入视频目录…';
 }
 function loadTeachingVideos(){
  if(!teachingVideosPromise)teachingVideosPromise=fetch('/teaching-videos.json',{credentials:'omit'}).then(response=>{if(!response.ok)throw new Error('video catalog');return response.json();}).then(data=>{
@@ -351,7 +359,7 @@ function loadTeachingVideos(){
  else renderTeachingVideos();
  return teachingVideosPromise;
 }
-$('video-topic').onchange=renderVideoLibrary;
+$('video-topic').onchange=renderVideoLibrary;$('video-author').onchange=renderVideoLibrary;
 
 async function init(){if(!authenticated)return;loadTeachingVideos();$('login-panel').hidden=true;$('private-app').hidden=false;$('logout').hidden=!cloudMode;$('confirm-enabled').checked=confirmDefault;await refresh();if(!authenticated)return;await loadLLMSettings();if(!authenticated)return;try{const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];renderSkillPicker();if(state)render()}catch(error){if(authenticated)toast('练习列表暂时未载入，请刷新重试。')}schedulePoll();}
 async function checkSession(){try{const response=await fetch('/api/session',{cache:'no-store'});if(response.status===404){cloudMode=false;authenticated=true;}else{if(!response.ok)throw new Error('session');const session=await response.json();cloudMode=!!session.cloud;authenticated=!!session.authenticated||!cloudMode;}if(authenticated)await init();else lockSession();}catch(error){$('login-panel').hidden=false;$('login-status').textContent='暂时无法连接，联网后重试。';connected(false);}}
