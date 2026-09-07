@@ -340,7 +340,7 @@ $('llm-test').onclick=async()=>{
  finally{settingsPending(false)}
 };
 
-let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false;
+let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false,teachingVideosCheckedAt=0;
 const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形'};
 function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
 function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
@@ -390,10 +390,17 @@ $('teaching-video').addEventListener('error',async()=>{
 });
 window.addEventListener('pagehide',stopTeachingPlayback);
 function videoItem(video){
- const li=textEl('li'),playback=teachingPlaybackUrl(video),link=textEl('a',playback?'查看原网页 ↗':video.title);link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';
+ const li=textEl('li'),playback=teachingPlaybackUrl(video);
  const seconds=Number(video.duration_seconds),duration=seconds>0?`${Math.floor(seconds/60)}:${String(Math.floor(seconds%60)).padStart(2,'0')}`:'时长未提供';
- if(playback){const play=textEl('button',`▶ ${video.title}`,'video-play-button');play.setAttribute('aria-haspopup','dialog');play.setAttribute('aria-controls','video-player-dialog');play.onclick=()=>openTeachingVideo(video);li.append(play);link.className='video-original';}
- li.append(link,textEl('small',`${video.author||'教学视频'} · ${new URL(video.url).hostname.replace(/^www\./,'')} · ${duration}`));return li;
+ if(playback){
+  const title=textEl('strong',video.title,'video-title'),play=textEl('button','▶ 在 App 内播放','video-play-button');
+  play.setAttribute('aria-label',`在 App 内播放：${video.title}`);play.setAttribute('aria-haspopup','dialog');play.setAttribute('aria-controls','video-player-dialog');play.onclick=()=>openTeachingVideo(video);
+  li.append(title,textEl('small',`${video.author||'教学视频'} · ${duration}`),play);
+ }else{
+  const link=textEl('a',video.title);link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';
+  li.append(link,textEl('small',`${video.author||'教学视频'} · ${duration} · 暂未提供站内视频`));
+ }
+ return li;
 }
 function renderTeachingVideos(){
  const lesson=state?.lesson,concepts=new Set([...videoTags(lesson?.concept),...videoTags(lesson?.concepts)]);
@@ -418,11 +425,12 @@ function renderVideoLibrary(){
  $('video-library-list').replaceChildren(...videos.map(videoItem));
  $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?(videos.length?`${videos.length} 条中文视频`:'当前主题与作者组合暂无视频，可切换筛选。'):'正在载入视频目录…';
 }
-function loadTeachingVideos(){
- if(!teachingVideosPromise)teachingVideosPromise=fetch('/teaching-videos.json',{credentials:'omit'}).then(response=>{if(!response.ok)throw new Error('video catalog');return response.json();}).then(data=>{
+function loadTeachingVideos(refresh=false){
+ if(refresh&&Date.now()-teachingVideosCheckedAt>60000)teachingVideosPromise=null;
+ if(!teachingVideosPromise){teachingVideosCheckedAt=Date.now();teachingVideosFailed=false;teachingVideosPromise=fetch('/teaching-videos.json',{credentials:'omit',cache:'no-store'}).then(response=>{if(!response.ok)throw new Error('video catalog');return response.json();}).then(data=>{
   const videos=Array.isArray(data)?data:data.videos;if(!Array.isArray(videos))throw new Error('video catalog');
   teachingVideos=videos.filter(video=>{try{const url=new URL(video.url);return !!video.title&&url.protocol==='https:'&&!url.username&&!url.password;}catch{return false;}});
- }).catch(()=>{teachingVideosFailed=true;}).finally(()=>{teachingVideosLoaded=true;if(authenticated)renderTeachingVideos();});
+ }).catch(()=>{teachingVideosFailed=true;}).finally(()=>{teachingVideosLoaded=true;if(authenticated)renderTeachingVideos();});}
  else renderTeachingVideos();
  return teachingVideosPromise;
 }
@@ -432,7 +440,7 @@ async function init(){if(!authenticated)return;loadTeachingVideos();$('login-pan
 async function checkSession(){try{const response=await fetch('/api/session',{cache:'no-store'});if(response.status===404){cloudMode=false;authenticated=true;}else{if(!response.ok)throw new Error('session');const session=await response.json();cloudMode=!!session.cloud;authenticated=!!session.authenticated||!cloudMode;}if(authenticated)await init();else lockSession();}catch(error){$('login-panel').hidden=false;$('login-status').textContent='暂时无法连接，联网后重试。';connected(false);}}
 $('login-form').onsubmit=async e=>{e.preventDefault();$('login-submit').disabled=true;$('login-status').textContent='正在登录…';try{const response=await fetch('/api/login',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('family-password').value})});if(!response.ok)throw new Error('密码不正确或请求过于频繁，请稍后重试。');$('family-password').value='';authEpoch++;authenticated=true;cloudMode=true;await init();$('login-status').textContent='';}catch(error){$('login-status').textContent=navigator.onLine?error.message:'当前离线，联网后继续。';}finally{$('family-password').value='';$('login-submit').disabled=false;}};
 $('logout').onclick=async()=>{lockSession();$('login-submit').disabled=true;$('login-status').textContent='正在退出…';try{await fetch('/api/logout',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:'{}'});$('login-status').textContent='已退出。';}catch(error){$('login-status').textContent='页面已锁定。退出请求未送达，请联网后刷新并退出。';}finally{$('login-submit').disabled=false;}};
-document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(pollTimer);else schedulePoll()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(pollTimer);else{schedulePoll();if(authenticated)loadTeachingVideos(true);}});
 function networkState(){$('offline-banner').hidden=navigator.onLine;if(!navigator.onLine){connected(false);pendingMove=null;if(state)render();}else if(authenticated){refresh();schedulePoll();}else checkSession();}
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);$('offline-banner').hidden=navigator.onLine;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install-app').hidden=false;});$('install-app').onclick=async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;$('install-app').hidden=true;}};
