@@ -1,0 +1,15 @@
+const enc=new TextEncoder();
+export const hex=bytes=>[...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('');
+export async function digest(text){return hex(await crypto.subtle.digest('SHA-256',enc.encode(text)));}
+export function equal(a,b){if(typeof a!=='string'||typeof b!=='string')return false;let result=a.length^b.length;for(let i=0;i<Math.max(a.length,b.length);i++)result|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);return result===0;}
+function b64(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes))).replaceAll('+','-').replaceAll('/','_').replace(/=+$/,'');}
+function unb64(text){const standard=text.replaceAll('-','+').replaceAll('_','/');return Uint8Array.from(atob(standard.padEnd(Math.ceil(standard.length/4)*4,'=')),c=>c.charCodeAt(0));}
+async function hmac(secret,text){const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return b64(await crypto.subtle.sign('HMAC',key,enc.encode(text)));}
+export function cookies(request){const out={};for(const part of (request.headers.get('Cookie')||'').split(';')){const at=part.indexOf('=');if(at>0)try{out[part.slice(0,at).trim()]=decodeURIComponent(part.slice(at+1))}catch{}}return out;}
+export async function makeSession(env){if(!env.SESSION_SECRET||env.SESSION_SECRET.length<32)throw new Error('家庭会话密钥尚未配置。');const data=b64(enc.encode(JSON.stringify({household:env.HOUSEHOLD_ID||'home',exp:Date.now()+7*86400000,nonce:crypto.randomUUID()})));return data+'.'+await hmac(env.SESSION_SECRET,data);}
+export async function authenticated(request,env){if(!env.SESSION_SECRET)return false;const value=cookies(request).go_session;if(!value||value.length>2048)return false;const[data,signature,...rest]=value.split('.');if(rest.length||!data||!signature)return false;try{if(!equal(signature,await hmac(env.SESSION_SECRET,data)))return false;const payload=JSON.parse(new TextDecoder().decode(unb64(data)));return payload.household===(env.HOUSEHOLD_ID||'home')&&Number.isFinite(payload.exp)&&payload.exp>Date.now();}catch{return false}}
+export const sessionCookie=token=>`go_session=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
+export const profileCookie=id=>`go_profile=${encodeURIComponent(id)}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=604800`;
+async function encryptionKey(secret){if(!secret||secret.length<32)throw new Error('会话密钥未配置。');const bytes=await crypto.subtle.digest('SHA-256',enc.encode('go-coach:llm-key:v1:'+secret));return crypto.subtle.importKey('raw',bytes,'AES-GCM',false,['encrypt','decrypt']);}
+export async function encrypt(text,secret){const iv=crypto.getRandomValues(new Uint8Array(12));const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},await encryptionKey(secret),enc.encode(text));return b64(iv)+'.'+b64(cipher);}
+export async function decrypt(value,secret){if(!value)return '';const[iv,cipher]=value.split('.');return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(iv)},await encryptionKey(secret),unb64(cipher)));}

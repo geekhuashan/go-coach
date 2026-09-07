@@ -1,0 +1,21 @@
+[Unit]
+Description=Go Coach Cloudflare Tunnel
+After=network-online.target go-coach-engine.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=go-coach-engine
+Group=go-coach-engine
+WorkingDirectory=/opt/go-coach-engine
+ExecStart=/opt/go-coach-engine/cloudflared-linux-amd64 tunnel --no-autoupdate --protocol http2 run --token-file /opt/go-coach-engine/.local/tunnel-token
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=192M
+
+[Install]
+WantedBy=multi-user.target

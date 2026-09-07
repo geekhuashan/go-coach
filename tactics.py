@@ -37,14 +37,14 @@ def validate_lesson(value):
     identity = text(value.get('id'), 'id', 80)
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', identity):
         fail('id 只支持英文字母、数字、短横线和下划线。')
-    if value.get('skill') != 'capture' or value.get('sequence') is not True:
-        fail('当前导入只支持连续吃子题（skill=capture、sequence=true）。')
+    if value.get('skill') not in ('capture', 'tsumego') or value.get('sequence') is not True:
+        fail('当前导入支持连续吃子题或作者解答题（skill=capture/tsumego、sequence=true）。')
     if type(value.get('difficulty')) is not int or value['difficulty'] not in (1, 2, 3, 4, 5):
         fail('难度必须是 1–5 的整数。')
     if type(value.get('to_play')) is not int or value['to_play'] not in (1, 2):
         fail('先行方必须是 1（黑）或 2（白）。')
     out = {k: text(value.get(k), k, 160 if k == 'title' else 1200) for k in ('title', 'prompt', 'hint')}
-    out.update(id=identity, size=size, skill='capture', sequence=True, difficulty=value['difficulty'], to_play=value['to_play'])
+    out.update(id=identity, size=size, skill=value['skill'], sequence=True, difficulty=value['difficulty'], to_play=value['to_play'])
     defender = 3 - out['to_play']
     stones = value.get('stones')
     if not isinstance(stones, list) or not 1 <= len(stones) <= capacity:
@@ -64,16 +64,19 @@ def validate_lesson(value):
         if not group(board, stone['x'], stone['y'])[1]:
             fail('初始局面存在无气棋块。')
     objective = value.get('objective')
-    if not isinstance(objective, dict) or objective.get('kind') not in ('capture', 'capture_any'):
-        fail('目标类型需为 capture 或 capture_any。')
-    raw_targets = objective.get('targets')
-    if not isinstance(raw_targets, list) or not 1 <= len(raw_targets) <= capacity:
+    if not isinstance(objective, dict) or objective.get('kind') not in ('capture', 'capture_any', 'authored_solution'):
+        fail('目标类型需为 capture、capture_any 或 authored_solution。')
+    authored = objective['kind'] == 'authored_solution'
+    if (authored and value['skill'] != 'tsumego') or (not authored and value['skill'] != 'capture'):
+        fail('作者解答使用 tsumego 分类，提子目标使用 capture 分类。')
+    raw_targets = [] if authored else objective.get('targets')
+    if not authored and (not isinstance(raw_targets, list) or not 1 <= len(raw_targets) <= capacity):
         fail(f'需要 1–{capacity} 个目标坐标。')
     targets = [point(p, '目标') for p in raw_targets]
     target_set = {tuple(p) for p in targets}
     if len(target_set) != len(targets) or any(board[y][x] != defender for x, y in targets):
         fail('目标必须是初始对方棋子，且不能重复。')
-    out['objective'] = dict(kind=objective['kind'], targets=targets)
+    out['objective'] = dict(kind=objective['kind']) if authored else dict(kind=objective['kind'], targets=targets)
     marks = value.get('marks', [])
     if not isinstance(marks, list) or len(marks) > capacity:
         fail(f'标记最多 {capacity} 个。')
@@ -84,15 +87,20 @@ def validate_lesson(value):
         x, y = point([mark.get('x'), mark.get('y')], '标记')
         out['marks'].append(dict(x=x, y=y, label=text(mark.get('label'), '标记文字', 16)))
     source = value.get('source', {'kind': 'manual'})
-    if not isinstance(source, dict) or source.get('kind') not in ('original', 'book', 'manual'):
-        fail('来源类型需为 original、book 或 manual。')
+    if not isinstance(source, dict) or source.get('kind') not in ('original', 'book', 'manual', 'licensed'):
+        fail('来源类型需为 original、book、manual 或 licensed。')
+    if authored and not (source.get('kind') == 'licensed' and source.get('license') and source.get('url')):
+        fail('作者答案题需要授权来源、许可和来源链接。')
     out['source'] = {'kind': source['kind']}
-    for field in ('title', 'page', 'problem', 'note'):
+    source_fields = ('title', 'page', 'problem', 'note')
+    if source['kind'] == 'licensed':
+        source_fields += ('author', 'license', 'url', 'commit', 'attribution', 'original_prompt')
+    for field in source_fields:
         if field in source:
             raw = source[field]
             if field in ('page', 'problem') and type(raw) is int:
                 raw = str(raw)
-            out['source'][field] = text(raw, '来源 ' + field, 600, required=False)
+            out['source'][field] = text(raw, '来源 ' + field, 2000 if field == 'original_prompt' else 600, required=False)
     counter = [0]
     active = set()
 
@@ -121,12 +129,14 @@ def validate_lesson(value):
         children = node.get('children', [])
         if not isinstance(children, list) or len(children) > 16:
             fail('每个节点最多 16 个分支。')
-        goal = bool(captured & target_set) if objective['kind'] == 'capture_any' else target_set <= captured
+        goal = (node.get('correct') is True or (node.get('result') == 'success' and node.get('author_verdict') == 'correct')) if authored else (bool(captured & target_set) if objective['kind'] == 'capture_any' else target_set <= captured)
         if children and goal:
             fail('目标已完成后仍有多余走法。')
         if not children:
-            if depth < 1 or depth % 2 != 1 or not goal:
-                fail('每个终点须由先行方实际提掉指定目标。')
+            if depth < 1 or (not authored and depth % 2 != 1) or not goal:
+                fail('每个终点须有明确作者正确标记。' if authored else '每个终点须由先行方实际提掉指定目标。')
+            if authored:
+                clean.update(result='success', author_verdict='correct')
         moves = []
         for child in children:
             if not isinstance(child, dict):

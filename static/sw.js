@@ -1,0 +1,7 @@
+// Public app shell only. Authenticated responses and API requests never enter Cache Storage.
+const CACHE='go-coach-public-v1';
+const PUBLIC=['/','/index.html','/app.js','/style.css','/favicon.svg','/manifest.webmanifest','/icons/icon-192.png','/icons/icon-512.png','/icons/apple-touch-icon.png'];
+self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(PUBLIC.map(url=>new Request(url,{credentials:'omit'})))).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',event=>{const request=event.request,url=new URL(request.url);if(request.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/')||!PUBLIC.includes(url.pathname))return;event.respondWith(fetch(new Request(request,{credentials:'omit'})).then(response=>{if(response.ok&&response.type==='basic'){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(url.pathname,copy));}return response;}).catch(()=>caches.match(url.pathname)));});
+self.addEventListener('message',event=>{if(event.data?.type==='CLEAR_PRIVATE_CACHE'){event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));}});

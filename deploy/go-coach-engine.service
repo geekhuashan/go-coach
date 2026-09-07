@@ -1,0 +1,25 @@
+[Unit]
+Description=Go Coach authenticated KataGo compute bridge
+After=network.target
+
+[Service]
+Type=simple
+User=go-coach-engine
+Group=go-coach-engine
+WorkingDirectory=/opt/go-coach-engine
+Environment=GO_COACH_KATAGO=/opt/go-coach-engine/squashfs-root/AppRun
+Environment=GO_COACH_MODEL=/opt/go-coach-engine/model-b10.bin.gz
+ExecStart=/usr/bin/python3 /opt/go-coach-engine/engine_bridge.py --port 8874 --token-file /opt/go-coach-engine/.local/engine-token
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/go-coach-engine/.local
+MemoryMax=384M
+CPUQuota=150%
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

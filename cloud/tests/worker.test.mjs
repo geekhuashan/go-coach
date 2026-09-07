@@ -1,0 +1,79 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import worker from '../worker.mjs';
+import {makeSession,digest} from '../auth.mjs';
+import {lessonState,blank,applyAction} from '../game.mjs';
+const lessons=JSON.parse(readFileSync(new URL('../builtin-lessons.json',import.meta.url)));
+class D1 {
+ constructor(){this.db=new DatabaseSync(':memory:');for(const name of ['0001_family.sql','0002_statistics.sql'])this.db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));}
+ prepare(sql){
+  const db=this.db;
+  function statement(args){return {
+   async first(){return db.prepare(sql).get(...args)||null},
+   async all(){return {results:db.prepare(sql).all(...args)}},
+   async run(){const result=db.prepare(sql).run(...args);return {meta:{changes:Number(result.changes)}}},
+   _execute(){const result=db.prepare(sql).run(...args);return {meta:{changes:Number(result.changes)}}}
+  };}
+  return {bind(...args){return statement(args)},...statement([])};
+ }
+ async batch(statements){this.db.exec('BEGIN');try{const results=statements.map(s=>s._execute());this.db.exec('COMMIT');return results}catch(e){this.db.exec('ROLLBACK');throw e}}
+}
+async function session(){const env={DB:new D1(),HOUSEHOLD_ID:'test-home',SESSION_SECRET:'test-only-secret-longer-than-thirty-two-characters',FAMILY_PASSWORD_HASH:await digest('test-password')};const cookie='go_session='+await makeSession(env);async function request(path,method='GET',data,extra=''){const headers={Cookie:cookie+(extra?'; '+extra:''),Origin:'https://go.example'};if(data!==undefined){headers['Content-Type']='application/json';data={expected_profile_id:extra.includes('go_profile=child')?'child':'parent',...data};}const r=await worker.fetch(new Request('https://go.example'+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data)}),env);let body;try{body=await r.json()}catch{}return {status:r.status,body,response:r};}return {env,request};}
+test('D1 CAS rejects concurrent stale moves without duplicate attempt or XP',async()=>{
+ const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.profile.id,'parent');
+ const action={type:'play',x:3,y:6,revision:s.revision};const results=await Promise.all([request('/api/action','POST',action),request('/api/action','POST',action)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);s=(await request('/api/state')).body;assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,10);
+ const replay=await request('/api/action','POST',{type:'retry',revision:s.revision});s=replay.body;s=(await request('/api/action','POST',{...action,revision:s.revision})).body;assert.equal(s.rating.practice_xp,10);assert.equal(s.recent_attempts.length,2);
+});
+test('profile cookie isolates devices and auth never exposes trees',async()=>{
+ const {request,env}=await session();const s=(await request('/api/state')).body;const switched=await request('/api/action','POST',{type:'switch_profile',profile_id:'child',revision:s.revision});assert.equal(switched.body.profile.id,'child');assert.equal((await request('/api/state')).body.profile.id,'parent');assert.equal((await request('/api/state','GET',undefined,'go_profile=child')).body.profile.id,'child');assert.equal(s.lesson.tree,undefined);const unauthorized=await worker.fetch(new Request('https://go.example/api/state'),env);assert.equal(unauthorized.status,401);
+});
+test('LLM settings reject stale client revision and encrypt stored key',async()=>{
+ const {request,env}=await session();let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'hint',revision:s.revision})).body;
+ let response=await request('/api/llm/settings','POST',{revision:0,base_url:'https://model.example/v1',model:'example',api_key:'test-only-api-key',enabled:true});assert.equal(response.status,409);assert.equal(env.DB.db.prepare('SELECT COUNT(*) n FROM llm_settings').get().n,0);
+ response=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'test-only-api-key',enabled:true});assert.equal(response.status,200);assert.equal(response.body.has_api_key,true);assert.equal(response.body.api_key,undefined);const row=env.DB.db.prepare('SELECT * FROM llm_settings').get();assert.ok(!JSON.stringify(row).includes('test-only-api-key'));
+});
+test('atomic login budget admits only remaining slot under concurrency',async()=>{
+ const {request,env}=await session();for(let i=0;i<11;i++)assert.equal((await request('/api/login','POST',{password:'wrong'})).status,401);
+ const results=await Promise.all(Array.from({length:3},()=>request('/api/login','POST',{password:'wrong'})));assert.deepEqual(results.map(r=>r.status).sort(),[401,429,429]);
+});
+test('confirmed result increments separated 19-road stats once; resume cannot award twice',async()=>{
+ const {request}=await session();let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'new',match_mode:'two_player',size:19,black_profile_id:'parent',white_profile_id:'child',revision:s.revision})).body;s=(await request('/api/action','POST',{type:'resign',revision:s.revision})).body;const match=s.match.id;assert.equal(s.rating.matches_played,1);assert.equal(s.rating.losses,1);assert.equal(s.rating.by_size[0].size,19);s=(await request('/api/action','POST',{type:'resume_match',match_id:match,revision:s.revision})).body;assert.equal(s.rating.matches_played,1);assert.equal(s.rating.by_size[0].rated_games,1);assert.equal((await request('/api/action','POST',{type:'resign',revision:s.revision})).status,400);
+});
+test('migration writes records atomically and refuses nonempty cloud overwrite',async()=>{
+ const {request}=await session();const s=(await request('/api/state')).body;const state=lessonState(lessons.find(l=>l.id==='escape'));const local={schema:2,active_profile_id:'parent',profiles:{parent:{id:'parent',name:'我',state,attempts:[{lesson_id:'capture-1-1',correct:true,assisted:false,attempt_no:1}],notes:[{text:'自己的学习想法'}],helped_lesson_ids:[]},child:{id:'child',name:'测试孩子',state,attempts:[],notes:[]}},matches:{}};
+ const migrated=await request('/api/migrate','POST',{revision:s.revision,store:local});assert.equal(migrated.status,200,JSON.stringify(migrated.body));assert.equal(migrated.body.attempts_count,1);const after=(await request('/api/state')).body;assert.equal(after.profiles.find(p=>p.id==='child').name,'测试孩子');assert.equal(after.recent_attempts.length,1);const denied=await request('/api/migrate','POST',{revision:after.revision,store:local});assert.equal(denied.status,409);
+});
+
+test('a stale tab cannot write into the profile selected by another tab',async()=>{
+ const {request}=await session();const original=(await request('/api/state')).body;
+ const changed=await request('/api/action','POST',{type:'switch_profile',profile_id:'child',revision:original.revision});assert.equal(changed.status,200);
+ for(const path of ['/api/action','/api/llm/explain']){const result=await request(path,'POST',{type:'feedback',text:'belongs to parent',expected_profile_id:'parent',revision:original.revision},'go_profile=child');assert.equal(result.status,409);}
+ assert.equal((await request('/api/history','GET',undefined,'go_profile=child')).body.notes.length,0);
+});
+test('migration includes shared matches and compact history without SQL partial writes',async()=>{
+ const {request}=await session();const start=(await request('/api/state')).body;
+ const profiles=[{id:'parent',name:'我'},{id:'child',name:'宝宝'}];
+ const context={profileId:'parent',profiles,catalog:lessons,helped:[],runs:{}};
+ let state=applyAction(blank(19),{type:'new',size:19,match_mode:'two_player'},context).state;
+ state=applyAction(state,{type:'play',x:18,y:18},context).state;
+ const store={schema:2,active_profile_id:'parent',profiles:Object.fromEntries(profiles.map(p=>[p.id,{...p,state,attempts:[],notes:[]}])) ,matches:{[state.match.id]:{id:state.match.id,state,updated_at:'2026-09-07T12:00:00Z'}}};
+ const result=await request('/api/migrate','POST',{revision:start.revision,store});assert.equal(result.status,200,JSON.stringify(result.body));assert.equal(result.body.matches_count,1);
+ const parent=(await request('/api/state')).body,child=(await request('/api/state','GET',undefined,'go_profile=child')).body;assert.equal(parent.size,19);assert.equal(child.board[18][18],1);assert.equal(child.recent_matches.length,1);
+});
+test('fallback produces one persisted AI move with its actual backend',async t=>{
+ const {request,env}=await session();Object.assign(env,{ENGINE_PRIMARY_URL:'https://fnos.example',ENGINE_PRIMARY_TOKEN:'primary',ENGINE_URL:'https://vps.example',ENGINE_TOKEN:'fallback'});let s=(await request('/api/state')).body;assert.equal(s.engine.primary_configured,true);assert.equal(s.engine.last_backend,null);s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:2,size:19,revision:s.revision})).body;
+ const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push(String(url));if(init.method==='GET')return new Response(JSON.stringify({ok:true,available:true}));if(String(url).includes('fnos'))return new Response('{}',{status:503});return new Response(JSON.stringify({x:15,y:3}));});
+ const response=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(response.status,200);s=response.body;assert.equal(s.move_number,1);assert.equal(s.engine_backend,'vps');assert.equal(s.engine.last_backend,'vps');assert.match(s.engine.status,/最近一次/);assert.equal(calls.filter(x=>x.endsWith('/move')).length,2);assert.equal(s.moves.length,1);
+});
+test('state remains unchanged if both engines fail and late primary output loses CAS',async t=>{
+ const {request,env}=await session();Object.assign(env,{ENGINE_PRIMARY_URL:'https://fnos.example',ENGINE_PRIMARY_TOKEN:'primary',ENGINE_URL:'https://vps.example',ENGINE_TOKEN:'fallback'});let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:2,size:19,revision:s.revision})).body;
+ t.mock.method(globalThis,'fetch',async()=>new Response('{}',{status:503}));assert.equal((await request('/api/action','POST',{type:'ai_move',revision:s.revision})).status,503);let latest=(await request('/api/state')).body;assert.equal(latest.revision,s.revision);assert.equal(latest.move_number,0);t.mock.restoreAll();
+ t.mock.method(globalThis,'fetch',async(url,init)=>{if(init.method==='GET')return new Response(JSON.stringify({ok:true,available:true}));const changed=await request('/api/action','POST',{type:'inspect',x:0,y:0,revision:s.revision});assert.equal(changed.status,200);return new Response(JSON.stringify({x:3,y:3}));});const lost=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(lost.status,409);latest=(await request('/api/state')).body;assert.equal(latest.move_number,0);assert.equal(latest.engine_backend,undefined);
+});
+test('LLM test uses manual redirects and rejects a 302 without forwarding its key',async t=>{
+ const {request}=await session();const s=(await request('/api/state')).body;const saved=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'test-only-model-key',enabled:true});assert.equal(saved.status,200);
+ const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push({url:String(url),authorization:init.headers.Authorization});assert.equal(init.redirect,'manual');assert.equal(JSON.stringify(JSON.parse(init.body)).includes('board'),false);return new Response(null,{status:302,headers:{Location:'https://untrusted.example/collect'}});});
+ const result=await request('/api/llm/test','POST',{});assert.equal(result.status,503);assert.deepEqual(calls,[{url:'https://model.example/v1/chat/completions',authorization:'Bearer test-only-model-key'}]);assert.ok(!JSON.stringify(result.body).includes('test-only-model-key'));
+});
