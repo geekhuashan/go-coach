@@ -18,3 +18,18 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 .rating-card{background:#fffefa;border:1px solid var(--line);border-radius:14px;padding:20px}.rating-card h3{font-size:15px;margin:12px 0 6px}.match-result-panel{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.match-result-panel summary{cursor:pointer;font-size:12px;color:var(--green)}.result-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.result-controls label{font-size:11px}.result-controls select{padding:10px;background:#fafbf6;border:1px solid var(--line);border-radius:7px}.result-controls button{min-height:44px}#rating-sizes p{border-top:1px solid var(--line);padding-top:8px}
 
 .lesson-source{overflow-wrap:anywhere}.lesson-source a{color:var(--green);text-decoration:underline;text-underline-offset:2px}
+
+/* Keep the board focused; secondary views share the same live learner state. */
+.page-nav{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:0 0 18px;padding-bottom:10px;scroll-margin-top:12px}
+.page-nav button{background:transparent;color:var(--muted);padding:11px 20px;border-radius:9px;font-size:13px;min-height:44px}
+.page-nav button[aria-current=page]{background:var(--green);color:white;font-weight:600}
+.text-link{display:block;background:transparent;color:var(--green);padding:12px 0 0;font-size:12px;text-align:left;min-height:40px}
+.compact-disclosure{padding:0;overflow:hidden}.compact-disclosure>summary{cursor:pointer;padding:17px 20px;font-size:13px;color:var(--green)}
+.compact-disclosure>summary span{font-size:10px;color:var(--muted);margin-left:8px}.disclosure-content{padding:0 20px 20px}
+.view-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}.view-heading h2{font-size:23px;margin:0 0 6px}.view-heading p{margin:0}.view-heading>button{flex-shrink:0}
+.secondary-view{max-width:1000px;margin:0 auto;min-height:50vh}.secondary-view .library-picker{border:0;margin:0;padding:0}.secondary-view .lesson-card{max-width:680px;margin:auto}.records-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+#view-settings{max-width:800px}#view-settings>.llm-card,.settings-card{margin-bottom:18px}.settings-card{padding:20px;background:#fffefa;border:1px solid var(--line);border-radius:14px}.settings-card summary{cursor:pointer}.settings-card h3{margin:0 0 12px;font-size:14px}#view-settings .llm-settings{border:0;margin:0;padding:0}#view-settings .account-actions{padding:0;margin:0}#view-settings .account-actions .quiet{width:100%;margin:0}#view-settings .engine-note{padding:12px 0 0}
+.sidebar{min-width:0}#next-practice h3{margin-top:9px}#next-practice .quiet{margin:6px 0 12px}
+@media(max-width:740px){.page-nav{gap:3px}.page-nav button{flex:1;padding:10px 7px;font-size:12px}.records-grid{grid-template-columns:1fr}.view-heading{align-items:start}.view-heading h2{font-size:20px}.view-heading>button{padding:10px}.compact-disclosure{padding:0}.secondary-view{min-height:60vh}}
+/* The practice screen starts with the learner and navigation, then the board. */
+.intro{display:none}.masthead{height:64px}main{padding-top:16px}.profile-bar{margin-bottom:14px}
