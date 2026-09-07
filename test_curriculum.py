@@ -79,7 +79,7 @@ class CurriculumTests(unittest.TestCase):
             new=recommend(records)
             self.assertNotEqual(new['id'],records[-1]['lesson_id'])
             records.append(attempt(new['id']))
-        self.assertEqual({a['skill'] for a in records},{'escape','capture','connect','cut'})
+        self.assertEqual({a['skill'] for a in records},{'escape','capture','connect','cut','tsumego'})
 
     def test_cut_feedback_does_not_claim_global_cut(self):
         lesson=get_lesson('cut-2-1')

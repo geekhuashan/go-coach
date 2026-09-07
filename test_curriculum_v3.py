@@ -48,7 +48,8 @@ class ExtendedCurriculumTests(unittest.TestCase):
         sequences = [l for l in curriculum.catalog() if l.get('sequence')]
         self.assertTrue(sequences)
         self.assertEqual({3, 4, 5}, {l['difficulty'] for l in sequences})
-        self.assertTrue(all(l['skill'] == 'capture' for l in sequences))
+        self.assertTrue(all(l['skill'] == ('tsumego' if l['id'].startswith('ggg-') else 'capture') for l in sequences))
+        self.assertEqual(sum(l['id'].startswith('ggg-') for l in sequences),417)
         identities = [l['id'] for l in curriculum.catalog()]
         self.assertEqual(len(identities), len(set(identities)))
         with patch.object(tactics, 'validate_lesson', side_effect=AssertionError('read revalidated')):
