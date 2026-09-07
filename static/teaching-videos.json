@@ -1,0 +1,604 @@
+[
+  {
+    "id": "count-liberties",
+    "title": "围棋入门 3. 数气",
+    "url": "https://www.bilibili.com/video/BV18FmbYpE5D/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 81,
+    "skills": [
+      "escape",
+      "capture"
+    ],
+    "concepts": [
+      "liberties"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/count-liberties.mp4"
+  },
+  {
+    "id": "atari-capture",
+    "title": "围棋入门 4. 打吃与提子",
+    "url": "https://www.bilibili.com/video/BV18ZmtYREaM/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 100,
+    "skills": [
+      "escape",
+      "capture"
+    ],
+    "concepts": [
+      "atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/atari-capture.mp4"
+  },
+  {
+    "id": "escape",
+    "title": "围棋入门 5. 逃跑与相互打吃",
+    "url": "https://www.bilibili.com/video/BV18ZmtY9ESR/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 153,
+    "skills": [
+      "escape"
+    ],
+    "concepts": [
+      "escape"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/escape.mp4"
+  },
+  {
+    "id": "connect-cut",
+    "title": "围棋入门 一学就会—连接和分断",
+    "url": "https://www.bilibili.com/video/BV1pAqwYgEP5/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 426,
+    "skills": [
+      "connect",
+      "cut"
+    ],
+    "concepts": [
+      "connect",
+      "cut"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/connect-cut.mp4"
+  },
+  {
+    "id": "double-atari",
+    "title": "围棋入门 一学就会—双打吃",
+    "url": "https://www.bilibili.com/video/BV1biCFYhEtb/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 228,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "double_atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/double-atari.mp4"
+  },
+  {
+    "id": "net",
+    "title": "围棋入门 一学就会—枷吃",
+    "url": "https://www.bilibili.com/video/BV1gvCFYwEKX/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 232,
+    "skills": [
+      "capture",
+      "tsumego"
+    ],
+    "concepts": [
+      "net"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/net.mp4"
+  },
+  {
+    "id": "gate",
+    "title": "围棋入门 一学就会—门吃",
+    "url": "https://www.bilibili.com/video/BV1uiCFYhEjR/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 63,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "gate"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/gate.mp4"
+  },
+  {
+    "id": "ladder",
+    "title": "围棋入门 一学就会 征吃基本棋形",
+    "url": "https://www.bilibili.com/video/BV1FHciebEE9/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 281,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/ladder.mp4"
+  },
+  {
+    "id": "ladder-direction",
+    "title": "围棋入门 征子打吃方向",
+    "url": "https://www.bilibili.com/video/BV1eGf1YBEpW/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 181,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/ladder-direction.mp4"
+  },
+  {
+    "id": "snapback",
+    "title": "围棋入门 倒扑实战应用",
+    "url": "https://www.bilibili.com/video/BV1gTRWYZEkX/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 103,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "snapback"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/snapback.mp4"
+  },
+  {
+    "id": "connection-trap",
+    "title": "围棋入门 接不归",
+    "url": "https://www.bilibili.com/video/BV1ax9EYjEBw/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 77,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "connection_trap"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/connection-trap.mp4"
+  },
+  {
+    "id": "edge-capture",
+    "title": "围棋入门 边线吃子",
+    "url": "https://www.bilibili.com/video/BV1Xe91YRETQ/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 351,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "edge_chase"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/edge-capture.mp4"
+  },
+  {
+    "id": "eyes",
+    "title": "围棋入门 真眼和假眼",
+    "url": "https://www.bilibili.com/video/BV1F6R8Y8EGo/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 385,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "eyes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/eyes.mp4"
+  },
+  {
+    "id": "life-shapes",
+    "title": "围棋入门 基本死活常形",
+    "url": "https://www.bilibili.com/video/BV1ZeQNY1EuE/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 378,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "life_shapes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看",
+    "playback_url": "/api/videos/life-shapes.mp4"
+  },
+  {
+    "id": "chen-1",
+    "title": "第一章：围棋规则",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=1",
+    "author": "棋士陈林涛",
+    "duration_seconds": 258,
+    "skills": [
+      "capture",
+      "escape"
+    ],
+    "concepts": [
+      "rules"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-1.mp4"
+  },
+  {
+    "id": "chen-2",
+    "title": "气、打吃和提子",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=2",
+    "author": "棋士陈林涛",
+    "duration_seconds": 327,
+    "skills": [
+      "capture",
+      "escape"
+    ],
+    "concepts": [
+      "atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-2.mp4"
+  },
+  {
+    "id": "chen-4",
+    "title": "打劫",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=4",
+    "author": "棋士陈林涛",
+    "duration_seconds": 204,
+    "skills": [
+      "life_death"
+    ],
+    "concepts": [
+      "ko"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-4.mp4"
+  },
+  {
+    "id": "chen-8",
+    "title": "第二章：吃子技巧   第一节：双打吃",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=8",
+    "author": "棋士陈林涛",
+    "duration_seconds": 170,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "double_atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-8.mp4"
+  },
+  {
+    "id": "chen-10",
+    "title": "关门吃",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=10",
+    "author": "棋士陈林涛",
+    "duration_seconds": 165,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "gate"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-10.mp4"
+  },
+  {
+    "id": "chen-11",
+    "title": "枷吃",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=11",
+    "author": "棋士陈林涛",
+    "duration_seconds": 405,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "net"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-11.mp4"
+  },
+  {
+    "id": "chen-12",
+    "title": "征吃",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=12",
+    "author": "棋士陈林涛",
+    "duration_seconds": 307,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-12.mp4"
+  },
+  {
+    "id": "chen-13",
+    "title": "边线吃子",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=13",
+    "author": "棋士陈林涛",
+    "duration_seconds": 178,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "edge_chase"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-13.mp4"
+  },
+  {
+    "id": "chen-14",
+    "title": "倒扑",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=14",
+    "author": "棋士陈林涛",
+    "duration_seconds": 232,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "snapback"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-14.mp4"
+  },
+  {
+    "id": "chen-15",
+    "title": "接不归",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=15",
+    "author": "棋士陈林涛",
+    "duration_seconds": 220,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "connection_trap"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-15.mp4"
+  },
+  {
+    "id": "chen-30",
+    "title": "第四章：初级死活  第一节：真眼与假眼",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=30",
+    "author": "棋士陈林涛",
+    "duration_seconds": 372,
+    "skills": [
+      "eyes",
+      "life_death"
+    ],
+    "concepts": [
+      "eyes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-30.mp4"
+  },
+  {
+    "id": "chen-31",
+    "title": "两眼活棋",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=31",
+    "author": "棋士陈林涛",
+    "duration_seconds": 320,
+    "skills": [
+      "eyes",
+      "life_death"
+    ],
+    "concepts": [
+      "eyes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-31.mp4"
+  },
+  {
+    "id": "chen-32",
+    "title": "直二直三和弯三",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=32",
+    "author": "棋士陈林涛",
+    "duration_seconds": 317,
+    "skills": [
+      "eyes",
+      "life_death"
+    ],
+    "concepts": [
+      "life_shapes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-32.mp4"
+  },
+  {
+    "id": "chen-52",
+    "title": "第六章：实用技巧—1.逃跑",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=52",
+    "author": "棋士陈林涛",
+    "duration_seconds": 633,
+    "skills": [
+      "escape"
+    ],
+    "concepts": [
+      "escape"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-52.mp4"
+  },
+  {
+    "id": "chen-53",
+    "title": "2.实用技巧：连接",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=53",
+    "author": "棋士陈林涛",
+    "duration_seconds": 551,
+    "skills": [
+      "connect"
+    ],
+    "concepts": [
+      "connection"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-53.mp4"
+  },
+  {
+    "id": "chen-54",
+    "title": "3.实用技巧：分断",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=54",
+    "author": "棋士陈林涛",
+    "duration_seconds": 436,
+    "skills": [
+      "cut"
+    ],
+    "concepts": [
+      "cutting"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/chen-54.mp4"
+  },
+  {
+    "id": "peiqi-1",
+    "title": "入门系列之吃子技巧：吃子",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=1",
+    "author": "佩棋教育",
+    "duration_seconds": 102,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "liberties"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-1.mp4"
+  },
+  {
+    "id": "peiqi-3",
+    "title": "入门系列之吃子技巧：逃子",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=3",
+    "author": "佩棋教育",
+    "duration_seconds": 66,
+    "skills": [
+      "escape"
+    ],
+    "concepts": [
+      "escape"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-3.mp4"
+  },
+  {
+    "id": "peiqi-4",
+    "title": "入门系列之吃子技巧：逃子方向",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=4",
+    "author": "佩棋教育",
+    "duration_seconds": 87,
+    "skills": [
+      "escape"
+    ],
+    "concepts": [
+      "escape"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-4.mp4"
+  },
+  {
+    "id": "peiqi-7",
+    "title": "入门系列之吃子技巧：门吃",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=7",
+    "author": "佩棋教育",
+    "duration_seconds": 105,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "gate"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-7.mp4"
+  },
+  {
+    "id": "peiqi-9",
+    "title": "入门系列之吃子技巧：双打吃",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=9",
+    "author": "佩棋教育",
+    "duration_seconds": 114,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "double_atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-9.mp4"
+  },
+  {
+    "id": "peiqi-10",
+    "title": "入门系列之吃子技巧：征子",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=10",
+    "author": "佩棋教育",
+    "duration_seconds": 149,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-10.mp4"
+  },
+  {
+    "id": "peiqi-12",
+    "title": "入门系列之吃子技巧：接不归",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=12",
+    "author": "佩棋教育",
+    "duration_seconds": 102,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "connection_trap"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
+    "playback_url": "/api/videos/peiqi-12.mp4"
+  }
+]

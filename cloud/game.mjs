@@ -1,0 +1,78 @@
+import {clone,group,play,key,coord,boardFor} from './rules.mjs';
+import {grade,publicLesson,recommend,practice} from './curriculum.mjs';
+export function blank(size=9){if(![9,19].includes(size))throw new Error('请选择9路或19路棋盘。');const board=Array.from({length:size},()=>Array(size).fill(0));return {size,board,initial_board:clone(board),to_play:1,initial_player:1,move_number:0,moves:[],captures:{black:0,white:0},last_move:null,mode:'free',lesson:null,marks:[],message:'黑棋先行。',history:[],ended:false,passes:0,feedback:[],demo_active:false,demo_step:0,demo_total:0,lesson_attempted:false,assisted:false,assessment:null,last_human_assessment:null};}
+export function lessonState(lesson){const s=blank(lesson.size||9);s.mode='lesson';s.lesson=clone(lesson);s.board=boardFor(lesson);s.initial_board=clone(s.board);s.to_play=s.initial_player=lesson.to_play||1;s.message=lesson.prompt;s.marks=clone(lesson.marks||[]);if(lesson.sequence)s.lesson_progress={status:'playing',ply:0,message:'连续计算题：你落子后，对手会按收录变化自动应手。'};return s;}
+export function computerTurn(s){return s.mode==='free'&&!s.ended&&!s.demo_active&&s.match?.[s.to_play===1?'black':'white']?.type==='ai';}
+function snap(s){const out={};for(const name of ['board','to_play','move_number','captures','last_move','passes','ended','marks','message','lesson_attempted','lesson_progress','assisted','assessment','last_human_assessment'])if(s[name]!==undefined)out[name]=clone(s[name]);return out;}
+export function ruleFeedback(before,after,x,y,color,captured){const g=group(after,x,y),colorName=color===1?'黑':'白',libs=g.liberties.length;return {correct:null,source:'rules',summary:`${colorName}棋落在${coord(x,y,after.length)}${captured?`，提走${captured}颗棋子`:''}。`,explanation:`落子后，这一整块${colorName}棋有${g.stones.length}颗棋子、${libs}口气。${libs===1?'只剩一口气，已经被打吃。':'气数是规则事实，不表示整盘优势或已经做活。'}`,marks:[]};}
+function move(s,x,y,color=s.to_play){if(s.ended)throw new Error('本局已结束，请重新开始。');if(s.moves.length>=1000)throw new Error('本局已达1000手保存上限，请导出棋谱后新开一局。');if(s.match)delete s.match.result_proposal;const before=clone(s.board),result=play(s.board,x,y,color,[key(s.board),...s.history.map(h=>key(h.board))]);s.history.push(snap(s));s.board=result.board;s.to_play=3-color;s.move_number++;s.last_move={x,y};s.moves.push({color,x,y,pass:false});s.passes=0;s.marks=[];s.captures[color===1?'black':'white']+=result.captured;s.message=`${color===1?'黑':'白'}棋落在${coord(x,y,s.size)}。`;
+ if(s.mode==='free'&&!s.demo_active)s.assessment=ruleFeedback(before,s.board,x,y,color,result.captured);
+ if(s.mode==='lesson'&&!s.demo_active&&!s.lesson.sequence){s.lesson_attempted=true;s.assessment=s.lesson.id==='custom'?null:grade(s.lesson,before,s.board,{x,y,color},result.captured);}
+ if(s.assessment&&!s.demo_active){s.message=s.assessment.summary+' '+s.assessment.explanation;s.marks=clone(s.assessment.marks||[]);}return result;
+}
+export function sequenceNode(s){let node=s.lesson.tree;for(const m of s.moves){node=node.children?.find(c=>c.move[0]===m.x&&c.move[1]===m.y);if(!node)return null;}return node;}
+export function captureGoalComplete(s){const objective=s.lesson?.objective,targets=objective?.targets||[],captured=targets.map(([x,y])=>[s.board,...(s.history||[]).map(h=>h.board)].some(board=>board[y][x]!==3-s.initial_player));return !!targets.length&&(objective.kind==='capture'?captured.every(Boolean):objective.kind==='capture_any'?captured.some(Boolean):false);}
+function sequencePlay(s,x,y){let node=sequenceNode(s);if(!node)throw new Error('当前变化未收录，请重试。');let child=node.children?.find(c=>c.move[0]===x&&c.move[1]===y);move(s,x,y);let summary,explanation,correct=null,status;
+ if(captureGoalComplete(s)){s.lesson_attempted=true;status='solved';correct=true;summary='目标已提掉，这手完成了题目。';explanation='已按棋盘规则核对实际提子结果，不要求落子与参考答案完全相同。';}
+ else if(!child){s.lesson_attempted=true;status='unlisted';summary='这手走出了参考变化，等待复核。';explanation='可以复核这手的效果，也可以看参考解法或重练。';s.assisted=true;}
+ else {explanation=child.explanation||'';if(child.children?.length){const replies=child.children,reply=replies[((s._branch_seed||0)+Math.floor(s.moves.length/2))%replies.length];move(s,...reply.move);explanation+=' '+(reply.explanation||'');child=reply;}const solved=!child.children?.length;s.lesson_attempted=solved;correct=solved?true:null;status=solved?'solved':'playing';summary=solved?(s.lesson.objective?.kind==='authored_solution'?'已完成作者收录的正确变化。':'这条吃子变化完成，目标已提掉。'):'对手已应手，请继续计算下一手。';}
+ s.assessment={correct,summary,explanation:explanation.trim(),marks:[],skill:s.lesson.skill,difficulty:s.lesson.difficulty};s.lesson_progress={status,ply:s.moves.length,message:summary};s.message=summary+' '+explanation;
+}
+function undoOne(s){if(!s.history.length)throw new Error('没有可以撤回的落子。');const previous=s.history.pop();Object.assign(s,previous);s.moves=s.moves.slice(0,s.move_number);delete s.inspection;}
+export function createMatch(profiles,profileId,a){const byId=new Map(profiles.map(p=>[p.id,p]));const human=id=>{if(!byId.has(id))throw new Error('找不到对局参与者。');return {type:'human',profile_id:id,name:byId.get(id).name}};const mode=a.match_mode||'two_player';if(!['two_player','human_ai'].includes(mode))throw new Error('请选择人机或双人对弈。');const match={id:crypto.randomUUID().replaceAll('-',''),mode};
+ if(mode==='human_ai'){const color=a.human_color??1;if(![1,2].includes(color))throw new Error('执棋颜色无效。');match.human_color=color;match[color===1?'black':'white']=human(profileId);match[color===1?'white':'black']={type:'ai',name:'KataGo'};}
+ else{const black=a.black_profile_id||profileId,white=a.white_profile_id||profiles.find(p=>p.id!==black)?.id;if(black===white||![black,white].includes(profileId))throw new Error('请选两位不同学习者，且包含当前学习者。');match.black=human(black);match.white=human(white);}return match;
+}
+export function applyAction(state,a,ctx){let s=clone(state);const type=a.type,lessonId=s.lesson?.id,helped=new Set(ctx.helped||[]),runs={...(ctx.runs||{})};let event=null,note=null;
+ if(lessonId&&helped.has(lessonId))s.assisted=true;
+ if(['new','setup','resume_match','lesson','retry','next_lesson','practice_mode'].includes(type)&&s.lesson?.sequence&&s.moves.length&&!s.lesson_attempted)helped.add(lessonId);
+ if(['play','pass'].includes(type)&&computerTurn(s))throw new Error('现在轮到电脑，请等待应手。');
+ if(type==='play'||type==='ai_move'){
+  if(s.demo_active)throw new Error('请先返回原局面。');if(s.mode==='lesson'&&s.lesson_attempted)throw new Error('本轮练习已结束，请重试或下一题。');
+  if(type==='ai_move'){if(!computerTurn(s))throw new Error('当前没有轮到电脑。');if(ctx.aiMove?.pass)pass(s);else if(ctx.aiMove)move(s,ctx.aiMove.x,ctx.aiMove.y);else throw new Error('电脑没有返回落点。');}
+  else if(s.lesson?.sequence)sequencePlay(s,a.x,a.y);else move(s,a.x,a.y);
+  if(type==='play'&&s.mode==='free')s.last_human_assessment=clone(s.assessment);
+ }
+ else if(type==='pass')pass(s);
+ else if(type==='undo'){
+  if(s.demo_active)throw new Error('请先返回原局面。');const sequence=s.lesson?.sequence,human=s.match?.mode==='human_ai'?s.match.human_color:null;
+  if(s.match?.result)throw new Error('已确认结果的对局不能悔棋，请新开一局。');
+  if(human&&!s.moves.some(m=>m.color===human))throw new Error('你还没有落子，没有可悔的决定。');
+  if(s.match)delete s.match.result_proposal;undoOne(s);while(s.history.length&&((sequence&&s.to_play!==s.initial_player)||(human&&s.to_play!==human)))undoOne(s);
+  if(sequence){s.assisted=true;helped.add(lessonId);}s.message='已退回上次落子前。';
+ }
+ else if(type==='retry'||type==='lesson'||type==='next_lesson'||type==='practice_mode'){
+  if(s.demo_active)throw new Error('请先返回原局面。');if(type==='practice_mode'){if(!['recommended','sequential','review'].includes(a.mode))throw new Error('练习模式无效。');runs._practice_mode=a.mode;}const mode=runs._practice_mode||'recommended';let id=type==='retry'?s.lesson?.id:type==='lesson'?a.id:mode==='recommended'?recommend(ctx.catalog,ctx.evidence,ctx.learning,ctx.recent,s.lesson?.id).id:practice({...ctx,runs,helped:[...helped]},s.lesson?.id,mode,type==='next_lesson').next_id;if(!id){s.message=mode==='review'?'当前没有待复习的题目。':'本轮题目已全部通关。';return {state:s,helped:[...helped],runs,event,note};}const lesson=ctx.catalog.find(l=>l.id===id)||(id==='custom'?s.lesson:null);if(!lesson)throw new Error('找不到这道练习。');s=lessonState(lesson);if(s.lesson.sequence){s._branch_seed=runs[id]||0;runs[id]=(runs[id]||0)+1;}
+ }
+ else if(type==='new'){s=blank(a.size||9);s.match=createMatch(ctx.profiles,ctx.profileId,a);s.match_id=s.match.id;}
+ else if(type==='resume_match'){if(!ctx.resumeState)throw new Error('找不到这位学习者参与的对局。');s=clone(ctx.resumeState);s.feedback=[];}
+ else if(type==='hint'){if(s.mode==='lesson'&&!s.lesson_attempted){s.assisted=true;helped.add(lessonId);}s.message=s.lesson?.hint||'先数整块棋的气。';}
+ else if(type==='inspect'){if(!Number.isInteger(a.x)||!Number.isInteger(a.y)||a.x<0||a.y<0||a.x>=s.size||a.y>=s.size)throw new Error('坐标无效。');const g=group(s.board,a.x,a.y);s.inspection={stones:g.stones.map(([x,y])=>({x,y})),liberties:g.liberties.map(([x,y])=>({x,y})),color:s.board[a.y][a.x]};s.marks=g.liberties.map(([x,y])=>({x,y,label:'气'}));if(g.stones.length&&s.mode==='lesson'&&!s.lesson_attempted){s.assisted=true;helped.add(lessonId);}s.message=g.stones.length?`这块棋有${g.stones.length}颗棋子、${g.liberties.length}口气。`:'这里是空点，请选一颗棋子。';}
+ else if(type==='feedback'){const text=String(a.text||'').trim();if(!text||text.length>4000)throw new Error('想法需为1至4000字。');note={text,move_number:s.move_number,created_at:new Date().toISOString(),profile_id:ctx.profileId,lesson_id:s.lesson?.id||null};s.message='想法已保存。';}
+ else if(type==='annotate'){if(!Array.isArray(a.marks)||a.marks.length>361)throw new Error('标记格式无效。');s.marks=a.marks.map(m=>{if(!Number.isInteger(m.x)||!Number.isInteger(m.y)||m.x<0||m.y<0||m.x>=s.size||m.y>=s.size)throw new Error('标记坐标无效。');return {x:m.x,y:m.y,label:String(m.label||'').slice(0,20)}});s.message=String(a.message||'').slice(0,4000);}
+ else if(type==='setup'){s=blank(a.size||9);s.mode='lesson';if(!Array.isArray(a.stones)||a.stones.length>s.size*s.size)throw new Error('摆子格式无效。');for(const p of a.stones){if(!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<0||p.y<0||p.x>=s.size||p.y>=s.size||![1,2].includes(p.color)||s.board[p.y][p.x])throw new Error('摆子坐标或颜色无效。');s.board[p.y][p.x]=p.color;}for(const p of a.stones)if(!group(s.board,p.x,p.y).liberties.length)throw new Error('初始棋块必须有气。');s.to_play=s.initial_player=a.to_play||1;if(![1,2].includes(s.to_play))throw new Error('执棋颜色无效。');s.initial_board=clone(s.board);s.lesson={id:'custom',title:String(a.title||'老师的练习题').slice(0,200),prompt:String(a.prompt||'请观察局面，再下一手。').slice(0,2000),hint:'先数整块棋的气。',stones:clone(a.stones),size:s.size};s.message=s.lesson.prompt;}
+ else if(type==='demo'){if(s.demo_active||!Array.isArray(a.moves)||!a.moves.length||a.moves.length>100)throw new Error('请提供1至100手演示，且先退出已有演示。');const checked=clone(s);checked.demo_active=true;for(const m of a.moves)move(checked,m.x,m.y,m.color||checked.to_play);s._demo_backup=clone(s);s._demo_moves=clone(a.moves);s.demo_active=true;s.demo_step=0;s.demo_total=a.moves.length;if(lessonId)helped.add(lessonId);demoNext(s);}
+ else if(type==='solution'){
+  if(s.demo_active||!s.lesson?.sequence)throw new Error('请在连续练习原局面查看参考解法。');
+  function path(node,state,moves=[]){if(!node.children?.length)return moves.length&&node.correct!==false?moves:null;for(const child of node.children){try{const next=clone(state);next.demo_active=true;move(next,...child.move);const result=path(child,next,[...moves,{x:child.move[0],y:child.move[1]}]);if(result)return result;}catch{}}return null;}
+  const initial=lessonState(s.lesson),moves=path(s.lesson.tree,initial);if(!moves)throw new Error('这道题暂时没有可演示的合法参考解法。');helped.add(lessonId);s.assisted=true;const backup=clone(s);s=initial;s.assisted=true;s._demo_backup=backup;s._demo_moves=moves;s.demo_active=true;s.demo_step=0;s.demo_total=moves.length;demoNext(s);
+ }
+ else if(type==='demo_next')demoNext(s);
+ else if(type==='restore_demo'){if(!s._demo_backup)throw new Error('当前没有演示。');s=clone(s._demo_backup);s.message='已返回原局面。';}
+ else if(['resign','propose_result','confirm_result'].includes(type)){finishMatch(s,a,ctx.profileId);}
+ else throw new Error('未知操作。');
+ if(s.lesson_progress?.status==='unlisted'&&lessonId)helped.add(lessonId);
+ if(s.lesson&&helped.has(s.lesson.id))s.assisted=true;
+ if(type==='play'&&s.lesson&&s.lesson.id!=='custom'&&typeof s.assessment?.correct==='boolean')event={lesson_id:s.lesson.id,title:s.lesson.title,skill:s.lesson.skill,difficulty:s.lesson.difficulty,correct:s.assessment.correct,assisted:!!s.assisted,move:clone(s.moves.at(-1)),summary:s.assessment.summary,created_at:new Date().toISOString(),profile_id:ctx.profileId};
+ if(type!=='inspect')delete s.inspection;
+ return {state:s,helped:[...helped],runs,event,note};
+}
+function pass(s){if(s.mode==='lesson'||s.demo_active||s.ended)throw new Error('当前局面不能停一手。');if(s.match)delete s.match.result_proposal;s.history.push(snap(s));s.moves.push({color:s.to_play,pass:true});s.to_play=3-s.to_play;s.move_number++;s.last_move=null;s.passes++;s.ended=s.passes>=2;s.message=s.ended?'双方连续停一手，本局结束，尚未确认胜负。':'已停一手，轮到对方。';}
+function demoNext(s){if(!s.demo_active||s.demo_step>=s.demo_total)throw new Error('没有下一手演示。');const m=s._demo_moves[s.demo_step];move(s,m.x,m.y,m.color||s.to_play);s.demo_step++;s.message=`演示第${s.demo_step}/${s.demo_total}手，可返回原局面。`;}
+function finishMatch(s,a,profileId){if(s.mode!=='free'||!s.match||s.demo_active)throw new Error('请在对局原局面登记结果。');if(s.match.result)throw new Error('这盘棋已有确认结果。');const side=s.match.black.profile_id===profileId?'black':s.match.white.profile_id===profileId?'white':null;if(!side)throw new Error('当前学习者不是对局参与者。');
+ if(a.type==='resign'){s.match.result={winner:side==='black'?'white':'black',reason:'resign',confirmed_by:[profileId],confirmed_at:new Date().toISOString()};s.ended=true;}
+ else{if(s.match.mode!=='two_player')throw new Error('人机对弈仅记录明确认输，不由模型猜测胜负。');if(a.type==='propose_result'){if(!['black','white','draw'].includes(a.winner))throw new Error('结果需为黑胜、白胜或和棋。');s.match.result_proposal={winner:a.winner,confirmed_by:[profileId]};}
+ else{const proposal=s.match.result_proposal;if(!proposal||proposal.confirmed_by.includes(profileId))throw new Error('需要另一位参与者确认相同结果。');s.match.result={...proposal,reason:'both_confirmed',confirmed_by:[...proposal.confirmed_by,profileId],confirmed_at:new Date().toISOString()};delete s.match.result_proposal;s.ended=true;}}
+ s.message=s.match.result?'对局结果已确认并保存。':'结果已提出，请另一位参与者切换自己的档案后确认。';}
+export function publicState(s){const out=clone(s);if(s.lesson)out.lesson=publicLesson(s.lesson);delete out._demo_backup;delete out._demo_moves;function clean(v){if(Array.isArray(v))v.forEach(clean);else if(v&&typeof v==='object'){for(const name of ['tree','objective','solutions','solution','_branch_seed'])delete v[name];Object.values(v).forEach(clean);}}clean(out);return out;}
+export function sgf(s){const xy=(x,y)=>String.fromCharCode(97+x)+String.fromCharCode(97+y);let text=`(;GM[1]FF[4]CA[UTF-8]AP[GoCoach:Cloud]SZ[${s.size}]KM[7.5]RU[Chinese]PL[${s.initial_player===2?'W':'B'}]`;for(const[color,tag]of [[1,'AB'],[2,'AW']]){const points=[];for(let y=0;y<s.size;y++)for(let x=0;x<s.size;x++)if(s.initial_board[y][x]===color)points.push('['+xy(x,y)+']');if(points.length)text+=tag+points.join('');}for(const m of s.moves)text+=';'+(m.color===1?'B':'W')+'['+(m.pass?'':xy(m.x,m.y))+']';return text+')';}

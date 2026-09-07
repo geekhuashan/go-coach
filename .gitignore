@@ -1,0 +1,14 @@
+.local/
+__pycache__/
+output/
+.playwright-cli/
+.DS_Store
+
+# Optional local credentials
+.env
+.env.*
+!.env.example
+node_modules/
+.wrangler/
+.dev.vars
+.dev.vars.*

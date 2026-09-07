@@ -1,0 +1,13 @@
+{
+  "name": "go-coach",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:cloud": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy",
+    "test:cloud": "node --test cloud/tests/*.test.mjs",
+    "db:local": "wrangler d1 migrations apply go-coach --local",
+    "db:remote": "wrangler d1 migrations apply go-coach --remote"
+  },
+  "devDependencies": { "wrangler": "4.129.0" }
+}
