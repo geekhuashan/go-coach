@@ -44,6 +44,17 @@ def practice_progress(profile,current_id=None,advance=False):
     group_start={}
     for l in catalog: group_start.setdefault(re.sub(r'\d+$','',l['id']),ids_order[l['id']])
     catalog.sort(key=lambda l:(group_start[re.sub(r'\d+$','',l['id'])],int(re.search(r'\d+$',l['id']).group()) if re.search(r'\d+$',l['id']) else 0))
+    mode=profile.get('practice_mode','recommended')
+    current=next((l for l in catalog if l['id']==current_id),None)
+    source=(current or {}).get('source') or {}
+    book_title=source.get('title') if mode=='sequential' and source.get('kind')=='book' else None
+    if book_title:
+        catalog=[l for l in catalog if (l.get('source') or {}).get('kind')=='book' and l['source'].get('title')==book_title]
+        def book_order(lesson):
+            numbers=re.findall(r'\d+',str(lesson['source'].get('problem','')))
+            fallback=re.findall(r'\d+',lesson['id'])
+            return (int((numbers or fallback)[-1]) if numbers or fallback else float('inf'),lesson['id'])
+        catalog.sort(key=book_order)
     ordered_ids=[l['id'] for l in catalog]
     catalog=[l for l in catalog if curriculum.available_lesson(l)]
     mode=profile.get('practice_mode','recommended')
@@ -54,7 +65,9 @@ def practice_progress(profile,current_id=None,advance=False):
     anchor=ordered_ids.index(current_id) if current_id in ordered_ids else -1
     pool=[identity for identity in ids if identity not in completed and (mode!='review' or identity in review)]
     next_id=next((identity for identity in pool if ordered_ids.index(identity)>anchor),pool[0] if pool else None) if advance else (pool[0] if pool else None)
-    return dict(mode=mode,total=len(ids),completed=len(set(ids)&completed),remaining=len(set(ids)-completed),current_index=index+1 if index>=0 else None,next_index=ids.index(next_id)+1 if next_id else None,review_count=len((set(ids)&review)-completed),next_id=next_id)
+    result=dict(mode=mode,total=len(ids),completed=len(set(ids)&completed),remaining=len(set(ids)-completed),current_index=index+1 if index>=0 else None,next_index=ids.index(next_id)+1 if next_id else None,review_count=len((set(ids)&review)-completed),next_id=next_id)
+    if book_title: result.update(book_title=book_title,chapter=current.get('concept'),book_complete=not pool)
+    return result
 
 
 def blank(revision=0, mode='free', size=9):
@@ -248,7 +261,8 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
                 identity=choice if isinstance(choice,str) else choice.get('id',choice.get('lesson_id'))
             else: identity=practice_progress(profile,(s.get('lesson') or {}).get('id'),kind=='next_lesson')['next_id']
             if not identity:
-                s['message']='当前没有待复习的题目。' if profile.get('practice_mode')=='review' else '本轮题目已全部通关。'
+                progress=practice_progress(profile,(s.get('lesson') or {}).get('id'))
+                s['message']='当前没有待复习的题目。' if profile.get('practice_mode')=='review' else f'《{progress["book_title"]}》已导入的题目全部完成。' if progress.get('book_title') else '本轮题目已全部通关。'
                 store['revision']+=1
                 active_state(store)
                 return store

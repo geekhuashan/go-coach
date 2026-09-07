@@ -21,7 +21,9 @@ export function validateLesson(value,{trustedAuthored=false}={}){
  for(const s of out.stones)if(!group(board,s.x,s.y).liberties.length)fail('初始棋块没有气。');
  const objective=value.objective||value.goal,kind=objective?.kind;
  if(!['capture','capture_any','authored_solution'].includes(kind))fail('目标类型无效。');
- if(kind==='authored_solution'&&!trustedAuthored&&!(value.source?.kind==='licensed'&&value.source?.license&&value.source?.url))fail('作者答案题需要授权来源、许可和来源链接。');
+ const privateBook=value.source?.kind==='book'&&value.source?.usage==='household_private'&&value.source?.answer_verified===true;
+ if(kind==='authored_solution'&&!trustedAuthored&&!(value.source?.kind==='licensed'&&value.source?.license&&value.source?.url)&&!privateBook)fail('作者答案题需要授权来源、许可和来源链接，或已核对的家庭私用书题来源。');
+ if(kind==='authored_solution'&&privateBook)for(const name of ['title','page','problem']){const raw=value.source[name];text((name==='page'||name==='problem')&&Number.isInteger(raw)?String(raw):raw,'书题来源 '+name,600);}
  const targets=kind==='authored_solution'?[]:objective.targets;
  if(!Array.isArray(targets)|| (kind!=='authored_solution'&&(targets.length<1||targets.length>40)))fail('目标坐标无效。');
  const ps=targets.map(p=>point(p,'目标')),defender=3-out.to_play;
@@ -29,6 +31,7 @@ export function validateLesson(value,{trustedAuthored=false}={}){
  out.objective={kind,targets:ps};
  const source=value.source||{kind:'manual'};if(!['original','book','manual','licensed'].includes(source.kind))fail('来源类型无效。');
  out.source={kind:source.kind};for(const name of ['title','page','problem','note',...(source.kind==='licensed'?['url','license','attribution','author','commit','original_prompt']:[])])if(source[name]!==undefined)out.source[name]=text(String(source[name]),'来源',1200,false);
+ if(privateBook)Object.assign(out.source,{usage:'household_private',answer_verified:true});
  out.marks=[];if(value.marks!==undefined&&!Array.isArray(value.marks))fail('标记需为列表。');
  for(const m of value.marks||[]){if(out.marks.length>=40)fail('标记过多。');const[x,y]=point([m.x,m.y],'标记');out.marks.push({x,y,label:text(m.label,'标记文字',16)});}
  let count=0;const active=new Set(),targetSet=new Set(ps.map(p=>p.join(',')));
@@ -87,9 +90,12 @@ export function recommend(catalog,evidence,stats,recent=[],currentId=null){
 
 export function focusBounds(lesson){const size=lesson.size||9,points=(lesson.stones||[]).map(p=>Array.isArray(p)?p:[p.x,p.y]);function walk(n){if(n?.move)points.push(n.move);for(const c of n?.children||[])walk(c);}walk(lesson.tree);const valid=points.filter(p=>p.length>=2&&p.every(Number.isInteger)&&p[0]>=0&&p[1]>=0&&p[0]<size&&p[1]<size);return valid.length?{min_x:Math.min(...valid.map(p=>p[0])),min_y:Math.min(...valid.map(p=>p[1])),max_x:Math.max(...valid.map(p=>p[0])),max_y:Math.max(...valid.map(p=>p[1]))}:null;}
 export function practice(ctx,currentId=null,mode=ctx.runs?._practice_mode||'recommended',advance=false){
- const ordered=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b)),catalog=ordered.filter(availableLesson),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
+ const current=ctx.catalog.find(l=>l.id===currentId),bookTitle=mode==='sequential'&&current?.source?.kind==='book'?current.source.title:null;
+ const number=l=>{const values=String(l.source?.problem||'').match(/\d+/g)||l.id.match(/\d+/g);return values?Number(values.at(-1)):Infinity;};
+ const ordered=(bookTitle?ctx.catalog.filter(l=>l.source?.kind==='book'&&l.source.title===bookTitle):ctx.catalog).filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b)),catalog=ordered.filter(availableLesson),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
+ if(bookTitle){ordered.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id));catalog.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id));}
  const pool=catalog.filter(l=>!completed.has(l.id)&&(mode!=='review'||review.has(l.id))),index=catalog.findIndex(l=>l.id===currentId),anchor=ordered.findIndex(l=>l.id===currentId);
  let next=pool[0];if(advance&&anchor>=0)next=pool.find(l=>ordered.indexOf(l)>anchor)||pool[0];
  const reviewCount=catalog.filter(l=>review.has(l.id)&&!completed.has(l.id)).length;
- return {mode,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:catalog.filter(l=>!completed.has(l.id)).length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:reviewCount,next_id:next?.id||null};
+ return {...(bookTitle?{book_title:bookTitle,chapter:current.concept||null,book_complete:pool.length===0}:{}),mode,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:catalog.filter(l=>!completed.has(l.id)).length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:reviewCount,next_id:next?.id||null};
 }

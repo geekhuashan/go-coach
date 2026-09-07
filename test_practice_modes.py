@@ -48,3 +48,32 @@ class PracticeTest(unittest.TestCase):
         self.assertEqual(p['state']['lesson']['id'],'escape-1-8')
         server.apply_store(store,dict(type='next_lesson'));self.assertEqual(p['state']['lesson']['id'],'escape-2-1')
         p['practice_mode']='review';p['helped_lesson_ids']=['escape-1-8'];self.assertEqual(server.practice_progress(p)['review_count'],0)
+
+    def test_book_sequential_scope_crosses_chapters_and_preserves_records(self):
+        store=self.store();profile=store['profiles']['parent']
+        base=copy.deepcopy(curriculum.get_lesson('escape-1-1'))
+        book=[dict(base,id='private-'+str(n),source={'kind':'book','title':'我的手筋书','problem':str(n)},concept=chapter) for n,chapter in [(10,'第二章'),(2,'第一章'),(1,'第一章')]]
+        other=dict(base,id='other-book',source={'kind':'book','title':'别的书','problem':'1'})
+        catalog=[base,other,*book]
+        with patch.object(curriculum,'catalog',lambda:copy.deepcopy(catalog)),patch.object(curriculum,'get_lesson',lambda identity:copy.deepcopy(next((l for l in catalog if l['id']==identity),None))):
+            profile['practice_mode']='sequential'
+            server.apply_store(store,{'type':'lesson','id':'private-2'})
+            profile['attempts']=[dict(lesson_id='private-1',correct=True,assisted=True),dict(lesson_id='private-2',correct=True,assisted=False)]
+            records=copy.deepcopy(profile['attempts'])
+            progress=server.practice_progress(profile,'private-2',True)
+            self.assertEqual((progress['total'],progress['completed'],progress['current_index']),(3,2,2))
+            self.assertEqual((progress['book_title'],progress['chapter'],progress['next_id']),('我的手筋书','第一章','private-10'))
+            server.apply_store(store,{'type':'next_lesson'})
+            self.assertEqual(profile['state']['lesson']['concept'],'第二章')
+            self.assertEqual(profile['attempts'],records)
+            profile['attempts'].append(dict(lesson_id='private-10',correct=True))
+            server.apply_store(store,{'type':'next_lesson'})
+            self.assertEqual(profile['state']['lesson']['id'],'private-10')
+            self.assertIn('已导入的题目全部完成',profile['state']['message'])
+            self.assertTrue(server.practice_progress(profile,'private-10')['book_complete'])
+            self.assertEqual(server.practice_progress(profile,base['id'])['total'],5)
+            self.assertNotIn('book_title',server.practice_progress(profile,base['id']))
+            for mode in ('review','recommended'):
+                profile['practice_mode']=mode
+                self.assertEqual(server.practice_progress(profile,'private-10')['total'],5)
+                self.assertNotIn('book_title',server.practice_progress(profile,'private-10'))

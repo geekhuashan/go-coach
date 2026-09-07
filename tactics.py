@@ -90,9 +90,18 @@ def validate_lesson(value):
     source = value.get('source', {'kind': 'manual'})
     if not isinstance(source, dict) or source.get('kind') not in ('original', 'book', 'manual', 'licensed'):
         fail('来源类型需为 original、book、manual 或 licensed。')
-    if authored and not (source.get('kind') == 'licensed' and source.get('license') and source.get('url')):
-        fail('作者答案题需要授权来源、许可和来源链接。')
+    private_book = source.get('kind') == 'book' and source.get('usage') == 'household_private' and source.get('answer_verified') is True
+    if authored and not ((source.get('kind') == 'licensed' and source.get('license') and source.get('url')) or private_book):
+        fail('作者答案题需要授权来源、许可和来源链接，或已核对的家庭私用书题来源。')
+    if authored and private_book:
+        for field in ('title', 'page', 'problem'):
+            raw = source.get(field)
+            if field in ('page', 'problem') and type(raw) is int:
+                raw = str(raw)
+            text(raw, '书题来源 ' + field, 600)
     out['source'] = {'kind': source['kind']}
+    if private_book:
+        out['source'].update(usage='household_private', answer_verified=True)
     source_fields = ('title', 'page', 'problem', 'note')
     if source['kind'] == 'licensed':
         source_fields += ('author', 'license', 'url', 'commit', 'attribution', 'original_prompt')

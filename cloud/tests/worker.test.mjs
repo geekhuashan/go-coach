@@ -119,3 +119,21 @@ test('new review evidence invalidates an older LLM explanation on the same board
  const s=blank(19),original=await contextKey(s);s.assessment={review:{source:'unavailable',verdict:'uncertain'}};const pending=await contextKey(s);s.assessment.review={source:'katago',verdict:'mistake',evidence:{score_loss:5}};
  assert.notEqual(await contextKey(s),pending);assert.notEqual(pending,original);
 });
+
+test('private book batch import is atomic, scoped and leaves current practice unchanged',async()=>{
+ const {request,env}=await session();const before=(await request('/api/state')).body;
+ const book=id=>({id,title:'私用书题',prompt:'黑先',hint:'观察气',size:9,skill:'tsumego',sequence:true,difficulty:3,to_play:1,stones:[{x:0,y:0,color:2},{x:1,y:0,color:1}],objective:{kind:'authored_solution'},source:{kind:'book',title:'格式验证用书',page:'1',problem:id,usage:'household_private',answer_verified:true},tree:{children:[{move:[0,1],explanation:'提子',result:'success',author_verdict:'correct',children:[]}]}});
+ const first=await request('/api/lessons/import','POST',{revision:before.revision,lessons:[book('private-1'),book('private-2')]});
+ assert.equal(first.status,200);assert.equal(first.body.imported,2);assert.ok(first.body.lessons.every(l=>l.tree===undefined));
+ const after=(await request('/api/state')).body;assert.deepEqual(after.board,before.board);assert.equal(after.lesson.id,before.lesson.id);assert.equal(after.rating.practice_xp,before.rating.practice_xp);
+ const catalog=(await request('/api/lessons')).body;assert.equal(catalog.filter(l=>l.source?.usage==='household_private').length,2);assert.ok(catalog.every(l=>l.tree===undefined));
+ for(const incoming of [[book('private-3'),book('private-1')],[book('private-3'),book('private-3')],[book('private-3'),{...book('private-4'),source:{kind:'book'}}],[],Array.from({length:65},(_,i)=>book('limit-'+i))]){
+  assert.equal((await request('/api/lessons/import','POST',{revision:after.revision,lessons:incoming})).status,400);
+  assert.equal(env.DB.db.prepare('SELECT COUNT(*) AS n FROM lessons').get().n,2);
+ }
+ const otherEnv={...env,HOUSEHOLD_ID:'other-household'},cookie='go_session='+await makeSession(otherEnv);
+ const response=await worker.fetch(new Request('https://go.example/api/lessons',{headers:{Cookie:cookie}}),otherEnv);
+ assert.equal(response.status,200);assert.equal((await response.json()).some(l=>l.id==='private-1'),false);
+ assert.equal((await request('/api/lessons/import','POST',{revision:before.revision,lessons:[book('stale')]})).status,409);
+ assert.equal(env.DB.db.prepare('SELECT COUNT(*) AS n FROM lessons').get().n,2);
+});

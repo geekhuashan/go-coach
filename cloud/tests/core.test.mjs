@@ -79,3 +79,27 @@ test('concept-specific mastery leaves other capture concepts available',async()=
  const {recommend}=await import('../curriculum.mjs'),base=catalog.find(l=>l.sequence&&l.difficulty===3);const book=[1,2,3].map(n=>({...base,id:'edge-test-'+n,concept:'edge_chase'}));book.push({...base,id:'ladder-test',concept:'ladder'});
  const wins=book.slice(0,3).map(l=>({lesson_id:l.id,correct:true,assisted:false,attempt_no:1}));const stats=learning(book,wins);let r=recommend(book,wins,stats,[...wins].reverse());assert.equal(r.concept,'ladder');assert.equal(r.skill,'capture');assert.match(r.reason,/边线追吃/);assert.equal(r.adjustment.kind,'reduce_frequency');
 });
+
+test('private book answers require verified provenance, replay legally and hide answer trees',()=>{
+ const value={id:'private-book-test',title:'书题',prompt:'黑先',hint:'算应手',size:9,skill:'tsumego',sequence:true,difficulty:2,to_play:1,stones:[{x:0,y:0,color:2}],objective:{kind:'authored_solution'},source:{kind:'book',usage:'household_private',answer_verified:true,title:'手筋书',page:'12',problem:'001',note:'答案第40页'},tree:{children:[{move:[1,0],explanation:'作者正确解',result:'success',author_verdict:'correct',children:[]}]}};
+ const clean=validateLesson(value);assert.deepEqual(clean.source,value.source);
+ for(const field of ['usage','answer_verified','title','page','problem']){const bad=structuredClone(value);delete bad.source[field];assert.throws(()=>validateLesson(bad),field);}
+ for(const [field,v] of [['answer_verified','true'],['answer_verified',1],['usage','public'],['title',' '],['page',null],['problem',false]]){const bad=structuredClone(value);bad.source[field]=v;assert.throws(()=>validateLesson(bad),field);}
+ const illegal=structuredClone(value);illegal.tree.children[0].move=[0,0];assert.throws(()=>validateLesson(illegal));
+ const unmarked=structuredClone(value);delete unmarked.tree.children[0].author_verdict;assert.throws(()=>validateLesson(unmarked));
+ const initial=lessonState(clean);assert.equal(publicState(initial).lesson.tree,undefined);assert.equal(publicState(initial).lesson.objective,undefined);
+ const result=action(initial,{type:'play',x:1,y:0},ctx({catalog:[clean]}));assert.equal(result.state.lesson_progress.status,'solved');assert.equal(result.event.correct,true);assert.match(result.state.assessment.summary,/作者/);assert.equal(publicState(result.state).lesson.tree,undefined);
+});
+
+test('sequential books continue across chapters without mixing catalogs or clearing evidence',async()=>{
+ const {practice}=await import('../curriculum.mjs');
+ const base=catalog.find(l=>!l.sequence&&available(l));function available(l){return l.id==='escape-1-1';}
+ const book=[10,2,1].map(n=>({...structuredClone(base),id:`private-${n}`,source:{kind:'book',title:'我的手筋书',problem:String(n)},concept:n===10?'第二章':'第一章'}));
+ const other={...base,id:'other-book',source:{kind:'book',title:'别的书',problem:'1'}};
+ const c=ctx({catalog:[base,other,...book],runs:{_practice_mode:'sequential'},completed:['private-1','private-2'],evidence:[{lesson_id:'private-1',correct:true,assisted:true}]});const original=structuredClone(c);
+ let p=practice(c,'private-2','sequential',true);assert.equal(p.total,3);assert.equal(p.completed,2);assert.equal(p.current_index,2);assert.equal(p.next_id,'private-10');assert.equal(p.book_title,'我的手筋书');assert.equal(p.chapter,'第一章');assert.deepEqual(c,original);
+ let r=action(lessonState(book.find(l=>l.id==='private-2')),{type:'next_lesson'},c);assert.equal(r.state.lesson.id,'private-10');assert.equal(r.state.lesson.concept,'第二章');assert.deepEqual(c,original);
+ c.completed.push('private-10');r=action(r.state,{type:'next_lesson'},c);assert.equal(r.state.lesson.id,'private-10');assert.match(r.state.message,/已导入的题目全部完成/);assert.equal(practice(c,'private-10').book_complete,true);
+ assert.equal(practice(c,base.id).total,5);assert.equal(practice(c,base.id).book_title,undefined);
+ for(const mode of ['recommended','review']){p=practice(c,'private-10',mode);assert.equal(p.total,5);assert.equal(p.book_title,undefined);}
+});

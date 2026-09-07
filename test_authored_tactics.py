@@ -12,6 +12,22 @@ class AuthoredTacticsTests(unittest.TestCase):
                     stones=[dict(x=18,y=18,color=2)],marks=[],objective=dict(kind='authored_solution'),
                     source=dict(kind='licensed',license='CC BY-NC-SA-4.0',url='https://example.com/problem',author='Example author'),
                     tree={'children':[{'move':[17,18],'explanation':'作者第一手','children':[{'move':[18,17],'explanation':"Correct. It is a ko.",'result':'success','author_verdict':'correct','children':[]}]}]})
+    def test_private_book_author_answers_preserve_source_and_validate(self):
+        value=self.lesson()
+        value['source']=dict(kind='book',usage='household_private',answer_verified=True,title='手筋书',page='12',problem='001',note='答案第40页')
+        clean=tactics.validate_lesson(value)
+        self.assertEqual(clean['source'],value['source'])
+        for field in ('usage','answer_verified','title','page','problem'):
+            bad=deepcopy(value);bad['source'].pop(field)
+            with self.subTest(field=field),self.assertRaises(ValueError):tactics.validate_lesson(bad)
+        for field,bad_value in [('answer_verified','true'),('answer_verified',1),('usage','public'),('title',' '),('page',None),('problem',False)]:
+            bad=deepcopy(value);bad['source'][field]=bad_value
+            with self.subTest(field=field,bad=bad_value),self.assertRaises(ValueError):tactics.validate_lesson(bad)
+        bad=deepcopy(value);bad['tree']['children'][0]['move']=[18,18]
+        with self.assertRaisesRegex(ValueError,'不合法'):tactics.validate_lesson(bad)
+        bad=deepcopy(value);bad['tree']['children'][0]['children'][0].pop('author_verdict')
+        with self.assertRaises(ValueError):tactics.validate_lesson(bad)
+
     def test_authored_even_ply_leaf_is_not_fake_capture(self):
         clean=tactics.validate_lesson(self.lesson())
         self.assertEqual(clean['objective'],{'kind':'authored_solution'})

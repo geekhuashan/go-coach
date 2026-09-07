@@ -35,7 +35,7 @@ function toast(text){([...document.querySelectorAll('.app-drawer[open]')].at(-1)
 function connected(online){$('connection').className='connection '+(online?'online':'offline');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?(cloudMode?'家庭棋盘已连接':'本地棋盘已连接'):'当前离线或连接中断'));}
 async function request(url, options={}){if(options.method==='POST'&&options.body&&state?.profile?.id){const payload=JSON.parse(options.body);if(!payload.expected_profile_id)payload.expected_profile_id=state.profile.id;options={...options,body:JSON.stringify(payload)};}const epoch=authEpoch;const response=await fetch(url,{cache:'no-store',...options,headers:{'Content-Type':'application/json',...options.headers}});if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(response.status===401){lockSession();throw new Error('请重新输入家庭密码。')}const result=await response.json();if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}throw new Error(result.error||result.message||'暂时没有完成，请再试一次。')}connected(true);return result;}
 async function refresh(){if(!authenticated||!navigator.onLine)return;try{const next=await request('/api/state');if(!state||next.revision!==state.revision||next.profile?.id!==state.profile?.id||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){setState(next)}}catch(error){connected(false)}}
-function clearPrivateUI(){closeDrawers();document.body.classList.remove('session-ready','drawer-open');showView('board');document.querySelectorAll('.compact-disclosure').forEach(el=>el.open=false);state=null;lessons=[];inspection=null;pendingMove=null;llmResult=null;llmError=null;llmSettings={enabled:false};llmAutoSeen.clear();$('private-app').hidden=true;for(const id of ['board','profiles','attempts','matches','skills','skill-select','lesson-select','black-player','white-player','rating-sizes'])$(id).replaceChildren();document.querySelectorAll('#private-app input,#private-app textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=''});document.querySelectorAll('#private-app p[id],#private-app h2[id]:not(#menu-title):not(#coach-title),#private-app h3[id],#private-app strong[id],#private-app .llm-answer,#private-app .inline-assessment,#private-app .inspection').forEach(el=>el.textContent='');document.querySelectorAll('#private-app span[id]').forEach(el=>{if(el.id==='turn-pill'){el.querySelector('span').textContent='';}else el.textContent='';});$('pending-move').hidden=true;$('resign-confirmation').hidden=true;$('toast').hidden=true;}
+function clearPrivateUI(){closeDrawers();document.body.classList.remove('session-ready','drawer-open');showView('board');document.querySelectorAll('.compact-disclosure').forEach(el=>el.open=false);state=null;lessons=[];inspection=null;pendingMove=null;llmResult=null;llmError=null;llmSettings={enabled:false};llmAutoSeen.clear();$('private-app').hidden=true;for(const id of ['board','profiles','attempts','matches','skills','skill-select','lesson-select','black-player','white-player','rating-sizes','book-select','chapter-select'])$(id).replaceChildren();document.querySelectorAll('#private-app input,#private-app textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=''});document.querySelectorAll('#private-app p[id],#private-app h2[id]:not(#menu-title):not(#coach-title),#private-app h3[id],#private-app strong[id],#private-app .llm-answer,#private-app .inline-assessment,#private-app .inspection').forEach(el=>el.textContent='');document.querySelectorAll('#private-app span[id]').forEach(el=>{if(el.id==='turn-pill'){el.querySelector('span').textContent='';}else el.textContent='';});$('pending-move').hidden=true;$('resign-confirmation').hidden=true;$('toast').hidden=true;}
 function lockSession(){authEpoch++;authenticated=false;clearTimeout(pollTimer);clearPrivateUI();$('login-panel').hidden=false;$('logout').hidden=true;navigator.serviceWorker?.controller?.postMessage({type:'CLEAR_PRIVATE_CACHE'});}
 function schedulePoll(){clearTimeout(pollTimer);if(authenticated&&!document.hidden)pollTimer=setTimeout(async()=>{if(!busy)await refresh();schedulePoll()},8000);}
 function feedbackText(value){return typeof value==='string'?value:Array.isArray(value)?value.at(-1)?.text||'':value?.text||''}
@@ -62,9 +62,9 @@ async function act(type,extra={}){
   if(state&&inspectionViewKey(state)===view)toast(state.assisted?'辅助记录已保存，请重新确认落子。':'辅助记录尚未保存，暂不能作答；请联网后再试。');
   return;
  }
- pendingMove=null;busy=true;busyAction=type;renderActionStatus();if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
+ pendingMove=null;busy=true;busyAction=type;renderActionStatus();renderPractice();if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
  try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra})});setState(next,{inspectionAck:type==='inspect'});
- if(['lesson','next_lesson','practice_mode','resume_match','new','solution','retry'].includes(type))showView('board',{focus:true});
+ if(['lesson','next_lesson','resume_match','new','solution','retry'].includes(type))showView('board',{focus:true});
  if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
  if(['switch_profile','add_profile','retry','lesson','next_lesson','practice_mode','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent=''}
  if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
@@ -122,16 +122,44 @@ function renderActionStatus(){
  $('review-move').disabled=busy;$('review-move').textContent=reviewing&&busyAction==='review_move'?'正在复核…':'重新复核';
  if(reviewing){$('inline-assessment').hidden=true;$('turn-pill').querySelector('span').textContent='正在复核…';}
 }
+function bookChapters(){
+ const books=new Map();
+ for(const lesson of lessons){
+  if(lesson.source?.kind!=='book'||!lesson.source.title||!lesson.concept)continue;
+  if(!books.has(lesson.source.title))books.set(lesson.source.title,new Map());
+  const chapters=books.get(lesson.source.title);
+  if(!chapters.has(lesson.concept))chapters.set(lesson.concept,[]);
+  chapters.get(lesson.concept).push(lesson);
+ }
+ const number=lesson=>Number(String(lesson.source.problem||'').match(/第(\d+)题/)?.[1]||String(lesson.id).match(/(\d+)$/)?.[1]||0);
+ return [...books].map(([title,chapters])=>({title,chapters:[...chapters].map(([name,items])=>({name,items:items.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id))})).sort((a,b)=>number(a.items[0])-number(b.items[0]))}));
+}
+function renderChapterPicker(){
+ const books=bookChapters(),select=$('chapter-select');
+ $('chapter-picker').hidden=state.practice_mode!=='sequential'||!books.length;
+ select.disabled=busy||state.demo_active;
+ const placeholder=textEl('option','选择书本章节…');placeholder.value='';placeholder.disabled=true;
+ select.replaceChildren(placeholder);
+ const current=lessons.find(l=>l.id===state.lesson?.id)||state.lesson;
+ let selected='';
+ for(const book of books){const group=document.createElement('optgroup');group.label=book.title;
+  for(const chapter of book.chapters){const first=chapter.items[0],option=textEl('option',`${chapter.name} · ${chapter.items.length} 题`);option.value=first.id;group.append(option);
+   if(current?.source?.kind==='book'&&current.source.title===book.title&&current.concept===chapter.name)selected=first.id;
+  }select.append(group);
+ }
+ select.value=selected;
+}
 function renderPractice(){
  const mode=state.practice_mode||'recommended',p=state.practice_progress||{};
+ renderChapterPicker();
  $('practice-mode').value=mode;$('practice-mode').disabled=busy||state.demo_active;
  const sequential=mode==='sequential',review=mode==='review',empty=(review&&p.review_count===0)||(sequential&&p.remaining===0);
  $('practice-progress').textContent=sequential?`已通过 ${p.completed||0} / ${p.total||lessons.length} 关${p.current_index?' · 当前第 '+p.current_index+' 关':''}`:review?`待复习 ${p.review_count||0} 题`:'按你的学习记录安排';
- $('next-practice-eyebrow').textContent=sequential?'顺序闯关':review?'错题复习':'适合你的下一题';
- if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent='按题库顺序练习，完整做对后通关。看过解答再做对也能过关，但不增加独立答题积分。';}
+ $('next-practice-eyebrow').textContent=sequential?'顺序练习':review?'错题复习':'适合你的下一题';
+ if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent=(p.book_title?[p.book_title,p.chapter].filter(Boolean).join(' · ')+'。按书内题号继续，章末接续下一章。':'按题库顺序练习，完整做对后通关。')+'看过解答再做对也能过关，但不增加独立答题积分。';}
  if(review){$('recommendation-title').textContent=empty?'暂时没有待复习题':'再练一次，弄懂它';$('recommendation-reason').textContent=empty?'可以切换智能推荐，或去题库挑题。':'重练还没做对的题；未收录的变化也留在这里，做对后移出。';}
- $('next-lesson').textContent=sequential?'继续闯关 →':review?'开始复习 →':'开始推荐练习 →';
- $('next-result').textContent=sequential?'下一关 →':review?'复习下一题 →':'练下一题 →';
+ $('next-lesson').textContent=sequential?'继续练习 →':review?'开始复习 →':'开始推荐练习 →';
+ $('next-result').textContent=sequential?'下一题 →':review?'复习下一题 →':'练下一题 →';
  $('next-lesson').disabled=busy||empty||state.demo_active;$('next-result').disabled=busy||empty;
 }
 function lessonFamily(l){return l.base_id||l.family_id||(l.variant!==undefined?l.id.replace(/-\d+$/,''):l.id)}
@@ -144,21 +172,29 @@ function renderLessonSource(lesson){
  addLink('CC BY-NC-SA 4.0','https://creativecommons.org/licenses/by-nc-sa/4.0/');
  try{const url=new URL(lesson.source.url);if(url.protocol==='https:'&&!url.username&&!url.password)addLink('原题',url.href);}catch{}
 }
+function renderBookPicker(){
+ const previous=$('book-select').value,books=[...new Set(lessons.filter(l=>l.source?.kind==='book'&&l.source.title).map(l=>l.source.title))];
+ $('book-filter').hidden=!books.length;
+ $('book-select').replaceChildren(...['all',...books].map(title=>{const o=textEl('option',title==='all'?'全部题目':title);o.value=title;return o;}));
+ $('book-select').value=books.includes(previous)?previous:'all';
+}
 function renderSkillPicker(){
+ renderBookPicker();
+ if(state)renderChapterPicker();
  const previous=$('skill-select').value,names=Object.fromEntries((state?.learning?.skills||[]).map(s=>[s.id,s.name]));
  const ids=['all',...new Set(lessons.map(l=>l.skill))];
  $('skill-select').replaceChildren(...ids.map(id=>{const o=textEl('option',id==='all'?'全部知识点':names[id]||id);o.value=id;return o}));
  $('skill-select').value=ids.includes(previous)?previous:'all';renderLessonPicker();
 }
 function renderLessonPicker(){
- const skill=$('skill-select').value,choice=$('difficulty-select').value;
- const options=lessons.filter(l=>(skill==='all'||l.skill===skill)&&l.difficulty===(choice==='auto'?(state?.learning?.skills?.find(s=>s.id===l.skill)?.next_difficulty||1):Number(choice))),previous=$('lesson-select').value;
+ const skill=$('skill-select').value,choice=$('difficulty-select').value,book=$('book-select').value||'all';
+ const options=lessons.filter(l=>(book==='all'||l.source?.kind==='book'&&l.source.title===book)&&(skill==='all'||l.skill===skill)&&(choice==='all'||l.difficulty===(choice==='auto'?(state?.learning?.skills?.find(s=>s.id===l.skill)?.next_difficulty||1):Number(choice)))),previous=$('lesson-select').value;
  $('lesson-select').replaceChildren(...options.map(l=>{const o=textEl('option',`${l.title} · ${l.size||9} 路${l.sequence?' · 连续应手':''}`);o.value=l.id;return o}));
  if(options.some(l=>l.id===previous))$('lesson-select').value=previous;
  else {const recent=new Set((state?.recent_attempts||[]).map(a=>a.lesson_id));const candidate=options.find(l=>!recent.has(l.id)&&l.id!==state?.lesson?.id)||options[0];if(candidate)$('lesson-select').value=candidate.id;}
  $('start-skill').disabled=!options.length;$('lesson-select').disabled=!options.length;
  const families=new Set(options.map(lessonFamily));const chosen=options.find(l=>l.id===$('lesson-select').value);
- $('lesson-count').textContent=options.length?`${families.size} 个独立局面 · ${options.length} 个可练版本（含旋转 / 镜像）${chosen?'\n'+lessonSource(chosen):''}`:'当前筛选没有题目，可以选择“全部知识点”或其他难度。';
+ $('lesson-count').textContent=options.length?`${options.length} 道题${families.size<options.length?' · '+families.size+' 个独立局面':''}${chosen?'\n'+lessonSource(chosen):''}`:'当前筛选没有题目，可以选择“全部知识点”或其他难度。';
 }
 let boardFocusKey=null, boardFocusFull=false;
 function lessonBoardBounds(s){
@@ -256,9 +292,16 @@ $('confirm-move').onclick=()=>{const move=pendingMove;if(!move||!state)return;if
 $('board-zoom').onclick=()=>{boardZoom=!boardZoom;if(state)render()};
 $('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').onclick=()=>act('hint');$('restart').onclick=()=>{if(state.lesson)act('retry');else startMatch(true)};$('ai-move').onclick=()=>{aiAttemptKey=null;aiFailedKey=null;act('ai_move')};$('restore-demo').onclick=()=>act('restore_demo');$('demo-next').onclick=()=>act('demo_next');$('send-feedback').onclick=()=>{const text=$('feedback').value.trim();if(!text){toast('先写一点你的想法吧，一句话也可以。');$('feedback').focus();return}act('feedback',{text})};
 $('show-solution').onclick=()=>act('solution');$('review-move').onclick=()=>act('review_move');
-$('practice-mode').onchange=()=>act('practice_mode',{mode:$('practice-mode').value});
+$('practice-mode').onchange=()=>{if(busy||!state||state.demo_active){if(state)renderPractice();return;}act('practice_mode',{mode:$('practice-mode').value});};
+$('chapter-select').onchange=()=>{
+ const id=$('chapter-select').value;
+ if(busy||!state||state.demo_active||state.practice_mode!=='sequential'){if(state)renderPractice();return;}
+ if(!bookChapters().some(book=>book.chapters.some(chapter=>chapter.items[0].id===id))){renderPractice();return;}
+ act('lesson',{id});
+};
 $('retry-result').onclick=()=>act('retry');$('next-result').onclick=()=>act('next_lesson');$('next-lesson').onclick=()=>act('next_lesson');
 $('profile-form').onsubmit=e=>{e.preventDefault();const name=$('profile-name').value.trim();if(name)act('add_profile',{name})};
+$('book-select').onchange=()=>{$('skill-select').value='all';$('difficulty-select').value='all';renderLessonPicker();};
 $('skill-select').onchange=renderLessonPicker;$('difficulty-select').onchange=()=>{$('skill-select').value='all';renderLessonPicker()};$('lesson-select').onchange=renderLessonPicker;
 $('start-skill').onclick=()=>{const id=$('lesson-select').value;if(id){clearInspection();act('lesson',{id})}};
 $('lesson-import-form').onsubmit=async e=>{
@@ -292,7 +335,7 @@ function renderMatch(){
  $('practice-controls').hidden=selectedMode!=='lesson';
  $('match-form').hidden=selectedMode==='lesson';$('human-settings').hidden=selectedMode!=='human_ai';$('two-player-settings').hidden=selectedMode!=='two_player';
  for(const [id,fallback] of [['black-player',0],['white-player',1]]){const selected=$(id).value;$(id).replaceChildren(...profiles.map(p=>{const o=textEl('option',p.name);o.value=p.id;return o}));$(id).value=profiles.some(p=>p.id===selected)?selected:profiles[fallback]?.id||profiles[0]?.id||''}
- $('mode-description').textContent=selectedMode==='lesson'?'按练习记录推荐下一题。':selectedMode==='human_ai'?'电脑自动应手，可随时悔棋。':'黑白轮流落子，对局存入双方档案。';
+ $('mode-description').textContent=selectedMode==='lesson'?(state.practice_mode==='sequential'?(state.practice_progress?.book_title?`${state.practice_progress.book_title} · ${state.practice_progress.chapter||state.lesson?.concept||''}`:'选择书本章节，从首题开始顺序练习。'):state.practice_mode==='review'?'重练还没做对的题。':'按练习记录推荐下一题。'):selectedMode==='human_ai'?'电脑自动应手，可随时悔棋。':'黑白轮流落子，对局存入双方档案。';
  if(selectionPending&&selectedMode!=='lesson')$('mode-description').textContent+=' 当前棋盘保持原局，点击“开始新对局”进入所选模式。';
  if(match&&state.mode!=='lesson'){
   const black=match.black?.name||'黑方',white=match.white?.name||'白方';const player=state.to_play===1?black:white;
@@ -504,7 +547,7 @@ function renderBoardChrome(){
  const board=$('board');
  if(board.dataset.focused==='true'){const [minX,minY,maxX,maxY]=board.dataset.visibleBounds.split(',').map(Number);$('board-eyebrow').textContent=`${state.size} 路 · 局部 ${cols[minX]}${state.size-minY}–${cols[maxX]}${state.size-maxY} · 虚线非边界`;}
  $('current-learner').textContent=state.profile?.name||'学习者';
- const practiceNames={recommended:'智能推荐',sequential:'顺序闯关',review:'错题复习'};
+ const practiceNames={recommended:'智能推荐',sequential:'顺序练习',review:'错题复习'};
  $('current-mode').textContent=state.mode==='lesson'?(practiceNames[state.practice_mode]||'智能推荐'):state.match?.mode==='human_ai'?'人机对弈':state.match?.mode==='two_player'?'双人对弈':'自由对弈';
  const hasFeedback=!$('inline-assessment').hidden;
  const saved=state.llm_explanation;
