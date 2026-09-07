@@ -56,10 +56,26 @@ test('switching a partial sequence into review immediately includes and restarts
  r=action(r.state,{type:'practice_mode',mode:'review'});assert.equal(r.state.lesson.id,l.id);assert.equal(r.state.moves.length,0);assert.ok(r.helped.includes(l.id));assert.ok(r.state.assisted);
 });
 test('base variants are limited by family without deleting historical evidence or custom puzzles',async()=>{
- const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,457);
+ const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,474);
  for(const skill of ['escape','capture','connect','cut'])for(const [difficulty,count]of [[1,3],[2,5]])assert.equal(visible.filter(l=>l.family_id===`${skill}-${difficulty}`).length,count);
  assert.ok(availableLesson({id:'escape-1-9'}));assert.ok(availableLesson({id:'imported',family_id:'escape-1',variant:8}));assert.ok(availableLesson({id:'escape-1-8',sequence:true}));
  const evidence=[{lesson_id:'escape-1-8',correct:true,assisted:false,attempt_no:1}];const stats=learning(catalog,evidence);assert.equal(stats.independent_correct,1);assert.ok(catalog.find(l=>l.id==='escape-1-8'));
  assert.ok(availableLesson(recommend(catalog,evidence,stats,evidence,'escape-1-8')));
- const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,457);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
+ const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,474);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
+});
+test('recent independent streaks reduce frequency, errors reinforce then rotate, and assistance cannot fake mastery',async()=>{
+ const {recommend}=await import('../curriculum.mjs');const attempt=(id,correct,assisted=false)=>({lesson_id:id,correct,assisted,attempt_no:1});
+ const wins=['escape-1-1','escape-1-2','escape-1-3'].map(id=>attempt(id,true));let r=recommend(catalog,wins,learning(catalog,wins),[...wins].reverse(),'escape-1-3');assert.notEqual(r.skill,'escape');assert.equal(r.adjustment.kind,'reduce_frequency');assert.match(r.reason,/连续做对3道不同题/);
+ const losses=[attempt('escape-2-1',false),attempt('escape-2-2',false)];r=recommend(catalog,losses,learning(catalog,losses),[...losses].reverse(),'escape-2-2');assert.equal(r.skill,'escape');assert.equal(r.difficulty,1);assert.equal(r.adjustment.kind,'reinforce');assert.match(r.reason,/降低难度/);
+ losses.push(attempt('escape-1-1',false));r=recommend(catalog,losses,learning(catalog,losses),[...losses].reverse(),'escape-1-1');assert.notEqual(r.skill,'escape');assert.equal(r.adjustment.kind,'rotate');
+ const helped=wins.map(a=>({...a,assisted:true}));r=recommend(catalog,helped,learning(catalog,helped),[...helped].reverse());assert.notEqual(r.adjustment.kind,'reduce_frequency');assert.equal(learning(catalog,helped).independent_correct,0);
+ const retried=wins.map(a=>({...a,attempt_no:2}));r=recommend(catalog,wins,learning(catalog,wins),[...retried].reverse());assert.equal(r.adjustment.kind,'reduce_frequency');
+ const interleaved=wins.flatMap(a=>[{...a,correct:false},{...a,attempt_no:2}]);r=recommend(catalog,wins,learning(catalog,wins),[...interleaved].reverse());assert.notEqual(r.adjustment.kind,'reduce_frequency');
+ const interruptedLosses=[{...wins[0],correct:false},{...wins[1],correct:false},wins[0],{...wins[0],correct:false},{...wins[0],lesson_id:'capture-1-1',correct:true}];r=recommend(catalog,wins,learning(catalog,wins),[...interruptedLosses].reverse());assert.notEqual(r.adjustment.kind,'reinforce');
+ const repeated=[wins[0],wins[0],wins[0]];r=recommend(catalog,[wins[0]],learning(catalog,[wins[0]]),repeated);assert.notEqual(r.adjustment.kind,'reduce_frequency');
+ r=recommend(catalog,[],learning(catalog,[]),[{lesson_id:'escape-1-1',correct:null}]);assert.equal(r.adjustment.kind,'balanced');assert.equal(r.skill,'escape');
+});
+test('concept-specific mastery leaves other capture concepts available',async()=>{
+ const {recommend}=await import('../curriculum.mjs'),base=catalog.find(l=>l.sequence&&l.difficulty===3);const book=[1,2,3].map(n=>({...base,id:'edge-test-'+n,concept:'edge_chase'}));book.push({...base,id:'ladder-test',concept:'ladder'});
+ const wins=book.slice(0,3).map(l=>({lesson_id:l.id,correct:true,assisted:false,attempt_no:1}));const stats=learning(book,wins);let r=recommend(book,wins,stats,[...wins].reverse());assert.equal(r.concept,'ladder');assert.equal(r.skill,'capture');assert.match(r.reason,/边线追吃/);assert.equal(r.adjustment.kind,'reduce_frequency');
 });

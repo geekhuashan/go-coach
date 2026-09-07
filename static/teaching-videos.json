@@ -1,0 +1,217 @@
+[
+  {
+    "id": "count-liberties",
+    "title": "围棋入门 3. 数气",
+    "url": "https://www.bilibili.com/video/BV18FmbYpE5D/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 81,
+    "skills": [
+      "escape",
+      "capture"
+    ],
+    "concepts": [
+      "liberties"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "atari-capture",
+    "title": "围棋入门 4. 打吃与提子",
+    "url": "https://www.bilibili.com/video/BV18ZmtYREaM/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 100,
+    "skills": [
+      "escape",
+      "capture"
+    ],
+    "concepts": [
+      "atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "escape",
+    "title": "围棋入门 5. 逃跑与相互打吃",
+    "url": "https://www.bilibili.com/video/BV18ZmtY9ESR/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 153,
+    "skills": [
+      "escape"
+    ],
+    "concepts": [
+      "escape"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "connect-cut",
+    "title": "围棋入门 一学就会—连接和分断",
+    "url": "https://www.bilibili.com/video/BV1pAqwYgEP5/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 426,
+    "skills": [
+      "connect",
+      "cut"
+    ],
+    "concepts": [
+      "connect",
+      "cut"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "double-atari",
+    "title": "围棋入门 一学就会—双打吃",
+    "url": "https://www.bilibili.com/video/BV1biCFYhEtb/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 228,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "double_atari"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "net",
+    "title": "围棋入门 一学就会—枷吃",
+    "url": "https://www.bilibili.com/video/BV1gvCFYwEKX/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 232,
+    "skills": [
+      "capture",
+      "tsumego"
+    ],
+    "concepts": [
+      "net"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "gate",
+    "title": "围棋入门 一学就会—门吃",
+    "url": "https://www.bilibili.com/video/BV1uiCFYhEjR/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 63,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "gate"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "ladder",
+    "title": "围棋入门 一学就会 征吃基本棋形",
+    "url": "https://www.bilibili.com/video/BV1FHciebEE9/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 281,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "ladder-direction",
+    "title": "围棋入门 征子打吃方向",
+    "url": "https://www.bilibili.com/video/BV1eGf1YBEpW/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 181,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "ladder"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "snapback",
+    "title": "围棋入门 倒扑实战应用",
+    "url": "https://www.bilibili.com/video/BV1gTRWYZEkX/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 103,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "snapback"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "connection-trap",
+    "title": "围棋入门 接不归",
+    "url": "https://www.bilibili.com/video/BV1ax9EYjEBw/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 77,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "connection_trap"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "edge-capture",
+    "title": "围棋入门 边线吃子",
+    "url": "https://www.bilibili.com/video/BV1Xe91YRETQ/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 351,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "edge_chase"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "eyes",
+    "title": "围棋入门 真眼和假眼",
+    "url": "https://www.bilibili.com/video/BV1F6R8Y8EGo/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 385,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "eyes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  },
+  {
+    "id": "life-shapes",
+    "title": "围棋入门 基本死活常形",
+    "url": "https://www.bilibili.com/video/BV1ZeQNY1EuE/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 378,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "life_shapes"
+    ],
+    "checked_at": "2026-09-07",
+    "verification": "页面元数据与作者已核对；未逐集观看"
+  }
+]

@@ -45,6 +45,7 @@ def validate_lesson(value):
         fail('先行方必须是 1（黑）或 2（白）。')
     out = {k: text(value.get(k), k, 160 if k == 'title' else 1200) for k in ('title', 'prompt', 'hint')}
     out.update(id=identity, size=size, skill=value['skill'], sequence=True, difficulty=value['difficulty'], to_play=value['to_play'])
+    if 'concept' in value: out['concept']=text(value['concept'],'题型',80)
     defender = 3 - out['to_play']
     stones = value.get('stones')
     if not isinstance(stones, list) or not 1 <= len(stones) <= capacity:

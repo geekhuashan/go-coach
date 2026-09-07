@@ -86,7 +86,7 @@ test('practice preference persists per profile, assisted completion clears revie
  await act({type:'next_lesson'});assert.ok(s.practice_progress.current_index>first);assert.equal((await request('/api/state')).body.practice_mode,'sequential');assert.equal((await request('/api/state','GET',undefined,'go_profile=child')).body.practice_mode,'recommended');
 });
 test('fresh profiles start in visible first variant while hidden historical lessons remain readable',async()=>{
- const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.lesson.id,'escape-1-1');assert.equal((await request('/api/lessons')).body.length,457);
+ const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.lesson.id,'escape-1-1');assert.equal((await request('/api/lessons')).body.length,474);
  s=(await request('/api/action','POST',{type:'practice_mode',mode:'sequential',revision:s.revision})).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'escape-1-8',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-8');
  s=(await request('/api/action','POST',{type:'next_lesson',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-2-1');

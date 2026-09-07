@@ -202,6 +202,8 @@ def public_store(store):
     profile=store['profiles'][store['active_profile_id']]
     out=public(active_state(store))
     out.update(profile={'id':profile['id'],'name':profile['name']},profiles=[{'id':p['id'],'name':p['name']} for p in store['profiles'].values()],learning=curriculum.learning(profile['attempts']),recent_attempts=copy.deepcopy(profile['attempts'][-10:][::-1]))
+    suggested=curriculum.recommend(profile['attempts'],(out.get('lesson') or {}).get('id'))
+    out['learning']['recommendation']={k:suggested[k] for k in ('id','title','skill','difficulty','reason','adjustment','concept') if k in suggested}
     current_key=context_key(out)
     out['context_key']=current_key
     out['llm_explanation']=next((copy.deepcopy(e) for e in reversed(profile.get('llm_explanations',[])) if e.get('context_key')==current_key),None)

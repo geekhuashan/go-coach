@@ -41,7 +41,7 @@ function setState(next){
  if(state?.profile?.id!==next.profile?.id||state?.match?.id!==next.match?.id||state?.revision!==next.revision)$('resign-confirmation').hidden=true;
  const switched=state?.profile?.id!==next.profile?.id;
  const pickerSkill=$('skill-select').value;
- const autoDifficultyChanged=$('difficulty-select').value==='auto'&&(state?.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1)!==(next.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1);
+ const autoDifficultyChanged=$('difficulty-select').value==='auto'&&(pickerSkill==='all'?JSON.stringify((state?.learning?.skills||[]).map(s=>[s.id,s.next_difficulty]))!==JSON.stringify((next.learning?.skills||[]).map(s=>[s.id,s.next_difficulty])):(state?.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1)!==(next.learning?.skills?.find(s=>s.id===pickerSkill)?.next_difficulty||1));
  const reset=switched||state?.match?.id!==next.match?.id||state?.lesson?.id!==next.lesson?.id||(state?.lesson_attempted&&!next.lesson_attempted)||(state?.move_number>0&&next.move_number===0);
  if(!state||reset){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。';tool='play';for(const t of ['play','inspect']){$('tool-'+t).classList.toggle('active',t==='play');$('tool-'+t).setAttribute('aria-pressed',String(t==='play'))}}
  if(!state||switched||state?.match?.id!==next.match?.id||state?.mode!==next.mode){selectedMode=next.match?.mode||'lesson';selectionPending=false;}if(switched||reset){$('llm-question').value='';llmError=null;}state=next;inspection=next.inspection||null;render();if(lessons.length&&(switched||autoDifficultyChanged))renderLessonPicker();scheduleComputer();scheduleExplanation();
@@ -83,6 +83,7 @@ function renderLearning(){
  $('show-solution').hidden=state.mode!=='lesson'||!state.lesson?.sequence||!state.lesson_attempted||state.demo_active;
  renderPractice();
  renderLessonSource(state.lesson);
+ renderTeachingVideos();
  if(state.lesson_attempted&&!state.demo_active){$('turn-pill').querySelector('span').textContent='本题已作答';$('turn-pill').className='turn-pill answered';if(!inspection)$('inspection').textContent='反馈已生成。可以查看气，再选“重练这一题”或“练下一题”。'}
  if(a&&state.message?.includes(a.summary))$('message').hidden=true;
 }
@@ -108,17 +109,21 @@ function renderLessonSource(lesson){
  addLink('CC BY-NC-SA 4.0','https://creativecommons.org/licenses/by-nc-sa/4.0/');
  try{const url=new URL(lesson.source.url);if(url.protocol==='https:'&&!url.username&&!url.password)addLink('原题',url.href);}catch{}
 }
-function renderSkillPicker(){const previous=$('skill-select').value;const names=Object.fromEntries((state?.learning?.skills||[]).map(s=>[s.id,s.name]));const ids=[...new Set(lessons.map(l=>l.skill))];$('skill-select').replaceChildren(...ids.map(id=>{const o=textEl('option',names[id]||id);o.value=id;return o}));if(ids.includes(previous))$('skill-select').value=previous;else if(state?.lesson?.skill)$('skill-select').value=state.lesson.skill;renderLessonPicker();}
+function renderSkillPicker(){
+ const previous=$('skill-select').value,names=Object.fromEntries((state?.learning?.skills||[]).map(s=>[s.id,s.name]));
+ const ids=['all',...new Set(lessons.map(l=>l.skill))];
+ $('skill-select').replaceChildren(...ids.map(id=>{const o=textEl('option',id==='all'?'全部知识点':names[id]||id);o.value=id;return o}));
+ $('skill-select').value=ids.includes(previous)?previous:'all';renderLessonPicker();
+}
 function renderLessonPicker(){
  const skill=$('skill-select').value,choice=$('difficulty-select').value;
- const target=choice==='auto'?(state?.learning?.skills?.find(s=>s.id===skill)?.next_difficulty||1):Number(choice);
- const options=lessons.filter(l=>l.skill===skill&&l.difficulty===target),previous=$('lesson-select').value;
+ const options=lessons.filter(l=>(skill==='all'||l.skill===skill)&&l.difficulty===(choice==='auto'?(state?.learning?.skills?.find(s=>s.id===l.skill)?.next_difficulty||1):Number(choice))),previous=$('lesson-select').value;
  $('lesson-select').replaceChildren(...options.map(l=>{const o=textEl('option',`${l.title} · ${l.size||9} 路${l.sequence?' · 连续应手':''}`);o.value=l.id;return o}));
  if(options.some(l=>l.id===previous))$('lesson-select').value=previous;
  else {const recent=new Set((state?.recent_attempts||[]).map(a=>a.lesson_id));const candidate=options.find(l=>!recent.has(l.id)&&l.id!==state?.lesson?.id)||options[0];if(candidate)$('lesson-select').value=candidate.id;}
  $('start-skill').disabled=!options.length;$('lesson-select').disabled=!options.length;
  const families=new Set(options.map(lessonFamily));const chosen=options.find(l=>l.id===$('lesson-select').value);
- $('lesson-count').textContent=options.length?`${families.size} 个独立局面 · ${options.length} 个可练版本（含旋转 / 镜像）${chosen?'\n'+lessonSource(chosen):''}`:'这个知识点暂没有此难度，换一个难度或选择“吃子”。';
+ $('lesson-count').textContent=options.length?`${families.size} 个独立局面 · ${options.length} 个可练版本（含旋转 / 镜像）${chosen?'\n'+lessonSource(chosen):''}`:'当前筛选没有题目，可以选择“全部知识点”或其他难度。';
 }
 let boardFocusKey=null, boardFocusFull=false;
 function lessonBoardBounds(s){
@@ -181,7 +186,7 @@ $('show-solution').onclick=()=>act('solution');
 $('practice-mode').onchange=()=>act('practice_mode',{mode:$('practice-mode').value});
 $('retry-result').onclick=()=>act('retry');$('next-result').onclick=()=>act('next_lesson');$('next-lesson').onclick=()=>act('next_lesson');
 $('profile-form').onsubmit=e=>{e.preventDefault();const name=$('profile-name').value.trim();if(name)act('add_profile',{name})};
-$('skill-select').onchange=renderLessonPicker;$('difficulty-select').onchange=()=>{const difficulty=Number($('difficulty-select').value);if(difficulty&&!lessons.some(l=>l.skill===$('skill-select').value&&l.difficulty===difficulty)){const candidate=lessons.find(l=>l.difficulty===difficulty);if(candidate)$('skill-select').value=candidate.skill;}renderLessonPicker()};$('lesson-select').onchange=renderLessonPicker;
+$('skill-select').onchange=renderLessonPicker;$('difficulty-select').onchange=()=>{$('skill-select').value='all';renderLessonPicker()};$('lesson-select').onchange=renderLessonPicker;
 $('start-skill').onclick=()=>{const id=$('lesson-select').value;if(id){selectTool('play');act('lesson',{id})}};
 $('lesson-import-form').onsubmit=async e=>{
  e.preventDefault();if(busy||!state)return;const file=$('lesson-file').files[0];if(!file)return;
@@ -314,7 +319,41 @@ $('llm-test').onclick=async()=>{
  finally{settingsPending(false)}
 };
 
-async function init(){if(!authenticated)return;$('login-panel').hidden=true;$('private-app').hidden=false;$('logout').hidden=!cloudMode;$('confirm-enabled').checked=confirmDefault;await refresh();if(!authenticated)return;await loadLLMSettings();if(!authenticated)return;try{const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];renderSkillPicker();if(state)render()}catch(error){if(authenticated)toast('练习列表暂时未载入，请刷新重试。')}schedulePoll();}
+let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false;
+const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形'};
+function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
+function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
+function videoItem(video){
+ const li=textEl('li'),link=textEl('a',video.title);link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';
+ const seconds=Number(video.duration_seconds),duration=seconds>0?`${Math.floor(seconds/60)}:${String(Math.floor(seconds%60)).padStart(2,'0')}`:'时长未提供';
+ li.append(link,textEl('small',`${video.author||'教学视频'} · ${new URL(video.url).hostname.replace(/^www\./,'')} · ${duration}`));return li;
+}
+function renderTeachingVideos(){
+ const lesson=state?.lesson,concepts=new Set([...videoTags(lesson?.concept),...videoTags(lesson?.concepts)]);
+ const related=teachingVideos.map(video=>({video,score:videoTags(video.concepts).reduce((sum,c)=>sum+(concepts.has(c)?3:0),0)+(videoTags(video.skills).includes(lesson?.skill)?1:0)})).filter(item=>item.score>0).sort((a,b)=>b.score-a.score).slice(0,3).map(item=>item.video);
+ $('lesson-video-list').replaceChildren(...related.map(videoItem));
+ $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?'': '当前题目暂无匹配视频，可到题库查看基础视频目录。';
+ renderVideoLibrary();
+}
+function renderVideoLibrary(){
+ const previous=$('video-topic').value,topics=[...new Set(teachingVideos.flatMap(videoTopics))];
+ $('video-topic').replaceChildren(...['all',...topics].map(topic=>{const o=textEl('option',topic==='all'?'全部主题':videoTopicNames[topic]||topic);o.value=topic;return o}));
+ $('video-topic').value=topics.includes(previous)?previous:'all';
+ const selected=$('video-topic').value,videos=teachingVideos.filter(video=>selected==='all'||videoTopics(video).includes(selected));
+ $('video-library-list').replaceChildren(...videos.map(videoItem));
+ $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?`${videos.length} 条中文视频`:'正在载入视频目录…';
+}
+function loadTeachingVideos(){
+ if(!teachingVideosPromise)teachingVideosPromise=fetch('/teaching-videos.json',{credentials:'omit'}).then(response=>{if(!response.ok)throw new Error('video catalog');return response.json();}).then(data=>{
+  const videos=Array.isArray(data)?data:data.videos;if(!Array.isArray(videos))throw new Error('video catalog');
+  teachingVideos=videos.filter(video=>{try{const url=new URL(video.url);return !!video.title&&url.protocol==='https:'&&!url.username&&!url.password;}catch{return false;}});
+ }).catch(()=>{teachingVideosFailed=true;}).finally(()=>{teachingVideosLoaded=true;if(authenticated)renderTeachingVideos();});
+ else renderTeachingVideos();
+ return teachingVideosPromise;
+}
+$('video-topic').onchange=renderVideoLibrary;
+
+async function init(){if(!authenticated)return;loadTeachingVideos();$('login-panel').hidden=true;$('private-app').hidden=false;$('logout').hidden=!cloudMode;$('confirm-enabled').checked=confirmDefault;await refresh();if(!authenticated)return;await loadLLMSettings();if(!authenticated)return;try{const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];renderSkillPicker();if(state)render()}catch(error){if(authenticated)toast('练习列表暂时未载入，请刷新重试。')}schedulePoll();}
 async function checkSession(){try{const response=await fetch('/api/session',{cache:'no-store'});if(response.status===404){cloudMode=false;authenticated=true;}else{if(!response.ok)throw new Error('session');const session=await response.json();cloudMode=!!session.cloud;authenticated=!!session.authenticated||!cloudMode;}if(authenticated)await init();else lockSession();}catch(error){$('login-panel').hidden=false;$('login-status').textContent='暂时无法连接，联网后重试。';connected(false);}}
 $('login-form').onsubmit=async e=>{e.preventDefault();$('login-submit').disabled=true;$('login-status').textContent='正在登录…';try{const response=await fetch('/api/login',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('family-password').value})});if(!response.ok)throw new Error('密码不正确或请求过于频繁，请稍后重试。');$('family-password').value='';authEpoch++;authenticated=true;cloudMode=true;await init();$('login-status').textContent='';}catch(error){$('login-status').textContent=navigator.onLine?error.message:'当前离线，联网后继续。';}finally{$('family-password').value='';$('login-submit').disabled=false;}};
 $('logout').onclick=async()=>{lockSession();$('login-submit').disabled=true;$('login-status').textContent='正在退出…';try{await fetch('/api/logout',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:'{}'});$('login-status').textContent='已退出。';}catch(error){$('login-status').textContent='页面已锁定。退出请求未送达，请联网后刷新并退出。';}finally{$('login-submit').disabled=false;}};

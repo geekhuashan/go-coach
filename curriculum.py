@@ -109,11 +109,16 @@ def load_imports(path):
 # Avoid repeating full-tree checks here or during catalog reads.
 import tactics as _tactics
 _authored = _tactics.catalog()
+_ORIGINAL_CONCEPTS={'tactic-double-atari':'double_atari','tactic-double-group':'double_atari','tactic-edge-chase':'edge_chase','tactic-edge-chain':'edge_chase','tactic-snapback':'snapback','tactic-counter-atari':'atari','tactic-short-ladder':'ladder','tactic-two-stone-ladder':'ladder'}
+for _lesson in _authored: _lesson['concept']=_ORIGINAL_CONCEPTS[_lesson['id']]
 _authored_ids = [lesson['id'] for lesson in _authored]
 if len(set(_authored_ids)) != len(_authored_ids) or set(_authored_ids) & set(_BY_ID):
     raise ValueError('内置连续题的 id 与现有题库重复。')
+_original_start=len(_CATALOG)
 _commit_lessons(_authored)
 # The bundled licensed book is shared by local and cloud deployments.
+load_imports(Path(__file__).resolve().parent / 'data/original-extra/lessons.json')
+_CATALOG[_original_start:]=sorted(_CATALOG[_original_start:],key=lambda l:l['difficulty'])
 load_imports(Path(__file__).resolve().parent / 'data/gogameguru/lessons.json')
 
 
@@ -220,37 +225,60 @@ def learning(attempts):
             difficulty = 2 if ready else 1
         skills.append({'id': skill, 'name': name, 'stage': stage, 'independent_attempts': total, 'correct': correct, 'total': total, 'accuracy': round(correct/total,3) if total else None, 'next_difficulty': difficulty})
     recommendation = _recommend(attempts, skills)
-    return {'stage': '待评估' if len(evidence) < 3 else '按技能逐项练习（不对应段位）', 'attempts_count': len(attempts), 'independent_correct': sum(bool(a.get('correct')) for a in evidence), 'independent_attempts': len(evidence), 'skills': skills, 'recommendation': {k: recommendation[k] for k in ('id','title','skill','difficulty','reason')}}
+    return {'stage': '待评估' if len(evidence) < 3 else '按技能逐项练习（不对应段位）', 'attempts_count': len(attempts), 'independent_correct': sum(bool(a.get('correct')) for a in evidence), 'independent_attempts': len(evidence), 'skills': skills, 'recommendation': {k: recommendation[k] for k in ('id','title','skill','difficulty','reason','adjustment')}}
 
+
+CONCEPT_NAMES={'double_atari':'双打吃','ladder':'征子','snapback':'倒扑','connection_trap':'接不归','edge_chase':'边线追吃','capture_race':'对杀','atari':'打吃'}
 
 def _recommend(attempts, skills, current_id=None):
-    valid = [a for a in attempts if a.get('lesson_id') in _BY_ID]
-    seen = {a['lesson_id'] for a in valid}
-    covered = {_BY_ID[a['lesson_id']]['skill'] for a in valid}
-    last = valid[-1] if valid else None
-    recent_skills = [_BY_ID[a['lesson_id']]['skill'] for a in valid[-2:]]
-    if last and not last.get('correct') and len(set(recent_skills)) != 1:
-        chosen_skill = _BY_ID[last['lesson_id']]['skill']
-        reason = '刚才这项还没掌握，换一道同技能题目巩固。'
-    elif last and not last.get('correct') and len(valid) == 1:
-        chosen_skill = _BY_ID[last['lesson_id']]['skill']
-        reason = '先换一道同技能题目，练习刚才的难点。'
-    else:
-        uncovered = [s for s in skills if s['id'] not in covered]
-        chosen = (uncovered or sorted(skills, key=lambda s: (s['independent_attempts'], s['accuracy'] or 0)))[0]
-        chosen_skill = chosen['id']
-        reason = '先用一道基础题了解这项能力。' if uncovered else '根据独立首次作答记录，优先练习证据较少的技能。'
-    stat = next(s for s in skills if s['id'] == chosen_skill)
-    difficulty = stat['next_difficulty']
-    if last and not last.get('correct') and _BY_ID[last['lesson_id']]['skill'] == chosen_skill:
-        difficulty = min(difficulty, _BY_ID[last['lesson_id']]['difficulty'])
-    candidates = [l for l in _CATALOG if l['skill'] == chosen_skill and l['difficulty'] == difficulty and available_lesson(l)]
-    excluded = current_id or (last['lesson_id'] if last else None)
-    fresh = [l for l in candidates if l['id'] not in seen and l['id'] != excluded]
-    last_index = {a['lesson_id']: i for i,a in enumerate(valid)}
-    available = [l for l in candidates if l['id'] != excluded] or candidates
-    lesson = deepcopy((fresh or sorted(available,key=lambda l: last_index.get(l['id'],-1)))[0])
-    lesson['reason'] = reason + (f' 较低难度已有足够的不同题首次独立作答记录，正确率达到 75%，可试难度 {difficulty}。' if difficulty >= 2 and stat['next_difficulty'] == difficulty else '')
+    def group_key(l): return f"concept:{l['skill']}:{l['concept']}" if l.get('concept') else f"skill:{l['skill']}"
+    valid=[a for a in reversed(attempts) if a.get('lesson_id') in _BY_ID and isinstance(a.get('correct'),bool)][:30]
+    seen={a['lesson_id'] for a in attempts}
+    groups={}
+    for l in _CATALOG:
+        if not available_lesson(l): continue
+        identity=group_key(l)
+        groups.setdefault(identity,dict(id=identity,skill=l['skill'],name=CONCEPT_NAMES.get(l.get('concept')) or l.get('concept') or SKILLS[l['skill']],lessons=[],records=[]))['lessons'].append(l)
+    for g in groups.values():
+        g['records']=[a for a in valid if group_key(_BY_ID[a['lesson_id']])==g['id']]
+        g['wins']=g['losses']=0;won=set();lost=set()
+        for a in g['records']:
+            if a['correct'] is not True or a.get('assisted'): break
+            if a['lesson_id'] not in won: won.add(a['lesson_id']);g['wins']+=1
+        for a in g['records']:
+            if a['correct'] is not False: break
+            if a['lesson_id'] not in lost: lost.add(a['lesson_id']);g['losses']+=1
+        g['count']=len({a['lesson_id'] for a in attempts if a.get('lesson_id') in _BY_ID and group_key(_BY_ID[a['lesson_id']])==g['id']})
+    latest=valid[0] if valid else None;last_group=group_key(_BY_ID[latest['lesson_id']]) if latest else None
+    run=0
+    for a in valid:
+        if group_key(_BY_ID[a['lesson_id']])!=last_group: break
+        run+=1
+    pool=[g for g in groups.values() if not (run>=3 and g['id']==last_group and len(groups)>1)]
+    urgent=sorted([g for g in pool if g['losses']>=2],key=lambda g:valid.index(g['records'][0]))
+    chosen=urgent[0] if urgent else None;kind='reinforce' if chosen else None
+    if not chosen and latest and latest['correct'] is False and run==1:
+        chosen=next((g for g in pool if g['id']==last_group),None);kind='retry_skill'
+    if not chosen:
+        chosen=min(pool,key=lambda g:g['count']+2*len(g['records'])+(12 if g['wins']>=3 else 0)+(100 if min(l['difficulty'] for l in g['lessons'])>next(s['next_difficulty'] for s in skills if s['id']==g['skill']) else 0))
+        kind='reduce_frequency' if any(g['wins']>=3 for g in groups.values()) else 'rotate' if run>=3 else 'balanced'
+    stat=next(s for s in skills if s['id']==chosen['skill']);levels=sorted({l['difficulty'] for l in chosen['lessons']});desired=stat['next_difficulty']
+    if kind=='reinforce': desired=min(desired,max(1,_BY_ID[chosen['records'][0]['lesson_id']]['difficulty']-1))
+    difficulty=next((d for d in reversed(levels) if d<=desired),levels[0]);candidates=[l for l in chosen['lessons'] if l['difficulty']==difficulty]
+    excluded=current_id or (latest['lesson_id'] if latest else None);recent_ids={a['lesson_id'] for a in valid[:3]}
+    eligible=[l for l in candidates if l['id']!=excluded] or candidates
+    rested=[l for l in eligible if l['id'] not in recent_ids];fresh=[l for l in (rested or eligible) if l['id'] not in seen]
+    last_index={}
+    for i,a in enumerate(valid): last_index.setdefault(a['lesson_id'],i)
+    lesson=deepcopy((fresh or rested or sorted(eligible,key=lambda l:-last_index.get(l['id'],1000000)))[0])
+    cooled=next((g for g in groups.values() if g['wins']>=3 and g['id']!=chosen['id']),None)
+    if kind=='reduce_frequency' and not cooled: kind='balanced'
+    if kind=='reinforce': reason=f"{chosen['name']}最近连续{chosen['losses']}道不同题答错，优先换题巩固"+('，先降低难度' if difficulty<_BY_ID[chosen['records'][0]['lesson_id']]['difficulty'] else '')+'。'
+    elif kind=='retry_skill': reason=f"刚才的{chosen['name']}还没掌握，换一道题再练一次。"
+    elif kind=='rotate': reason=f"刚连续练了同一类题，先换成{chosen['name']}；需要巩固的内容之后还会安排。"
+    elif kind=='reduce_frequency': reason=f"{cooled['name']}近期连续做对{cooled['wins']}道不同题，暂时少安排一些，换练{chosen['name']}。"
+    else: reason=f"根据近期练习和首次作答记录，换练{chosen['name']}。"
+    lesson.update(reason=reason,adjustment=dict(kind=kind,skill=chosen['skill'],concept=lesson.get('concept'),group=chosen['name'],streak=chosen['losses'] if kind=='reinforce' else cooled['wins'] if kind=='reduce_frequency' else 0,window=30))
     return lesson
 
 

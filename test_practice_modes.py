@@ -34,7 +34,7 @@ class PracticeTest(unittest.TestCase):
         self.assertEqual(s['lesson']['id'],'tactic-short-ladder');self.assertEqual(s['moves'],[]);self.assertTrue(s['assisted'])
     def test_variant_limits_keep_history_and_advance_from_hidden(self):
         visible=[l for l in curriculum.catalog() if curriculum.available_lesson(l)]
-        self.assertEqual(len(visible),457)
+        self.assertEqual(len(visible),474)
         for skill in ('escape','capture','connect','cut'):
             for difficulty,count in ((1,3),(2,5)):
                 self.assertEqual(sum(l.get('family_id')==f'{skill}-{difficulty}' for l in visible),count)

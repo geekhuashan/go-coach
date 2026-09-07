@@ -74,7 +74,8 @@ class CurriculumTests(unittest.TestCase):
         self.assertEqual(second['skill'],'escape')
         self.assertNotEqual(second['id'],'escape-1-1')
         records.append(attempt(second['id'],False))
-        self.assertEqual(recommend(records)['skill'],'capture')
+        self.assertEqual(recommend(records)['skill'],'escape')
+        self.assertEqual(recommend(records)['adjustment']['kind'],'reinforce')
         for _ in range(12):
             new=recommend(records)
             self.assertNotEqual(new['id'],records[-1]['lesson_id'])
