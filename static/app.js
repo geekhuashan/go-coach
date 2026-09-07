@@ -51,7 +51,7 @@ function renderLearning(){
  const profile=state.profile||{name:'我'}, learning=state.learning||{}, recommendation=learning.recommendation||state.recommendation;
  $('profiles').replaceChildren(...(state.profiles||[]).map(p=>{const b=textEl('button',p.name,p.id===profile.id?'profile-option selected':'profile-option');b.setAttribute('aria-pressed',String(p.id===profile.id));b.onclick=()=>{if(p.id!==profile.id)act('switch_profile',{profile_id:p.id})};return b}));
  $('active-profile').textContent=`正在为「${profile.name}」保存进度`;
- $('learning-title').textContent=`${profile.name}的学习进度`;$('learning-stage').textContent=learning.stage||'等待第一次练习';
+ $('learning-title').textContent=`${profile.name}的学习进度`;$('learning-stage').textContent=(learning.stage||'等待第一次练习').replace('（不对应段位）','');
  $('learning-count').textContent=learning.attempts_count?`已记录 ${learning.attempts_count} 次作答 · 独立答对 ${learning.independent_correct||0} 次`:'先做几道小题，慢慢了解适合你的练习。';
  $('skills').replaceChildren(...(learning.skills||[]).map(s=>{const row=textEl('div','','skill-row');const top=textEl('div','','skill-row-heading');top.append(textEl('strong',s.name),textEl('span',s.stage||'待评估'));row.append(top,textEl('small',s.independent_attempts?`独立作答 ${s.independent_attempts} 次 · 答对 ${s.correct||0} 次`:'独立作答样本不足，继续练习看看'));return row}));
  $('recommendation-title').textContent=recommendation?.title||'从基础题开始';
@@ -176,12 +176,12 @@ $('mode-lesson').onclick=()=>selectMode('lesson');$('mode-human-ai').onclick=()=
 
 function renderRating(){
  const rating=state.rating;const match=state.match;const inMatch=state.mode==='free'&&!!match;
- $('rating-title').textContent=`${state.profile?.name||'我'}的成长`;
+ $('rating-title').textContent=`${state.profile?.name||'我'}的练习概览`;
  $('rating-practice').textContent=rating?`练习等级 ${rating.practice_level||1} · ${rating.practice_xp||0} XP（独立完成新题积累）`:'完成练习后逐步积累；此服务暂未提供等级统计。';
  const count=rating?.matches_played||0;const ratingScope=rating?`${rating.summary_size||state.size||9} 路 · ${rating.summary_mode==='human_ai'?'人机':'双人'} · `:'';
  $('rating-summary').textContent=ratingScope+(count?`已确认 ${count} 局 · ${rating.wins||0} 胜 / ${rating.losses||0} 负 / ${rating.draws||0} 和`:'对局样本不足，胜率待评估。');
  $('rating-sizes').replaceChildren(...(rating?.by_size||[]).map(row=>{const line=textEl('p','','quiet');const played=row.matches_played||0;const rate=played?Math.round(100*(row.wins||0)/played):0;line.textContent=`${row.size} 路 · ${row.mode==='human_ai'?'人机':'双人'} · ${played} 局${played?' · 胜率 '+rate+'%':' · 胜率待评估'}${row.rating!==undefined?' · 站内评分 '+Math.round(row.rating)+(row.rated_games<5?'（暂定）':''):''}`;return line}));
- $('rating-note').textContent='练习等级不等于真实围棋段位。'+(rating?.rating_note||'站内评分仅参考已确认的人类对局，少于 5 局标为暂定。');
+ $('rating-note').textContent='练习等级记录独立完成新题的积累，不对应围棋段位。站内评分仅参考同尺寸、双方确认的人类对局；少于 5 局为暂定。人机成绩单列，AI 棋力尚未校准。';
  $('match-result-panel').hidden=!cloudMode||!inMatch;
  const result=match?.result,proposal=match?.result_proposal||match?.proposal;const winnerText=value=>value==='black'?'黑方胜':value==='white'?'白方胜':value==='draw'?'和棋':'待确认';
  $('match-result-status').textContent=result?`已登记结果：${winnerText(result.winner||result)}`:proposal?`待另一位学习者确认：${winnerText(proposal.winner)}`:'当前尚无已确认结果。请核对棋盘后登记。';

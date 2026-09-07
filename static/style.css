@@ -33,3 +33,11 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 @media(max-width:740px){.page-nav{gap:3px}.page-nav button{flex:1;padding:10px 7px;font-size:12px}.records-grid{grid-template-columns:1fr}.view-heading{align-items:start}.view-heading h2{font-size:20px}.view-heading>button{padding:10px}.compact-disclosure{padding:0}.secondary-view{min-height:60vh}}
 /* The practice screen starts with the learner and navigation, then the board. */
 .intro{display:none}.masthead{height:64px}main{padding-top:16px}.profile-bar{margin-bottom:14px}
+
+/* Records: an overview followed by independently flowing columns. */
+#view-records{max-width:none}#view-records>.rating-card{margin-bottom:20px;padding:22px 24px;background:#edf2e8}#view-records .rating-card h3{margin:0 0 14px;font-size:17px}
+.record-overview{display:grid;grid-template-columns:1fr 1fr;gap:24px}.record-overview p{margin:0;font-size:15px;color:var(--ink);line-height:1.7}.record-overview p+p{border-left:1px solid #d5dfce;padding-left:24px}
+.record-explainer{margin-top:16px}.record-explainer summary{cursor:pointer;font-size:12px;color:#52694c}.record-explainer .quiet{font-size:12px}
+.records-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px}.records-column{display:flex;flex-direction:column;gap:20px;min-width:0}
+#view-records .section-heading{gap:12px;flex-wrap:wrap}#view-records .eyebrow{font-size:14px;letter-spacing:0;color:var(--ink)}#view-records .quiet{font-size:13px}#view-records .small-label{font-size:12px}#view-records .skill-row-heading{font-size:14px}#view-records .skill-row-heading span{font-size:12px}#view-records .skill-row small{font-size:12px}#view-records .skill-row{padding:8px 0 13px}#view-records .history-card li{padding:15px 0;gap:7px}#view-records .history-card li strong{font-size:14px}#view-records .history-card li span{font-size:13px}#view-records .history-card li small{font-size:12px}#view-records .history-card,#view-records .learning-card{padding:22px 24px}
+@media(max-width:740px){.records-grid{grid-template-columns:1fr}.record-overview{grid-template-columns:1fr;gap:10px}.record-overview p+p{border-left:0;padding-left:0}.records-column{gap:16px}#view-records>.rating-card,#view-records .history-card,#view-records .learning-card{padding:18px}.record-overview p{font-size:14px}}
