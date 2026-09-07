@@ -1,0 +1,6714 @@
+{
+  "version": 1,
+  "lessons": {
+    "ggg-easy-119": [
+      {
+        "moves": [
+          [
+            17,
+            16
+          ],
+          [
+            17,
+            13
+          ],
+          [
+            18,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black A has been captured in a ladder. This result is bad for Black.",
+        "reason_zh": "A处的黑棋被征吃吃住了，这个结果对黑棋不利。",
+        "pvReply": [
+          [
+            16,
+            12
+          ]
+        ],
+        "evidence_moves": [
+          [
+            17,
+            16
+          ],
+          [
+            17,
+            13
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            16,
+            12
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-119.sgf#node=1.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              16,
+              13
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-119.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black A has been captured in a ladder. This result is bad for Black."
+        }
+      },
+      {
+        "moves": [
+          [
+            18,
+            15
+          ],
+          [
+            17,
+            13
+          ],
+          [
+            17,
+            16
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black A has been captured in a ladder. This result is bad for Black.",
+        "reason_zh": "A处的黑棋被征吃吃住了，这个结果对黑棋不利。",
+        "pvReply": [
+          [
+            16,
+            12
+          ]
+        ],
+        "evidence_moves": [
+          [
+            18,
+            15
+          ],
+          [
+            17,
+            13
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            16,
+            12
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-119.sgf#node=2.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              16,
+              13
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-119.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black A has been captured in a ladder. This result is bad for Black."
+        }
+      }
+    ],
+    "ggg-easy-137": [
+      {
+        "moves": [
+          [
+            15,
+            14
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            15,
+            14
+          ],
+          [
+            16,
+            12
+          ],
+          [
+            15,
+            12
+          ],
+          [
+            15,
+            11
+          ],
+          [
+            14,
+            12
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            11
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            13,
+            9
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black, because Black A is in atari.",
+        "reason_zh": "A处的黑棋自己被打吃了，因此黑棋不能继续按这条路线征吃。",
+        "pvReply": [
+          [
+            12,
+            10
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            14
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            15,
+            14
+          ],
+          [
+            16,
+            12
+          ],
+          [
+            15,
+            12
+          ],
+          [
+            15,
+            11
+          ],
+          [
+            14,
+            12
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            11
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            13,
+            9
+          ],
+          [
+            12,
+            10
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-137.sgf#node=0.0.0.0.0.0.1.0.0.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              14,
+              13
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-137.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black, because Black A is in atari."
+        }
+      }
+    ],
+    "ggg-easy-40": [
+      {
+        "moves": [
+          [
+            17,
+            13
+          ],
+          [
+            18,
+            14
+          ],
+          [
+            16,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "After White 4 here, there's no way to live.",
+        "reason_zh": "白棋第4手走到这里后，黑棋已经没有做活的办法。",
+        "pvReply": [
+          [
+            14,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            17,
+            13
+          ],
+          [
+            18,
+            14
+          ],
+          [
+            16,
+            13
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-40.sgf#node=1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-40.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "After White 4 here, there's no way to live."
+        }
+      }
+    ],
+    "ggg-easy-57": [
+      {
+        "moves": [
+          [
+            6,
+            18
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            3,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black doesn't have enough liberties to make a ko, so Black dies.",
+        "reason_zh": "黑棋的气不够，连打劫的机会也没有，这块棋无法做活。",
+        "pvReply": [
+          [
+            2,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            6,
+            18
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            2,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-57.sgf#node=2.0.2.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-57.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            2,
+            0
+          ],
+          "comment": "Black doesn't have enough liberties to make a ko, so Black dies."
+        }
+      }
+    ],
+    "ggg-easy-68": [
+      {
+        "moves": [
+          [
+            15,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black can't make two eyes now. Later if White wants to take these stones off the board for some reason, White can exchange A for B, then fill the outside liberties with C and D. Capturing White's stones will only give Black one eye.",
+        "reason_zh": "黑棋做不出两个真眼。白棋以后可先交换A、B，再用C、D收紧外气；黑棋即使提掉里面的白子，也只能得到一个眼。",
+        "pvReply": [
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            18
+          ],
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-68.sgf#node=2.0",
+        "evidence_labels": [
+          {
+            "move": [
+              18,
+              14
+            ],
+            "label": "C"
+          },
+          {
+            "move": [
+              18,
+              16
+            ],
+            "label": "B"
+          },
+          {
+            "move": [
+              18,
+              17
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              14,
+              18
+            ],
+            "label": "D"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-68.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0
+          ],
+          "comment": "Black can't make two eyes now. Later if White wants to take these stones off the board for some reason, White can exchange A for B, then fill the outside liberties with C and D. Capturing White's stones will only give Black one eye."
+        }
+      },
+      {
+        "moves": [
+          [
+            18,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black can't make two eyes now. A is a false eye because it's not connected to the rest of the group with a Black stone at B.",
+        "reason_zh": "黑棋做不出两个真眼。B处缺一颗黑子，棋形没有连好，所以A只是假眼。",
+        "pvReply": [
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            18,
+            17
+          ],
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-68.sgf#node=1.0",
+        "evidence_labels": [
+          {
+            "move": [
+              17,
+              15
+            ],
+            "label": "B"
+          },
+          {
+            "move": [
+              18,
+              16
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-68.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0
+          ],
+          "comment": "Black can't make two eyes now. A is a false eye because it's not connected to the rest of the group with a Black stone at B."
+        }
+      }
+    ],
+    "ggg-easy-70": [
+      {
+        "moves": [
+          [
+            2,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black only has one eye, so Black's dead.",
+        "reason_zh": "黑棋只有一个眼，这块棋无法做活。",
+        "pvReply": [
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            2,
+            17
+          ],
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-70.sgf#node=1.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0
+          ],
+          "comment": "Black only has one eye, so Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            3,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black only has one eye, so Black's dead.",
+        "reason_zh": "黑棋只有一个眼，这块棋无法做活。",
+        "pvReply": [
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            3,
+            18
+          ],
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-70.sgf#node=2.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0
+          ],
+          "comment": "Black only has one eye, so Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            0,
+            15
+          ],
+          [
+            1,
+            18
+          ],
+          [
+            2,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Capturing at A only makes a false eye, so Black's already died.",
+        "reason_zh": "在A提子也只能做出假眼，黑棋已经无法做活。",
+        "pvReply": [],
+        "evidence_moves": [
+          [
+            0,
+            15
+          ],
+          [
+            1,
+            18
+          ],
+          [
+            2,
+            17
+          ]
+        ],
+        "evidence_at": "move",
+        "source_path": "weekly-go-problems/easy/ggg-easy-70.sgf#node=4.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              0,
+              15
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            4,
+            0,
+            0
+          ],
+          "comment": "Capturing at A only makes a false eye, so Black's already died."
+        }
+      },
+      {
+        "moves": [
+          [
+            1,
+            18
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            2,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Capturing at A only makes a false eye, so Black dies.",
+        "reason_zh": "黑棋在A提子后得到的只是假眼，仍然无法做活。",
+        "pvReply": [
+          [
+            5,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            1,
+            18
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            2,
+            17
+          ],
+          [
+            5,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-70.sgf#node=0.0.2.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              0,
+              15
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            2,
+            0,
+            0,
+            0
+          ],
+          "comment": "Capturing at A only makes a false eye, so Black dies."
+        }
+      }
+    ],
+    "ggg-easy-71": [
+      {
+        "moves": [
+          [
+            0,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This is the vital point. Black will die after White plays here.",
+        "reason_zh": "这里是要点。白棋占住后，黑棋就无法做活。",
+        "pvReply": [
+          [
+            0,
+            15
+          ]
+        ],
+        "evidence_moves": [
+          [
+            0,
+            17
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-71.sgf#node=2.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-71.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0
+          ],
+          "comment": "This is the vital point. Black will die after White plays here."
+        }
+      },
+      {
+        "moves": [
+          [
+            2,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black can't make two eyes now.",
+        "reason_zh": "走到这里，黑棋已经做不出两个真眼了。",
+        "pvReply": [
+          [
+            0,
+            15
+          ]
+        ],
+        "evidence_moves": [
+          [
+            2,
+            15
+          ],
+          [
+            0,
+            15
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-71.sgf#node=1.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-71.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0
+          ],
+          "comment": "Black can't make two eyes now."
+        }
+      }
+    ],
+    "ggg-easy-73": [
+      {
+        "moves": [
+          [
+            1,
+            15
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            16
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A is a false eye, so Black's group will be captured.",
+        "reason_zh": "A只是假眼，不能保护整块黑棋，黑棋会被吃掉。",
+        "pvReply": [
+          [
+            0,
+            14
+          ]
+        ],
+        "evidence_moves": [
+          [
+            1,
+            15
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            16
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-73.sgf#node=1.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              1,
+              16
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-73.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "A is a false eye, so Black's group will be captured."
+        }
+      }
+    ],
+    "ggg-easy-78": [
+      {
+        "moves": [
+          [
+            10,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "White will play here and now Black's corner stones are captured.",
+        "reason_zh": "白棋应在这里后，角上的黑棋就被吃住了。",
+        "pvReply": [
+          [
+            14,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            10,
+            14
+          ],
+          [
+            14,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-78.sgf#node=3.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-78.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0
+          ],
+          "comment": "White will play here and now Black's corner stones are captured."
+        }
+      }
+    ],
+    "ggg-easy-95": [
+      {
+        "moves": [
+          [
+            1,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Even if Black plays at A or B next, White can ignore it and Black's still dead.",
+        "reason_zh": "黑棋下一手即使走A或B，白棋也不必应，黑棋仍然无法做活。",
+        "pvReply": [
+          [
+            0,
+            14
+          ]
+        ],
+        "evidence_moves": [
+          [
+            1,
+            15
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-95.sgf#node=4.0",
+        "evidence_labels": [
+          {
+            "move": [
+              0,
+              15
+            ],
+            "label": "B"
+          },
+          {
+            "move": [
+              0,
+              16
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-95.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            4,
+            0
+          ],
+          "comment": "Even if Black plays at A or B next, White can ignore it and Black's still dead."
+        }
+      }
+    ],
+    "ggg-easy-98": [
+      {
+        "moves": [
+          [
+            3,
+            12
+          ],
+          [
+            4,
+            13
+          ],
+          [
+            5,
+            13
+          ],
+          [
+            4,
+            12
+          ],
+          [
+            4,
+            11
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black.",
+        "reason_zh": "黑棋这条征吃路线走不通，不能按这样继续追。",
+        "pvReply": [
+          [
+            5,
+            12
+          ]
+        ],
+        "evidence_moves": [
+          [
+            3,
+            12
+          ],
+          [
+            4,
+            13
+          ],
+          [
+            5,
+            13
+          ],
+          [
+            4,
+            12
+          ],
+          [
+            4,
+            11
+          ],
+          [
+            5,
+            12
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-98.sgf#node=2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-98.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black."
+        }
+      },
+      {
+        "moves": [
+          [
+            4,
+            13
+          ],
+          [
+            3,
+            12
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            12
+          ],
+          [
+            5,
+            12
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black.",
+        "reason_zh": "黑棋这条征吃路线走不通，不能按这样继续追。",
+        "pvReply": [
+          [
+            4,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            4,
+            13
+          ],
+          [
+            3,
+            12
+          ],
+          [
+            3,
+            11
+          ],
+          [
+            4,
+            12
+          ],
+          [
+            5,
+            12
+          ],
+          [
+            4,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/easy/ggg-easy-98.sgf#node=1.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/easy/ggg-easy-98.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black."
+        }
+      }
+    ],
+    "ggg-hard-01": [
+      {
+        "moves": [
+          [
+            7,
+            18
+          ],
+          [
+            6,
+            17
+          ],
+          [
+            6,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's already died.",
+        "reason_zh": "黑棋已经成了死棋，接下来也无法做活。",
+        "pvReply": [],
+        "evidence_moves": [
+          [
+            7,
+            18
+          ],
+          [
+            6,
+            17
+          ],
+          [
+            6,
+            18
+          ]
+        ],
+        "evidence_at": "move",
+        "source_path": "weekly-go-problems/hard/ggg-hard-01.sgf#node=2.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-01.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0
+          ],
+          "comment": "Black's already died."
+        }
+      }
+    ],
+    "ggg-hard-100": [
+      {
+        "moves": [
+          [
+            9,
+            11
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            9,
+            11
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=6.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            6,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=4.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            4,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            12,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            14,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            12,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=1.0.1.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            1,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            13,
+            13
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            15,
+            14
+          ]
+        ],
+        "evidence_moves": [
+          [
+            13,
+            13
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            15,
+            14
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=8.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            8,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            14,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            12,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=0.0.1.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            14
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            14
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=5.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            5,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            12,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            16,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            16,
+            16
+          ]
+        ],
+        "evidence_moves": [
+          [
+            12,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            16,
+            16
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=1.0.0.1.1.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            1,
+            1,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            11,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            9,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            11,
+            14
+          ],
+          [
+            9,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.1.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            15
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.0.0.4.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.0.0.3.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            11,
+            15
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.2.0.1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            15
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            10,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=3.0.0.0.4.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0,
+            0,
+            0,
+            4,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=3.0.0.0.3.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=3.0.2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            11,
+            15
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            15
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=3.0.2.0.1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0,
+            2,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            14
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=2.0.0.0.2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            13
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_moves": [
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            16
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            13
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=3.0.0.0.2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            3,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            14,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            11,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            9,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            13
+          ],
+          [
+            16,
+            14
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            8,
+            15
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            14
+          ],
+          [
+            11,
+            16
+          ],
+          [
+            11,
+            14
+          ],
+          [
+            9,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-100.sgf#node=0.0.0.1.0.0.1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      }
+    ],
+    "ggg-hard-137": [
+      {
+        "moves": [
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            12
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black because of A.",
+        "reason_zh": "A处让黑棋这条征吃路线走不通，请特别留意那里。",
+        "pvReply": [
+          [
+            11,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-137.sgf#node=4.0.0.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              10,
+              10
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-137.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            4,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black because of A."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            12
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black because of A.",
+        "reason_zh": "A处让黑棋这条征吃路线走不通，请特别留意那里。",
+        "pvReply": [
+          [
+            11,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            13
+          ],
+          [
+            13,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            14,
+            14
+          ],
+          [
+            14,
+            13
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            12
+          ],
+          [
+            11,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-137.sgf#node=0.2.1.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              10,
+              10
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-137.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            2,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black because of A."
+        }
+      }
+    ],
+    "ggg-hard-49": [
+      {
+        "moves": [
+          [
+            12,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black, because of A.",
+        "reason_zh": "A处让黑棋这条征吃路线走不通，请特别留意那里。",
+        "pvReply": [
+          [
+            6,
+            11
+          ]
+        ],
+        "evidence_moves": [
+          [
+            12,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            6,
+            11
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-49.sgf#node=0.0.0.0.0.0.0.0.0.0.2.0.1.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              9,
+              11
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-49.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black, because of A."
+        }
+      },
+      {
+        "moves": [
+          [
+            12,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            8,
+            9
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black, because of A.",
+        "reason_zh": "A处让黑棋这条征吃路线走不通，请特别留意那里。",
+        "pvReply": [
+          [
+            7,
+            10
+          ]
+        ],
+        "evidence_moves": [
+          [
+            12,
+            12
+          ],
+          [
+            12,
+            11
+          ],
+          [
+            13,
+            11
+          ],
+          [
+            12,
+            10
+          ],
+          [
+            13,
+            12
+          ],
+          [
+            14,
+            10
+          ],
+          [
+            11,
+            11
+          ],
+          [
+            11,
+            10
+          ],
+          [
+            10,
+            11
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            13,
+            10
+          ],
+          [
+            9,
+            13
+          ],
+          [
+            9,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            8,
+            9
+          ],
+          [
+            7,
+            10
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-49.sgf#node=0.0.0.0.0.0.0.0.0.0.2.0.2.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              7,
+              12
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-49.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black, because of A."
+        }
+      }
+    ],
+    "ggg-hard-51": [
+      {
+        "moves": [
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            14,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            14,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=1.0.0.0.1.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            14,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            14,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=2.0.0.0.1.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            17,
+            16
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=5.0.1.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            5,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=0.0.0.0.0.0.2.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              18,
+              16
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            16
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=0.0.0.0.3.0.0.0.1.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=0.0.0.0.1.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            15,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            15,
+            15
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=0.0.1.0.1.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              18,
+              16
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            18,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            17,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=5.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            5,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "A and B are miai. Black's dead.",
+        "reason_zh": "A和B互为见合：黑棋防住一处，白棋就走另一处，黑棋仍无法做活。",
+        "pvReply": [
+          [
+            18,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            17
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            15
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            18,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-51.sgf#node=0.0.0.0.2.0.0.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              15,
+              13
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              15,
+              15
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-51.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "A and B are miai. Black's dead."
+        }
+      }
+    ],
+    "ggg-hard-61": [
+      {
+        "moves": [
+          [
+            18,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            13,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            16,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            18,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            18,
+            15
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            13,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            16,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-61.sgf#node=0.1.0.0.1.0.1.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-61.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      }
+    ],
+    "ggg-hard-72": [
+      {
+        "moves": [
+          [
+            17,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            17,
+            16
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Eventually Black will have to capture White's three stones, and Black will die.",
+        "reason_zh": "黑棋最后必须提掉这三颗白子，但提完以后仍无法做活。",
+        "pvReply": [
+          [
+            18,
+            16
+          ]
+        ],
+        "evidence_moves": [
+          [
+            17,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            18,
+            16
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-72.sgf#node=2.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-72.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0
+          ],
+          "comment": "Eventually Black will have to capture White's three stones, and Black will die."
+        }
+      }
+    ],
+    "ggg-hard-74": [
+      {
+        "moves": [
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            12,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black can't capture White so Black's stones are all dead.",
+        "reason_zh": "黑棋吃不住白棋，自己的这一整块棋也无法做活。",
+        "pvReply": [
+          [
+            10,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            12,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            12,
+            17
+          ],
+          [
+            10,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-74.sgf#node=0.0.0.0.0.0.0.0.2.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-74.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black can't capture White so Black's stones are all dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            12,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black can't capture White so Black's stones are all dead.",
+        "reason_zh": "黑棋吃不住白棋，自己的这一整块棋也无法做活。",
+        "pvReply": [
+          [
+            10,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            12,
+            18
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            16
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ],
+          [
+            10,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/hard/ggg-hard-74.sgf#node=0.0.0.0.0.0.0.0.1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/hard/ggg-hard-74.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black can't capture White so Black's stones are all dead."
+        }
+      }
+    ],
+    "ggg-intermediate-100": [
+      {
+        "moves": [
+          [
+            5,
+            17
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            4,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead. Even if Black ataris at A now, White can ignore it because Black still can't make two eyes.",
+        "reason_zh": "黑棋在A打吃也救不活：白棋可以不应，黑棋仍做不出两个真眼。",
+        "pvReply": [
+          [
+            6,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            5,
+            17
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            4,
+            17
+          ],
+          [
+            6,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-100.sgf#node=1.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              2,
+              17
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead. Even if Black ataris at A now, White can ignore it because Black still can't make two eyes."
+        }
+      },
+      {
+        "moves": [
+          [
+            9,
+            13
+          ],
+          [
+            9,
+            16
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black only has one eye at best, so Black's dead.",
+        "reason_zh": "黑棋最多只能做出一个眼，因此无法做活。",
+        "pvReply": [
+          [
+            8,
+            9
+          ]
+        ],
+        "evidence_moves": [
+          [
+            9,
+            13
+          ],
+          [
+            9,
+            16
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            8,
+            10
+          ],
+          [
+            8,
+            9
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-100.sgf#node=2.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-100.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black only has one eye at best, so Black's dead."
+        }
+      }
+    ],
+    "ggg-intermediate-46": [
+      {
+        "moves": [
+          [
+            4,
+            17
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            2,
+            17
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            5,
+            16
+          ],
+          [
+            6,
+            17
+          ],
+          [
+            7,
+            16
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            8,
+            17
+          ],
+          [
+            5,
+            18
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            6,
+            16
+          ],
+          [
+            7,
+            15
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's stones are captured, and he still has to play A in the lower left.",
+        "reason_zh": "这块黑棋被吃住了，而且黑棋还得回到左下角补A。",
+        "pvReply": [
+          [
+            5,
+            14
+          ]
+        ],
+        "evidence_moves": [
+          [
+            4,
+            17
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            2,
+            17
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            5,
+            16
+          ],
+          [
+            6,
+            17
+          ],
+          [
+            7,
+            16
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            8,
+            17
+          ],
+          [
+            5,
+            18
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            6,
+            16
+          ],
+          [
+            7,
+            15
+          ],
+          [
+            5,
+            14
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-46.sgf#node=0.0.0.0.0.0.0.1.1.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              1,
+              17
+            ],
+            "label": "A"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-46.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's stones are captured, and he still has to play A in the lower left."
+        }
+      }
+    ],
+    "ggg-intermediate-54": [
+      {
+        "moves": [
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            15,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's stones are captured.",
+        "reason_zh": "这块黑棋被吃住了。",
+        "pvReply": [
+          [
+            17,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            16,
+            17
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-54.sgf#node=1.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-54.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's stones are captured."
+        }
+      },
+      {
+        "moves": [
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            15,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's stones are captured.",
+        "reason_zh": "这块黑棋被吃住了。",
+        "pvReply": [
+          [
+            17,
+            16
+          ]
+        ],
+        "evidence_moves": [
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            15
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            16,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            16
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-54.sgf#node=2.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-54.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's stones are captured."
+        }
+      }
+    ],
+    "ggg-intermediate-67": [
+      {
+        "moves": [
+          [
+            2,
+            18
+          ],
+          [
+            2,
+            17
+          ],
+          [
+            6,
+            18
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            1,
+            17
+          ],
+          [
+            2,
+            16
+          ],
+          [
+            1,
+            16
+          ],
+          [
+            2,
+            15
+          ],
+          [
+            2,
+            14
+          ],
+          [
+            1,
+            15
+          ],
+          [
+            1,
+            14
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            14
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Almost correct, but Black can't atari now, so White lives. Be careful towards the end of the ladder.",
+        "reason_zh": "前面接近正确，但最后黑棋已经不能打吃，白棋因此活了。征吃快结束时也要数清气。",
+        "pvReply": [
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            2,
+            18
+          ],
+          [
+            2,
+            17
+          ],
+          [
+            6,
+            18
+          ],
+          [
+            3,
+            18
+          ],
+          [
+            1,
+            17
+          ],
+          [
+            2,
+            16
+          ],
+          [
+            1,
+            16
+          ],
+          [
+            2,
+            15
+          ],
+          [
+            2,
+            14
+          ],
+          [
+            1,
+            15
+          ],
+          [
+            1,
+            14
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            14
+          ],
+          [
+            1,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-67.sgf#node=0.0.0.0.0.0.0.0.0.0.1.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-67.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0
+          ],
+          "comment": "Almost correct, but Black can't atari now, so White lives. Be careful towards the end of the ladder."
+        }
+      }
+    ],
+    "ggg-intermediate-70": [
+      {
+        "moves": [
+          [
+            11,
+            14
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            11,
+            14
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            15
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            12,
+            17
+          ],
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-70.sgf#node=1.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ],
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-70.sgf#node=2.0.3.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            2,
+            0,
+            3,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      },
+      {
+        "moves": [
+          [
+            11,
+            14
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black has weaknesses at A and B, but only has time to fix one of them, so Black's dead.",
+        "reason_zh": "黑棋在A和B都有缺陷，却只来得及补一处，因此仍然无法做活。",
+        "pvReply": [
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            11,
+            14
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            12,
+            15
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            13,
+            16
+          ],
+          [
+            11,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            12,
+            17
+          ],
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-70.sgf#node=1.0.0.0.2.0.0.0.0.0",
+        "evidence_labels": [
+          {
+            "move": [
+              12,
+              16
+            ],
+            "label": "A"
+          },
+          {
+            "move": [
+              13,
+              18
+            ],
+            "label": "B"
+          }
+        ],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-70.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black has weaknesses at A and B, but only has time to fix one of them, so Black's dead."
+        }
+      }
+    ],
+    "ggg-intermediate-82": [
+      {
+        "moves": [
+          [
+            2,
+            17
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            1,
+            16
+          ],
+          [
+            1,
+            17
+          ],
+          [
+            0,
+            16
+          ],
+          [
+            3,
+            17
+          ],
+          [
+            4,
+            17
+          ],
+          [
+            2,
+            18
+          ],
+          [
+            1,
+            14
+          ],
+          [
+            1,
+            13
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            17
+          ],
+          [
+            5,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black's dead.",
+        "reason_zh": "走到这里，这块黑棋已经无法做活。",
+        "pvReply": [
+          [
+            3,
+            18
+          ]
+        ],
+        "evidence_moves": [
+          [
+            2,
+            17
+          ],
+          [
+            7,
+            17
+          ],
+          [
+            1,
+            16
+          ],
+          [
+            1,
+            17
+          ],
+          [
+            0,
+            16
+          ],
+          [
+            3,
+            17
+          ],
+          [
+            4,
+            17
+          ],
+          [
+            2,
+            18
+          ],
+          [
+            1,
+            14
+          ],
+          [
+            1,
+            13
+          ],
+          [
+            0,
+            15
+          ],
+          [
+            0,
+            17
+          ],
+          [
+            5,
+            18
+          ],
+          [
+            3,
+            18
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-82.sgf#node=0.1.0.0.1.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-82.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black's dead."
+        }
+      }
+    ],
+    "ggg-intermediate-98": [
+      {
+        "moves": [
+          [
+            5,
+            12
+          ],
+          [
+            6,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black.",
+        "reason_zh": "黑棋这条征吃路线走不通，不能按这样继续追。",
+        "pvReply": [
+          [
+            8,
+            10
+          ]
+        ],
+        "evidence_moves": [
+          [
+            5,
+            12
+          ],
+          [
+            6,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            6,
+            11
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-98.sgf#node=1.0.0.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-98.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black."
+        }
+      },
+      {
+        "moves": [
+          [
+            6,
+            11
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            5,
+            12
+          ],
+          [
+            6,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "This ladder doesn't work for Black.",
+        "reason_zh": "黑棋这条征吃路线走不通，不能按这样继续追。",
+        "pvReply": [
+          [
+            8,
+            10
+          ]
+        ],
+        "evidence_moves": [
+          [
+            6,
+            11
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            5,
+            12
+          ],
+          [
+            6,
+            13
+          ],
+          [
+            7,
+            13
+          ],
+          [
+            7,
+            12
+          ],
+          [
+            8,
+            12
+          ],
+          [
+            7,
+            11
+          ],
+          [
+            7,
+            10
+          ],
+          [
+            8,
+            11
+          ],
+          [
+            9,
+            11
+          ],
+          [
+            8,
+            10
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-98.sgf#node=0.0.0.0.1.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-98.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "This ladder doesn't work for Black."
+        }
+      }
+    ],
+    "ggg-intermediate-99": [
+      {
+        "moves": [
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            13,
+            17
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            13,
+            18
+          ]
+        ],
+        "verdict": "author_refuted",
+        "reason": "Black usually needs three liberties to make this work, but he only has two. Black's dead.",
+        "reason_zh": "这套走法通常需要三口气，黑棋却只有两口，所以无法做活。",
+        "pvReply": [
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_moves": [
+          [
+            15,
+            15
+          ],
+          [
+            14,
+            16
+          ],
+          [
+            13,
+            17
+          ],
+          [
+            17,
+            16
+          ],
+          [
+            16,
+            15
+          ],
+          [
+            14,
+            17
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            15,
+            17
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            17,
+            18
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            18,
+            16
+          ],
+          [
+            15,
+            18
+          ],
+          [
+            18,
+            18
+          ],
+          [
+            17,
+            17
+          ],
+          [
+            18,
+            17
+          ],
+          [
+            13,
+            18
+          ],
+          [
+            11,
+            17
+          ]
+        ],
+        "evidence_at": "reply",
+        "source_path": "weekly-go-problems/intermediate/ggg-intermediate-99.sgf#node=1.0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",
+        "evidence_labels": [],
+        "source": {
+          "kind": "licensed",
+          "url": "https://github.com/gogameguru/go-problems/blob/eee12b2e39d59dbe81a8b9eaa7d4f103978d9224/weekly-go-problems/intermediate/ggg-intermediate-99.sgf",
+          "license": "CC BY-NC-SA-4.0",
+          "attribution": "Go Game Guru Weekly Go Problems by David Ormerod and An Younggil, CC BY-NC-SA 4.0; converted from SGF with original comments retained.",
+          "sgf_node_path": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "comment": "Black usually needs three liberties to make this work, but he only has two. Black's dead."
+        }
+      }
+    ]
+  }
+}

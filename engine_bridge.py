@@ -57,7 +57,7 @@ def handler(token):
         def do_POST(self):
             if not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
                 return self.reply(401, {'error': 'Unauthorized'})
-            if self.path not in ('/analyze', '/move'):
+            if self.path not in ('/analyze', '/move', '/review'):
                 return self.reply(404, {'error': 'Not found'})
             try:
                 length = int(self.headers.get('Content-Length', '0'))
@@ -66,10 +66,12 @@ def handler(token):
                 self.connection.settimeout(10)
                 payload = json.loads(self.rfile.read(length))
                 state = validate_state(payload.get('state'))
+                if self.path == '/review': engine.review_points(state)
             except (ValueError, TypeError, AttributeError, OSError):
                 return self.reply(400, {'error': 'Invalid request'})
             try:
-                self.reply(200, engine.analyze(state) if self.path == '/analyze' else engine.choose_move(state))
+                operation={'/analyze':engine.analyze,'/move':engine.choose_move,'/review':engine.review}[self.path]
+                self.reply(200, operation(state))
             except Exception:
                 self.reply(503, {'error': 'Local engine temporarily unavailable'})
     return Handler

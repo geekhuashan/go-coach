@@ -30,6 +30,9 @@ class EngineBridgeHTTPTest(unittest.TestCase):
         self.move_patch = patch.object(engine_bridge.engine, 'choose_move', return_value={'x': 0, 'y': 0})
         self.analyze = self.analyze_patch.start()
         self.move = self.move_patch.start()
+        self.review_patch = patch.object(engine_bridge.engine,'review',return_value={'revision':1,'engine':'KataGo','perspective':'black','candidate':{},'reference':{}})
+        self.review = self.review_patch.start()
+        self.addCleanup(self.review_patch.stop)
         self.addCleanup(self.analyze_patch.stop)
         self.addCleanup(self.move_patch.stop)
 
@@ -124,6 +127,25 @@ class EngineBridgeHTTPTest(unittest.TestCase):
                 self.assertEqual(self.request(raw=b'{}', headers={'Content-Length': length})[0], 413)
         self.assertEqual(self.request(raw=b'{}', headers={'Content-Length': 'invalid'})[0], 400)
         self.analyze.assert_not_called()
+
+    def test_review_auth_validation_and_dispatch(self):
+        self.assertEqual(self.request('/review',auth=False,raw=b'not-json')[0],401)
+        self.review.assert_not_called()
+        for size in (9,19):
+            state=self.state(size)
+            state['review']={'candidate':{'x':0,'y':0},'reference':{'x':size-1,'y':size-1}}
+            self.assertEqual(self.request('/review',{'state':state}), (200,self.review.return_value))
+            self.review.assert_called_with(state)
+        self.analyze.assert_not_called();self.move.assert_not_called()
+        self.review.reset_mock()
+        for review in (None,{}, {'candidate':{'x':0,'y':0},'reference':{'x':19,'y':0}},
+                       {'candidate':{'x':0,'y':0},'reference':{'x':1,'y':1},'third':{'x':2,'y':2}}):
+            state=self.state();state['review']=review
+            self.assertEqual(self.request('/review',{'state':state})[0],400)
+        self.review.assert_not_called()
+        state=self.state();state['review']={'candidate':{'x':0,'y':0},'reference':{'x':1,'y':1}}
+        self.review.side_effect=RuntimeError('private-engine-detail')
+        self.assertEqual(self.request('/review',{'state':state}), (503,{'error':'Local engine temporarily unavailable'}))
 
     def test_engine_exception_returns_generic_503_without_details(self):
         private_detail = 'private-config-path-and-engine-token-must-not-appear'

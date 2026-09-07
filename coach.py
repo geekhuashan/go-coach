@@ -17,13 +17,17 @@ def call(route, body=None):
 if __name__ == "__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--action-file",type=Path)
-    parser.add_argument("--analyze",action="store_true")
+    mode=parser.add_mutually_exclusive_group()
+    mode.add_argument("--analyze",action="store_true")
+    mode.add_argument("--review",action="store_true",help="复核当前连续题的参考答案外走法")
     args=parser.parse_args()
     if args.action_file:
         result=call("/api/action",json.loads(args.action_file.read_text()))
     else:
         result=call("/api/state")
-        if args.analyze:
+        if args.review:
+            result=call("/api/action",{"type":"review_move","revision":result["revision"],"expected_profile_id":result.get("profile",{}).get("id")})
+        elif args.analyze:
             result=call("/api/analyze",{"revision":result["revision"]})
     if "board" in result:
         result.pop("history",None)

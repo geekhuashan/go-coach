@@ -195,6 +195,8 @@ def context_key(s):
     context={k:s.get(k) for k in ('board','moves','initial_board','to_play','mode','move_number','captures','ended','demo_active')}
     context['lesson_id']=(s.get('lesson') or {}).get('id')
     context['match_id']=s.get('match_id')
+    review=(s.get('assessment') or {}).get('review')
+    if review is not None:context['review']=review
     return hashlib.sha256(json.dumps(context,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
 
@@ -214,7 +216,7 @@ def public_store(store):
     return out
 
 
-def apply_store(store,action,ai_choice=None):
+def apply_store(store,action,ai_choice=None,reviewer=None):
     kind=action.get('type')
     if kind=='switch_profile':
         identity=action.get('profile_id')
@@ -285,6 +287,16 @@ def apply_store(store,action,ai_choice=None):
             else:apply(s,action)
         if kind=='play' and s['mode']=='free':
             s['last_human_assessment']=copy.deepcopy(s.get('assessment'))
+        did_review=False
+        if kind=='review_move' or kind=='play' and (s.get('lesson_progress') or {}).get('status')=='unlisted':
+            import lesson_review
+            before=lesson_review.review_position(s);before['revision']=store['revision']
+            review=lesson_review.rule_review(s) or lesson_review.author_review(s,curriculum.get_lesson(s['lesson']['id']))
+            if not review:
+                try:review=lesson_review.engine_review(before,reviewer(before)) if reviewer else lesson_review.unavailable_review(before)
+                except Exception:review=lesson_review.unavailable_review(before)
+            lesson_review.set_review(s,review);s['assisted']=True;did_review=True
+            if lesson_id not in helped:helped.append(lesson_id)
         if lesson_id and (kind in ('hint','demo','solution') or kind=='inspect' and s.get('inspection',{}).get('stones') or kind=='undo' and (s.get('lesson') or {}).get('sequence') or (s.get('lesson_progress') or {}).get('status')=='unlisted'):
             if lesson_id not in helped: helped.append(lesson_id)
         if (s.get('lesson') or {}).get('id') in helped: s['assisted']=True
@@ -298,7 +310,7 @@ def apply_store(store,action,ai_choice=None):
             notes.append(note)
         profile['notes']=notes
         s['feedback']=copy.deepcopy(notes)
-        if kind=='play' and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
+        if (kind=='play' or kind=='review_move' and did_review) and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
             lesson=s['lesson'];assessment=s['assessment']
             if isinstance(assessment.get('correct'),bool):
                 count=sum(a['lesson_id']==lesson['id'] for a in profile['attempts'])+1
@@ -383,10 +395,14 @@ def sequence_play(s,x,y):
     child=next((n for n in node.get('children',[]) if n['move']==[x,y]),None)
     move(s,x,y)
     lesson=s['lesson']
-    if child is None:
+    import lesson_review
+    if lesson_review.capture_goal_complete(s):
+        s['lesson_attempted']=True;status='solved';correct=True
+        summary='目标已提掉，这手完成了题目。';explanation='已按棋盘规则核对实际提子结果，不要求落子与参考答案完全相同。'
+    elif child is None:
         s['lesson_attempted']=True
-        summary='这手暂不判对错。'
-        explanation='题库没有收录这条变化。可以看参考解法，或重练换一手；本次不计正确率。'
+        summary='这手走出了参考变化，等待复核。'
+        explanation='可以复核这手的效果，也可以看参考解法或重练。'
         s['assisted']=True
         status='unlisted'; correct=None
     else:
@@ -417,6 +433,9 @@ def apply(s,a):
         if (s.get('lesson') or {}).get('sequence'):
             sequence_play(s,a.get('x'),a.get('y'))
         else: move(s,a.get('x'),a.get('y'))
+    elif t=='review_move':
+        import lesson_review
+        lesson_review.review_position(s)
     elif t=='ai_move':
         if s['demo_active'] or s['mode']=='lesson': raise ValueError('请在自由对弈中使用电脑应手。')
         try:
@@ -640,6 +659,9 @@ class Handler(SimpleHTTPRequestHandler):
                 candidate=copy.deepcopy(STATE)
                 profile_id=STORE['active_profile_id']
                 learning=curriculum.learning(STORE['profiles'][profile_id]['attempts'])
+                if action.get('expected_profile_id') is not None and action['expected_profile_id']!=profile_id:
+                    return self.respond(409,{'error':'学习者已切换，请刷新后重试。','state':public_store(STORE)})
+                review_store=copy.deepcopy(STORE) if self.path=='/api/action' and (action.get('type')=='review_move' or action.get('type')=='play' and (candidate.get('lesson') or {}).get('sequence')) else None
             if self.path=='/api/lessons/import':
                 import tactics
                 lesson=tactics.validate_lesson(action.get('lesson'))
@@ -688,11 +710,19 @@ class Handler(SimpleHTTPRequestHandler):
                     raise ValueError('当前没有轮到电脑。')
                 import engine
                 choice=engine.choose_move(candidate)
+            if review_store is not None:
+                import engine
+                apply_store(review_store,action,reviewer=engine.review)
             with LOCK:
-                if STATE['revision']!=candidate['revision']:
+                if STATE['revision']!=candidate['revision'] or STORE['active_profile_id']!=profile_id or context_key(STATE)!=context_key(candidate):
                     return self.respond(409,{'error':'计算期间棋盘已更新，请重试。','state':public_store(STORE)})
-                updated=copy.deepcopy(STORE)
-                apply_store(updated,action,ai_choice=choice)
+                updated=review_store if review_store is not None else copy.deepcopy(STORE)
+                if review_store is None:apply_store(updated,action,ai_choice=choice)
+                else:
+                    # LLM records append without changing the board revision.
+                    # Preserve any that arrived while this review was running.
+                    for identity,profile in STORE['profiles'].items():
+                        if 'llm_explanations' in profile:updated['profiles'][identity]['llm_explanations']=copy.deepcopy(profile['llm_explanations'])
                 save(updated)
                 STORE=updated
                 STATE=active_state(STORE)

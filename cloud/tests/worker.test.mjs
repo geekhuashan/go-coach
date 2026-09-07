@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
-import worker from '../worker.mjs';
+import worker,{contextKey} from '../worker.mjs';
 import {makeSession,digest} from '../auth.mjs';
 import {lessonState,blank,applyAction} from '../game.mjs';
 const lessons=JSON.parse(readFileSync(new URL('../builtin-lessons.json',import.meta.url)));
@@ -20,7 +20,7 @@ class D1 {
  }
  async batch(statements){this.db.exec('BEGIN');try{const results=statements.map(s=>s._execute());this.db.exec('COMMIT');return results}catch(e){this.db.exec('ROLLBACK');throw e}}
 }
-async function session(){const env={DB:new D1(),HOUSEHOLD_ID:'test-home',SESSION_SECRET:'test-only-secret-longer-than-thirty-two-characters',FAMILY_PASSWORD_HASH:await digest('test-password')};const cookie='go_session='+await makeSession(env);async function request(path,method='GET',data,extra=''){const headers={Cookie:cookie+(extra?'; '+extra:''),Origin:'https://go.example'};if(data!==undefined){headers['Content-Type']='application/json';data={expected_profile_id:extra.includes('go_profile=child')?'child':'parent',...data};}const r=await worker.fetch(new Request('https://go.example'+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data)}),env);let body;try{body=await r.json()}catch{}return {status:r.status,body,response:r};}return {env,request};}
+async function session(){const env={DB:new D1(),HOUSEHOLD_ID:'test-home',SESSION_SECRET:'test-only-secret-longer-than-thirty-two-characters',FAMILY_PASSWORD_HASH:await digest('NOT_A_REAL_PASSWORD')};const cookie='go_session='+await makeSession(env);async function request(path,method='GET',data,extra=''){const headers={Cookie:cookie+(extra?'; '+extra:''),Origin:'https://go.example'};if(data!==undefined){headers['Content-Type']='application/json';data={expected_profile_id:extra.includes('go_profile=child')?'child':'parent',...data};}const r=await worker.fetch(new Request('https://go.example'+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data)}),env);let body;try{body=await r.json()}catch{}return {status:r.status,body,response:r};}return {env,request};}
 test('D1 CAS rejects concurrent stale moves without duplicate attempt or XP',async()=>{
  const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.profile.id,'parent');
  const action={type:'play',x:2,y:4,revision:s.revision};const results=await Promise.all([request('/api/action','POST',action),request('/api/action','POST',action)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);s=(await request('/api/state')).body;assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,10);
@@ -31,8 +31,8 @@ test('profile cookie isolates devices and auth never exposes trees',async()=>{
 });
 test('LLM settings reject stale client revision and encrypt stored key',async()=>{
  const {request,env}=await session();let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'hint',revision:s.revision})).body;
- let response=await request('/api/llm/settings','POST',{revision:0,base_url:'https://model.example/v1',model:'example',api_key:'test-only-api-key',enabled:true});assert.equal(response.status,409);assert.equal(env.DB.db.prepare('SELECT COUNT(*) n FROM llm_settings').get().n,0);
- response=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'test-only-api-key',enabled:true});assert.equal(response.status,200);assert.equal(response.body.has_api_key,true);assert.equal(response.body.api_key,undefined);const row=env.DB.db.prepare('SELECT * FROM llm_settings').get();assert.ok(!JSON.stringify(row).includes('test-only-api-key'));
+ let response=await request('/api/llm/settings','POST',{revision:0,base_url:'https://model.example/v1',model:'example',api_key:'NOT_A_REAL_KEY',enabled:true});assert.equal(response.status,409);assert.equal(env.DB.db.prepare('SELECT COUNT(*) n FROM llm_settings').get().n,0);
+ response=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'NOT_A_REAL_KEY',enabled:true});assert.equal(response.status,200);assert.equal(response.body.has_api_key,true);assert.equal(response.body.api_key,undefined);const row=env.DB.db.prepare('SELECT * FROM llm_settings').get();assert.ok(!JSON.stringify(row).includes('NOT_A_REAL_KEY'));
 });
 test('atomic login budget admits only remaining slot under concurrency',async()=>{
  const {request,env}=await session();for(let i=0;i<11;i++)assert.equal((await request('/api/login','POST',{password:'wrong'})).status,401);
@@ -73,9 +73,9 @@ test('state remains unchanged if both engines fail and late primary output loses
  t.mock.method(globalThis,'fetch',async(url,init)=>{if(init.method==='GET')return new Response(JSON.stringify({ok:true,available:true}));const changed=await request('/api/action','POST',{type:'inspect',x:0,y:0,revision:s.revision});assert.equal(changed.status,200);return new Response(JSON.stringify({x:3,y:3}));});const lost=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(lost.status,409);latest=(await request('/api/state')).body;assert.equal(latest.move_number,0);assert.equal(latest.engine_backend,undefined);
 });
 test('LLM test uses manual redirects and rejects a 302 without forwarding its key',async t=>{
- const {request}=await session();const s=(await request('/api/state')).body;const saved=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'test-only-model-key',enabled:true});assert.equal(saved.status,200);
+ const {request}=await session();const s=(await request('/api/state')).body;const saved=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'example',api_key:'EXAMPLE_ONLY',enabled:true});assert.equal(saved.status,200);
  const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push({url:String(url),authorization:init.headers.Authorization});assert.equal(init.redirect,'manual');assert.equal(JSON.stringify(JSON.parse(init.body)).includes('board'),false);return new Response(null,{status:302,headers:{Location:'https://untrusted.example/collect'}});});
- const result=await request('/api/llm/test','POST',{});assert.equal(result.status,503);assert.deepEqual(calls,[{url:'https://model.example/v1/chat/completions',authorization:'Bearer test-only-model-key'}]);assert.ok(!JSON.stringify(result.body).includes('test-only-model-key'));
+ const result=await request('/api/llm/test','POST',{});assert.equal(result.status,503);assert.deepEqual(calls,[{url:'https://model.example/v1/chat/completions',authorization:'Bearer EXAMPLE_ONLY'}]);assert.ok(!JSON.stringify(result.body).includes('EXAMPLE_ONLY'));
 });
 test('practice preference persists per profile, assisted completion clears review and sequential advances',async()=>{
  const {request}=await session();let s=(await request('/api/state')).body;
@@ -91,4 +91,31 @@ test('fresh profiles start in visible first variant while hidden historical less
  s=(await request('/api/action','POST',{type:'lesson',id:'escape-1-8',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-8');
  s=(await request('/api/action','POST',{type:'next_lesson',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-2-1');
  s=(await request('/api/action','POST',{type:'add_profile',name:'新学习者',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-1');
+});
+test('exact author refutation grades once without asking KataGo or awarding XP',async t=>{
+ const {request}=await session();let s=(await request('/api/state')).body;
+ s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-68',revision:s.revision})).body;
+ t.mock.method(globalThis,'fetch',async()=>{throw new Error('author proof must not call the engine')});
+ const response=await request('/api/action','POST',{type:'play',x:15,y:18,revision:s.revision});assert.equal(response.status,200);s=response.body;
+ assert.equal(s.assessment.review.source,'author');assert.equal(s.assessment.correct,false);assert.equal(s.lesson_progress.status,'failed');assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,0);
+ assert.equal((await request('/api/action','POST',{type:'review_move',revision:s.revision})).status,400);assert.equal((await request('/api/state')).body.recent_attempts.length,1);
+});
+test('unlisted move survives an outage, retries compute evidence, and stale reviews cannot write',async t=>{
+ const {request,env}=await session();let s=(await request('/api/state')).body;
+ s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-01',revision:s.revision})).body;
+ let r=await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision});assert.equal(r.status,200);s=r.body;
+ assert.equal(s.board[0][0],1);assert.equal(s.assessment.review.source,'unavailable');assert.equal(s.recent_attempts.length,0);
+ Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let stale=false;
+ t.mock.method(globalThis,'fetch',async(url,init)=>{
+  assert.equal(String(url),'https://engine.example/review');const p=JSON.parse(init.body).state;assert.equal(p.board[0][0],0);assert.equal(p.moves.length,0);assert.equal(p.lesson,undefined);assert.ok(p.review);
+  const coords='ABCDEFGHJKLMNOPQRSTUVWXYZ',item=point=>{const move=coords[point.x]+(p.size-point.y);return {move,rootInfo:{scoreLead:1,visits:64},moves:[{move,pv:[move]}],ownership:Array(p.size*p.size).fill(0)};};
+  if(stale)env.DB.db.prepare('UPDATE households SET revision=revision+1').run();
+  return new Response(JSON.stringify({revision:p.revision,perspective:'black',candidate:item(p.review.candidate),reference:item(p.review.reference)}));
+ });
+ r=await request('/api/action','POST',{type:'review_move',revision:s.revision});assert.equal(r.status,200);s=r.body;assert.equal(s.assessment.review.verdict,'reasonable');assert.equal(s.assessment.correct,null);assert.equal(s.recent_attempts.length,0);assert.equal(s.rating.practice_xp,0);
+ const saved=env.DB.db.prepare("SELECT state_json FROM profiles WHERE id='parent'").get().state_json;stale=true;r=await request('/api/action','POST',{type:'review_move',revision:s.revision});assert.equal(r.status,409);assert.equal(env.DB.db.prepare("SELECT state_json FROM profiles WHERE id='parent'").get().state_json,saved);
+});
+test('new review evidence invalidates an older LLM explanation on the same board',async()=>{
+ const s=blank(19),original=await contextKey(s);s.assessment={review:{source:'unavailable',verdict:'uncertain'}};const pending=await contextKey(s);s.assessment.review={source:'katago',verdict:'mistake',evidence:{score_loss:5}};
+ assert.notEqual(await contextKey(s),pending);assert.notEqual(pending,original);
 });

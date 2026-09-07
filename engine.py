@@ -128,36 +128,93 @@ def analysis_query(state, request_id):
     }
 
 
-def analyze(state):
+def _run_query(query, timeout=90):
+    """Send one bounded request while the caller holds the process lock."""
     global _status, _last_error
+    deadline = time.monotonic() + timeout
+    _start()
+    try:
+        _process.stdin.write(json.dumps(query) + "\n")
+        _process.stdin.flush()
+        while time.monotonic() < deadline:
+            result = _output.get(timeout=max(0.1, deadline - time.monotonic()))
+            if result.get("_exit"):
+                raise RuntimeError("KataGo 进程退出，请检查本地 engine.log。")
+            if result.get("id") != query['id']:
+                continue
+            if "error" in result:
+                raise RuntimeError(result["error"])
+            if result.get("isDuringSearch"):
+                continue
+            if "moveInfos" not in result:
+                continue
+            _status, _last_error = "已就绪", ""
+            return result
+        raise RuntimeError("KataGo 分析超时，可继续练题，稍后再试。")
+    except (OSError, queue.Empty, RuntimeError) as exc:
+        _status, _last_error = "暂不可用", str(exc) or "分析超时"
+        close()
+        raise RuntimeError(_last_error) from exc
+
+
+def analyze(state):
     with _lock:
-        request_id = uuid.uuid4().hex
-        query = analysis_query(state, request_id)
-        _start()
-        try:
-            _process.stdin.write(json.dumps(query) + "\n")
-            _process.stdin.flush()
-            deadline = time.monotonic() + 90
-            while time.monotonic() < deadline:
-                result = _output.get(timeout=max(0.1, deadline - time.monotonic()))
-                if result.get("_exit"):
-                    raise RuntimeError("KataGo 进程退出，请检查本地 engine.log。")
-                if result.get("id") != request_id:
-                    continue
-                if "error" in result:
-                    raise RuntimeError(result["error"])
-                if result.get("isDuringSearch"):
-                    continue
-                if "moveInfos" not in result:
-                    continue
-                _status, _last_error = "已就绪", ""
-                return {"revision":state["revision"], "engine":"KataGo", "perspective":"black",
-                        "rootInfo":result.get("rootInfo",{}), "moves":result["moveInfos"][:8]}
-            raise RuntimeError("KataGo 分析超时，可继续练题，稍后再试。")
-        except (OSError, queue.Empty, RuntimeError) as exc:
-            _status, _last_error = "暂不可用", str(exc) or "分析超时"
-            close()
-            raise RuntimeError(_last_error) from exc
+        query = analysis_query(state, uuid.uuid4().hex)
+        result = _run_query(query)
+        return {"revision":state["revision"], "engine":"KataGo", "perspective":"black",
+                "rootInfo":result.get("rootInfo",{}), "moves":result["moveInfos"][:8]}
+
+
+def review_points(state):
+    """Accept exactly two named board coordinates, never client query options."""
+    value = state.get('review')
+    if not isinstance(value, dict) or set(value) != {'candidate', 'reference'}:
+        raise ValueError('复核需要候选和参考两个落点。')
+    if type(state.get('to_play')) is not int or state['to_play'] not in (1,2):
+        raise ValueError('复核先行方无效。')
+    points = {}
+    for label in ('candidate', 'reference'):
+        point = value[label]
+        if not isinstance(point, dict) or set(point) != {'x','y'}:
+            raise ValueError('复核落点只允许 x、y 坐标。')
+        points[label] = coordinate(point['x'], point['y'], state['size'])
+        if state['board'][point['y']][point['x']] != 0:
+            raise ValueError('复核落点必须为空点。')
+    return points
+
+
+def review(state):
+    """Compare two root constraints; return evidence without a life/death verdict."""
+    points = review_points(state)
+    queries = {}
+    for label, point in points.items():
+        query = analysis_query(state, uuid.uuid4().hex)
+        query.update(maxVisits=128, includeOwnership=True,
+                     allowMoves=[{'player':'B' if state['to_play']==1 else 'W',
+                                  'moves':[point], 'untilDepth':1}],
+                     overrideSettings={'maxTime':3,'reportAnalysisWinratesAs':'BLACK'})
+        queries[label] = query
+    deadline = time.monotonic() + 12
+    if not _lock.acquire(timeout=2):
+        raise RuntimeError('KataGo 正忙，请稍后再复核。')
+    try:
+        result = {'revision':state['revision'],'engine':'KataGo','perspective':'black'}
+        for label, query in queries.items():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0: raise RuntimeError('KataGo 复核超时，请稍后重试。')
+            raw = _run_query(query, timeout=min(6, remaining))
+            moves, ownership = raw.get('moveInfos'), raw.get('ownership')
+            if not isinstance(raw.get('rootInfo'), dict) or not isinstance(moves,list) or not moves:
+                raise RuntimeError('KataGo 未返回完整复核信息。')
+            if any(not isinstance(m,dict) or m.get('move')!=points[label] for m in moves):
+                raise RuntimeError('KataGo 未返回指定根落点的复核信息。')
+            if not isinstance(ownership,list) or len(ownership)!=state['size']**2:
+                raise RuntimeError('KataGo 未返回完整归属预测。')
+            result[label] = {'move':points[label], 'rootInfo':raw['rootInfo'],
+                             'moves':moves[:8], 'ownership':ownership}
+        return result
+    finally:
+        _lock.release()
 
 
 def choose_move(state):

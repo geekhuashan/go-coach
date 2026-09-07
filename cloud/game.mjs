@@ -11,8 +11,10 @@ function move(s,x,y,color=s.to_play){if(s.ended)throw new Error('本局已结束
  if(s.assessment&&!s.demo_active){s.message=s.assessment.summary+' '+s.assessment.explanation;s.marks=clone(s.assessment.marks||[]);}return result;
 }
 export function sequenceNode(s){let node=s.lesson.tree;for(const m of s.moves){node=node.children?.find(c=>c.move[0]===m.x&&c.move[1]===m.y);if(!node)return null;}return node;}
+export function captureGoalComplete(s){const objective=s.lesson?.objective,targets=objective?.targets||[],captured=targets.map(([x,y])=>[s.board,...(s.history||[]).map(h=>h.board)].some(board=>board[y][x]!==3-s.initial_player));return !!targets.length&&(objective.kind==='capture'?captured.every(Boolean):objective.kind==='capture_any'?captured.some(Boolean):false);}
 function sequencePlay(s,x,y){let node=sequenceNode(s);if(!node)throw new Error('当前变化未收录，请重试。');let child=node.children?.find(c=>c.move[0]===x&&c.move[1]===y);move(s,x,y);let summary,explanation,correct=null,status;
- if(!child){s.lesson_attempted=true;status='unlisted';summary='这手暂不判对错。';explanation='题库没有收录这条变化。可以看参考解法，或重练换一手；本次不计正确率。';s.assisted=true;}
+ if(captureGoalComplete(s)){s.lesson_attempted=true;status='solved';correct=true;summary='目标已提掉，这手完成了题目。';explanation='已按棋盘规则核对实际提子结果，不要求落子与参考答案完全相同。';}
+ else if(!child){s.lesson_attempted=true;status='unlisted';summary='这手走出了参考变化，等待复核。';explanation='可以复核这手的效果，也可以看参考解法或重练。';s.assisted=true;}
  else {explanation=child.explanation||'';if(child.children?.length){const replies=child.children,reply=replies[((s._branch_seed||0)+Math.floor(s.moves.length/2))%replies.length];move(s,...reply.move);explanation+=' '+(reply.explanation||'');child=reply;}const solved=!child.children?.length;s.lesson_attempted=solved;correct=solved?true:null;status=solved?'solved':'playing';summary=solved?(s.lesson.objective?.kind==='authored_solution'?'已完成作者收录的正确变化。':'这条吃子变化完成，目标已提掉。'):'对手已应手，请继续计算下一手。';}
  s.assessment={correct,summary,explanation:explanation.trim(),marks:[],skill:s.lesson.skill,difficulty:s.lesson.difficulty};s.lesson_progress={status,ply:s.moves.length,message:summary};s.message=summary+' '+explanation;
 }
