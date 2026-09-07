@@ -32,3 +32,19 @@ class PracticeTest(unittest.TestCase):
         self.assertEqual(len(s['moves']),2);self.assertFalse(s['lesson_attempted'])
         server.apply_store(store,{'type':'practice_mode','mode':'review'})
         self.assertEqual(s['lesson']['id'],'tactic-short-ladder');self.assertEqual(s['moves'],[]);self.assertTrue(s['assisted'])
+    def test_variant_limits_keep_history_and_advance_from_hidden(self):
+        visible=[l for l in curriculum.catalog() if curriculum.available_lesson(l)]
+        self.assertEqual(len(visible),457)
+        for skill in ('escape','capture','connect','cut'):
+            for difficulty,count in ((1,3),(2,5)):
+                self.assertEqual(sum(l.get('family_id')==f'{skill}-{difficulty}' for l in visible),count)
+        self.assertTrue(curriculum.available_lesson(dict(id='imported',family_id='escape-1',variant=8)))
+        self.assertTrue(curriculum.available_lesson(dict(id='escape-1-9')))
+        store=self.store();p=store['profiles']['parent'];self.assertEqual(p['state']['lesson']['id'],'escape-1-1')
+        p['attempts']=[dict(lesson_id='escape-1-8',correct=True,assisted=False,attempt_no=1)]
+        self.assertEqual(curriculum.learning(p['attempts'])['independent_correct'],1)
+        self.assertTrue(curriculum.available_lesson(curriculum.recommend(p['attempts'])))
+        p['practice_mode']='sequential';server.apply_store(store,dict(type='lesson',id='escape-1-8'))
+        self.assertEqual(p['state']['lesson']['id'],'escape-1-8')
+        server.apply_store(store,dict(type='next_lesson'));self.assertEqual(p['state']['lesson']['id'],'escape-2-1')
+        p['practice_mode']='review';p['helped_lesson_ids']=['escape-1-8'];self.assertEqual(server.practice_progress(p)['review_count'],0)

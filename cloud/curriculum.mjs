@@ -1,5 +1,7 @@
 import {clone,group,play,key,boardFor,coord} from './rules.mjs';
 export const SKILLS={escape:'救棋与数气',capture:'打吃与提子',connect:'连接棋块',cut:'阻断直接连接',life:'死活与计算',tsumego:'死活与手筋'};
+// Only the original eight base families have interchangeable rotation variants.
+export function availableLesson(lesson){if(lesson.legacy||['escape','capture','connect'].includes(lesson.id))return false;const match=!lesson.sequence&&/^(escape|capture|connect|cut)-([12])-([1-8])$/.exec(lesson.id);return !match||Number(match[3])<=(match[2]==='1'?3:5);}
 export function publicLesson(lesson){const{objective,solutions,solution,tree,...visible}=lesson;return {...clone(visible),focus_bounds:focusBounds(lesson)};}
 export function validateLesson(value,{trustedAuthored=false}={}){
  const size=value?.size||9;if(![9,19].includes(size))throw new Error('题目棋盘需为9路或19路。');
@@ -67,16 +69,16 @@ export function recommend(catalog,evidence,stats,recent=[],currentId=null){
  const byId=new Map(catalog.map(l=>[l.id,l])),valid=recent.filter(a=>byId.has(a.lesson_id)),last=valid[0],covered=new Set(evidence.filter(a=>byId.has(a.lesson_id)).map(a=>byId.get(a.lesson_id).skill));
  let chosen;if(last&&!last.correct&&(valid.length===1||byId.get(valid[1].lesson_id).skill!==byId.get(last.lesson_id).skill))chosen=stats.skills.find(s=>s.id===byId.get(last.lesson_id).skill);
  chosen ||= stats.skills.find(s=>!covered.has(s.id))||[...stats.skills].sort((a,b)=>a.independent_attempts-b.independent_attempts||(a.accuracy||0)-(b.accuracy||0))[0];
- const candidates=catalog.filter(l=>l.skill===chosen.id&&l.difficulty===chosen.next_difficulty&&!l.legacy),seen=new Set(evidence.map(a=>a.lesson_id));
+ const candidates=catalog.filter(l=>l.skill===chosen.id&&l.difficulty===chosen.next_difficulty&&availableLesson(l)),seen=new Set(evidence.map(a=>a.lesson_id));
  const lesson=candidates.find(l=>!seen.has(l.id)&&l.id!==currentId)||candidates.find(l=>l.id!==currentId)||candidates[0];
  return {...publicLesson(lesson),reason:chosen.independent_attempts<3?'先用不同题目了解这项能力。':'根据首次独立作答记录，练习这项能力；辅助与重做不用于提升评级。'};
 }
 
 export function focusBounds(lesson){const size=lesson.size||9,points=(lesson.stones||[]).map(p=>Array.isArray(p)?p:[p.x,p.y]);function walk(n){if(n?.move)points.push(n.move);for(const c of n?.children||[])walk(c);}walk(lesson.tree);const valid=points.filter(p=>p.length>=2&&p.every(Number.isInteger)&&p[0]>=0&&p[1]>=0&&p[0]<size&&p[1]<size);return valid.length?{min_x:Math.min(...valid.map(p=>p[0])),min_y:Math.min(...valid.map(p=>p[1])),max_x:Math.max(...valid.map(p=>p[0])),max_y:Math.max(...valid.map(p=>p[1]))}:null;}
 export function practice(ctx,currentId=null,mode=ctx.runs?._practice_mode||'recommended',advance=false){
- const catalog=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b)),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
- const pool=catalog.filter(l=>!completed.has(l.id)&&(mode!=='review'||review.has(l.id))),index=catalog.findIndex(l=>l.id===currentId);
- let next=pool[0];if(advance&&index>=0)next=pool.find(l=>catalog.indexOf(l)>index)||pool[0];
+ const ordered=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b)),catalog=ordered.filter(availableLesson),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
+ const pool=catalog.filter(l=>!completed.has(l.id)&&(mode!=='review'||review.has(l.id))),index=catalog.findIndex(l=>l.id===currentId),anchor=ordered.findIndex(l=>l.id===currentId);
+ let next=pool[0];if(advance&&anchor>=0)next=pool.find(l=>ordered.indexOf(l)>anchor)||pool[0];
  const reviewCount=catalog.filter(l=>review.has(l.id)&&!completed.has(l.id)).length;
  return {mode,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:catalog.filter(l=>!completed.has(l.id)).length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:reviewCount,next_id:next?.id||null};
 }

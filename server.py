@@ -44,13 +44,16 @@ def practice_progress(profile,current_id=None,advance=False):
     group_start={}
     for l in catalog: group_start.setdefault(re.sub(r'\d+$','',l['id']),ids_order[l['id']])
     catalog.sort(key=lambda l:(group_start[re.sub(r'\d+$','',l['id'])],int(re.search(r'\d+$',l['id']).group()) if re.search(r'\d+$',l['id']) else 0))
+    ordered_ids=[l['id'] for l in catalog]
+    catalog=[l for l in catalog if curriculum.available_lesson(l)]
     mode=profile.get('practice_mode','recommended')
     completed={a['lesson_id'] for a in profile['attempts'] if a.get('correct') is True}
     review=set(profile.get('helped_lesson_ids',[]))|{a['lesson_id'] for a in profile['attempts'] if a.get('correct') is False}
     ids=[l['id'] for l in catalog]
     index=ids.index(current_id) if current_id in ids else -1
+    anchor=ordered_ids.index(current_id) if current_id in ordered_ids else -1
     pool=[identity for identity in ids if identity not in completed and (mode!='review' or identity in review)]
-    next_id=next((identity for identity in pool if ids.index(identity)>index),pool[0] if pool else None) if advance else (pool[0] if pool else None)
+    next_id=next((identity for identity in pool if ordered_ids.index(identity)>anchor),pool[0] if pool else None) if advance else (pool[0] if pool else None)
     return dict(mode=mode,total=len(ids),completed=len(set(ids)&completed),remaining=len(set(ids)-completed),current_index=index+1 if index>=0 else None,next_index=ids.index(next_id)+1 if next_id else None,review_count=len((set(ids)&review)-completed),next_id=next_id)
 
 
@@ -97,7 +100,7 @@ def save(store):
 
 
 def make_profile(identity,name,state=None):
-    return dict(id=identity,name=name,state=state or lesson_state('escape',0),attempts=[],notes=[],helped_lesson_ids=[],created_at=now())
+    return dict(id=identity,name=name,state=state or lesson_state('escape-1-1',0),attempts=[],notes=[],helped_lesson_ids=[],created_at=now())
 
 
 def load_store():
@@ -107,7 +110,7 @@ def load_store():
         data.setdefault('matches',{})
         for p in data['profiles'].values():p.setdefault('helped_lesson_ids',[])
         return data
-    state=lesson_state('escape',0)
+    state=lesson_state('escape-1-1',0)
     if FILE.exists():
         state=json.loads(FILE.read_text(encoding='utf-8'))
         state['assessment']=None
@@ -598,7 +601,7 @@ class Handler(SimpleHTTPRequestHandler):
         if route=='/api/state':
             with LOCK: return self.respond(200,public_store(STORE))
         if route=='/api/lessons':
-            with LOCK: return self.respond(200,[lesson_public(l) for l in curriculum.catalog()])
+            with LOCK: return self.respond(200,[lesson_public(l) for l in curriculum.catalog() if curriculum.available_lesson(l)])
         if route=='/api/profiles':
             with LOCK: return self.respond(200,public_store(STORE)['profiles'])
         if route=='/api/matches':

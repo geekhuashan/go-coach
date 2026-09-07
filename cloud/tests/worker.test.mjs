@@ -23,7 +23,7 @@ class D1 {
 async function session(){const env={DB:new D1(),HOUSEHOLD_ID:'test-home',SESSION_SECRET:'test-only-secret-longer-than-thirty-two-characters',FAMILY_PASSWORD_HASH:await digest('test-password')};const cookie='go_session='+await makeSession(env);async function request(path,method='GET',data,extra=''){const headers={Cookie:cookie+(extra?'; '+extra:''),Origin:'https://go.example'};if(data!==undefined){headers['Content-Type']='application/json';data={expected_profile_id:extra.includes('go_profile=child')?'child':'parent',...data};}const r=await worker.fetch(new Request('https://go.example'+path,{method,headers,body:data===undefined?undefined:JSON.stringify(data)}),env);let body;try{body=await r.json()}catch{}return {status:r.status,body,response:r};}return {env,request};}
 test('D1 CAS rejects concurrent stale moves without duplicate attempt or XP',async()=>{
  const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.profile.id,'parent');
- const action={type:'play',x:3,y:6,revision:s.revision};const results=await Promise.all([request('/api/action','POST',action),request('/api/action','POST',action)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);s=(await request('/api/state')).body;assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,10);
+ const action={type:'play',x:2,y:4,revision:s.revision};const results=await Promise.all([request('/api/action','POST',action),request('/api/action','POST',action)]);assert.deepEqual(results.map(r=>r.status).sort(),[200,409]);s=(await request('/api/state')).body;assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,10);
  const replay=await request('/api/action','POST',{type:'retry',revision:s.revision});s=replay.body;s=(await request('/api/action','POST',{...action,revision:s.revision})).body;assert.equal(s.rating.practice_xp,10);assert.equal(s.recent_attempts.length,2);
 });
 test('profile cookie isolates devices and auth never exposes trees',async()=>{
@@ -84,4 +84,11 @@ test('practice preference persists per profile, assisted completion clears revie
  await act({type:'play',x:2,y:4});assert.equal(s.recent_attempts[0].correct,true);assert.equal(s.rating.practice_xp,0);assert.equal(s.practice_progress.completed,1);assert.equal(s.practice_progress.review_count,0);
  await act({type:'next_lesson'});assert.match(s.message,/没有待复习/);await act({type:'practice_mode',mode:'sequential'});const first=s.practice_progress.current_index;
  await act({type:'next_lesson'});assert.ok(s.practice_progress.current_index>first);assert.equal((await request('/api/state')).body.practice_mode,'sequential');assert.equal((await request('/api/state','GET',undefined,'go_profile=child')).body.practice_mode,'recommended');
+});
+test('fresh profiles start in visible first variant while hidden historical lessons remain readable',async()=>{
+ const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.lesson.id,'escape-1-1');assert.equal((await request('/api/lessons')).body.length,457);
+ s=(await request('/api/action','POST',{type:'practice_mode',mode:'sequential',revision:s.revision})).body;
+ s=(await request('/api/action','POST',{type:'lesson',id:'escape-1-8',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-8');
+ s=(await request('/api/action','POST',{type:'next_lesson',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-2-1');
+ s=(await request('/api/action','POST',{type:'add_profile',name:'新学习者',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-1');
 });

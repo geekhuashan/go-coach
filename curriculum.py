@@ -1,5 +1,6 @@
 """Local rule-based curriculum with validated tactical sequences and imports."""
 import json
+import re
 from pathlib import Path
 from copy import deepcopy
 from go_rules import group
@@ -114,6 +115,12 @@ if len(set(_authored_ids)) != len(_authored_ids) or set(_authored_ids) & set(_BY
 _commit_lessons(_authored)
 # The bundled licensed book is shared by local and cloud deployments.
 load_imports(Path(__file__).resolve().parent / 'data/gogameguru/lessons.json')
+
+
+def available_lesson(lesson):
+    if lesson.get('legacy') or lesson['id'] in ('escape','capture','connect'): return False
+    match=None if lesson.get('sequence') else re.fullmatch(r'(escape|capture|connect|cut)-([12])-([1-8])',lesson['id'])
+    return not match or int(match[3]) <= (3 if match[2]=='1' else 5)
 
 
 def catalog():
@@ -237,7 +244,7 @@ def _recommend(attempts, skills, current_id=None):
     difficulty = stat['next_difficulty']
     if last and not last.get('correct') and _BY_ID[last['lesson_id']]['skill'] == chosen_skill:
         difficulty = min(difficulty, _BY_ID[last['lesson_id']]['difficulty'])
-    candidates = [l for l in _CATALOG if l['skill'] == chosen_skill and l['difficulty'] == difficulty]
+    candidates = [l for l in _CATALOG if l['skill'] == chosen_skill and l['difficulty'] == difficulty and available_lesson(l)]
     excluded = current_id or (last['lesson_id'] if last else None)
     fresh = [l for l in candidates if l['id'] not in seen and l['id'] != excluded]
     last_index = {a['lesson_id']: i for i,a in enumerate(valid)}

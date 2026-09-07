@@ -55,3 +55,11 @@ test('switching a partial sequence into review immediately includes and restarts
  const l=catalog.find(l=>l.id==='tactic-short-ladder');let r=action(lessonState(l),{type:'play',x:l.tree.children[0].move[0],y:l.tree.children[0].move[1]});assert.equal(r.state.lesson_attempted,false);assert.equal(r.state.moves.length,2);
  r=action(r.state,{type:'practice_mode',mode:'review'});assert.equal(r.state.lesson.id,l.id);assert.equal(r.state.moves.length,0);assert.ok(r.helped.includes(l.id));assert.ok(r.state.assisted);
 });
+test('base variants are limited by family without deleting historical evidence or custom puzzles',async()=>{
+ const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,457);
+ for(const skill of ['escape','capture','connect','cut'])for(const [difficulty,count]of [[1,3],[2,5]])assert.equal(visible.filter(l=>l.family_id===`${skill}-${difficulty}`).length,count);
+ assert.ok(availableLesson({id:'escape-1-9'}));assert.ok(availableLesson({id:'imported',family_id:'escape-1',variant:8}));assert.ok(availableLesson({id:'escape-1-8',sequence:true}));
+ const evidence=[{lesson_id:'escape-1-8',correct:true,assisted:false,attempt_no:1}];const stats=learning(catalog,evidence);assert.equal(stats.independent_correct,1);assert.ok(catalog.find(l=>l.id==='escape-1-8'));
+ assert.ok(availableLesson(recommend(catalog,evidence,stats,evidence,'escape-1-8')));
+ const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,457);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
+});

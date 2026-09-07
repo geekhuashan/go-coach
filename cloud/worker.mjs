@@ -1,6 +1,6 @@
 import builtins from './builtin-lessons.json' with {type:'json'};
 import {clone} from './rules.mjs';
-import {learning,recommend,publicLesson,validateLesson,practice} from './curriculum.mjs';
+import {learning,recommend,publicLesson,validateLesson,practice,availableLesson} from './curriculum.mjs';
 import {lessonState,applyAction,computerTurn,publicState,sgf} from './game.mjs';
 import {digest,equal,cookies,authenticated,makeSession,sessionCookie,profileCookie,encrypt,decrypt} from './auth.mjs';
 const builtinLessons=builtins.map(l=>({...l,legacy:['escape','capture','connect'].includes(l.id)}));
@@ -15,7 +15,7 @@ function fail(message,status=400){throw Object.assign(new Error(message),{status
 function originAllowed(request){const origin=request.headers.get('Origin');return !origin||origin===new URL(request.url).origin;}
 function sizeCheck(value,max=MAX_STATE_BYTES){const text=JSON.stringify(value);if(enc.encode(text).byteLength>max)fail('本次内容超出保存上限，请拆分题目或导出历史后新开一局。',413);return text;}
 async function body(request,max=32768){if(!(request.headers.get('Content-Type')||'').startsWith('application/json'))fail('需要JSON请求。',415);if(Number(request.headers.get('Content-Length')||0)>max)fail('请求过大。',413);const text=await request.text();if(enc.encode(text).byteLength>max)fail('请求过大。',413);let value;try{value=JSON.parse(text)}catch{fail('JSON格式无效。')}if(!value||typeof value!=='object'||Array.isArray(value))fail('请求需为JSON对象。');return value;}
-async function initialize(env){const hh=household(env);let family=await env.DB.prepare('SELECT revision FROM households WHERE id=?').bind(hh).first();if(!family){const s=JSON.stringify(lessonState(builtinLessons.find(l=>l.id==='escape')||builtinLessons[0]));await env.DB.batch([env.DB.prepare('INSERT OR IGNORE INTO households(id) VALUES(?)').bind(hh),env.DB.prepare('INSERT OR IGNORE INTO profiles(household_id,id,name,state_json) VALUES(?,?,?,?)').bind(hh,'parent','我',s),env.DB.prepare('INSERT OR IGNORE INTO profiles(household_id,id,name,state_json) VALUES(?,?,?,?)').bind(hh,'child','宝宝',s)]);family=await env.DB.prepare('SELECT revision FROM households WHERE id=?').bind(hh).first();}return family;}
+async function initialize(env){const hh=household(env);let family=await env.DB.prepare('SELECT revision FROM households WHERE id=?').bind(hh).first();if(!family){const s=JSON.stringify(lessonState(builtinLessons.find(l=>l.id==='escape-1-1')||builtinLessons[0]));await env.DB.batch([env.DB.prepare('INSERT OR IGNORE INTO households(id) VALUES(?)').bind(hh),env.DB.prepare('INSERT OR IGNORE INTO profiles(household_id,id,name,state_json) VALUES(?,?,?,?)').bind(hh,'parent','我',s),env.DB.prepare('INSERT OR IGNORE INTO profiles(household_id,id,name,state_json) VALUES(?,?,?,?)').bind(hh,'child','宝宝',s)]);family=await env.DB.prepare('SELECT revision FROM households WHERE id=?').bind(hh).first();}return family;}
 async function load(env,request,forcedId=null){const hh=household(env),family=await initialize(env);const profiles=await rows(env.DB.prepare('SELECT id,name FROM profiles WHERE household_id=? ORDER BY created_at,id').bind(hh));const proposed=forcedId||cookies(request).go_profile;const id=profiles.some(p=>p.id===proposed)?proposed:profiles.some(p=>p.id==='parent')?'parent':profiles[0]?.id;if(!id)fail('家庭档案不存在。',500);
  const [row,imports,evidence,recent,total,notes,markers,completedRows]=await Promise.all([
  env.DB.prepare('SELECT * FROM profiles WHERE household_id=? AND id=?').bind(hh,id).first(),
@@ -75,7 +75,7 @@ async function resultChanges(env,ctx,state){if(!state.match?.result||ctx.state.m
  return changes;
 }
 async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!ctx.profiles.some(p=>p.id===a.profile_id))fail('找不到这位学习者。');return json(await publicContext(env,await load(env,request,a.profile_id)),200,{'Set-Cookie':profileCookie(a.profile_id)});}
- if(a.type==='add_profile'){const name=String(a.name||'').trim();if(!name||name.length>30||ctx.profiles.length>=20||ctx.profiles.some(p=>p.name===name))fail('称呼需要1至30字且不能重复，最多20人。');const id='learner-'+crypto.randomUUID().slice(0,12);const ok=await commit(env,ctx,token=>[env.DB.prepare(`INSERT INTO profiles(household_id,id,name,state_json) SELECT ?,?,?,? WHERE ${guard()}`).bind(ctx.hh,id,name,JSON.stringify(lessonState(builtinLessons.find(l=>l.id==='escape')||builtinLessons[0])),ctx.hh,token)]);if(!ok)return conflict(env,request);return json(await publicContext(env,await load(env,request,id)),200,{'Set-Cookie':profileCookie(id)});}
+ if(a.type==='add_profile'){const name=String(a.name||'').trim();if(!name||name.length>30||ctx.profiles.length>=20||ctx.profiles.some(p=>p.name===name))fail('称呼需要1至30字且不能重复，最多20人。');const id='learner-'+crypto.randomUUID().slice(0,12);const ok=await commit(env,ctx,token=>[env.DB.prepare(`INSERT INTO profiles(household_id,id,name,state_json) SELECT ?,?,?,? WHERE ${guard()}`).bind(ctx.hh,id,name,JSON.stringify(lessonState(builtinLessons.find(l=>l.id==='escape-1-1')||builtinLessons[0])),ctx.hh,token)]);if(!ok)return conflict(env,request);return json(await publicContext(env,await load(env,request,id)),200,{'Set-Cookie':profileCookie(id)});}
  if(a.type==='ai_move'){if(!computerTurn(ctx.state))fail('当前没有轮到电脑。');ctx.aiMove=await bridge(env,'move',ctx.state);ctx.aiBackend=ctx.aiMove.engine_backend;}
  if(a.type==='resume_match'){const row=await env.DB.prepare('SELECT state_json FROM matches WHERE household_id=? AND id=? AND (black_profile_id=? OR white_profile_id=?)').bind(ctx.hh,a.match_id,ctx.profileId,ctx.profileId).first();ctx.resumeState=parse(row?.state_json);}
  let changed;try{changed=applyAction(ctx.state,a,ctx)}catch(e){fail(e.message)}const state=changed.state;if(a.type==='ai_move')state.engine_backend=ctx.aiBackend;let event=changed.event;if(event){const count=await env.DB.prepare('SELECT COUNT(*) AS count FROM attempts WHERE household_id=? AND profile_id=? AND lesson_id=?').bind(ctx.hh,ctx.profileId,event.lesson_id).first();event.attempt_no=count.count+1;}
@@ -118,7 +118,7 @@ export default {async fetch(request,env){const url=new URL(request.url),path=url
  const ctx=await load(env,request);
  if(request.method==='GET'){
   if(path==='/api/state')return json(await publicContext(env,ctx));
-  if(path==='/api/lessons')return json(ctx.catalog.filter(l=>!l.legacy).map(lessonListItem));
+  if(path==='/api/lessons')return json(ctx.catalog.filter(availableLesson).map(lessonListItem));
   if(path==='/api/profiles')return json(ctx.profiles);
   if(path==='/api/history')return await historyRoute(env,ctx,url);
   if(path==='/api/llm/settings')return json(safeSettings(await llmSettings(env)));
