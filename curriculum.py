@@ -4,7 +4,7 @@ from pathlib import Path
 from copy import deepcopy
 from go_rules import group
 
-SKILLS = {'escape': '救棋与数气', 'capture': '打吃与提子', 'connect': '连接棋块', 'cut': '阻断直接连接'}
+SKILLS = {'escape': '救棋与数气', 'capture': '打吃与提子', 'connect': '连接棋块', 'cut': '阻断直接连接', 'tsumego': '死活与手筋'}
 
 
 def _transform(p, variant):
@@ -112,6 +112,8 @@ _authored_ids = [lesson['id'] for lesson in _authored]
 if len(set(_authored_ids)) != len(_authored_ids) or set(_authored_ids) & set(_BY_ID):
     raise ValueError('内置连续题的 id 与现有题库重复。')
 _commit_lessons(_authored)
+# The bundled licensed book is shared by local and cloud deployments.
+load_imports(Path(__file__).resolve().parent / 'data/gogameguru/lessons.json')
 
 
 def catalog():
@@ -182,7 +184,7 @@ def learning(attempts):
         records = [a for a in evidence if _BY_ID[a['lesson_id']]['skill'] == skill]
         correct = sum(bool(a.get('correct')) for a in records)
         total = len(records)
-        if skill == 'capture':
+        if skill in ('capture','tsumego'):
             levels = sorted({l['difficulty'] for l in _CATALOG if l['skill'] == skill})
             difficulty = levels[0]
             for current, following in zip(levels, levels[1:]):

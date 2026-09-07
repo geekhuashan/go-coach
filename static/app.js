@@ -38,9 +38,9 @@ function setState(next){
 async function act(type,extra={}){
  if(busy||!state)return;if(!navigator.onLine){toast('当前离线，联网后继续。');return}pendingMove=null;busy=true;if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
  try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra})});setState(next);
- if(['lesson','next_lesson','resume_match','new'].includes(type))showView('board',{focus:true});
+ if(['lesson','next_lesson','practice_mode','resume_match','new'].includes(type))showView('board',{focus:true});
  if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
- if(['switch_profile','add_profile','retry','lesson','next_lesson','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。'}
+ if(['switch_profile','add_profile','retry','lesson','next_lesson','practice_mode','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='想法和练习记录都归当前学习者保存。'}
  if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
  if(type==='play'&&next.assessment){if(matchMedia('(max-width:740px)').matches)requestAnimationFrame(()=>$('coach-card').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth',block:'nearest'}));toast(next.assessment.summary);$('coach-card').classList.remove('feedback-flash');requestAnimationFrame(()=>$('coach-card').classList.add('feedback-flash'))}
  if(type==='add_profile'){$('profile-name').value='';document.querySelector('.add-profile').open=false}
@@ -70,9 +70,23 @@ function renderLearning(){
  $('hint').hidden=!state.lesson||state.lesson_attempted||state.demo_active;
  $('coach-eyebrow').textContent=state.lesson?.sequence?'多手练习 · 对手自动应手':isResult?'这一手 · 本地自动反馈':'这一题 · 落子后自动讲解';
  const progress=state.lesson_progress;$('lesson-progress').hidden=!progress||state.mode!=='lesson'||state.demo_active;$('lesson-progress').textContent=progress?`${progress.status==='solved'?'✓ 变化完成':progress.status==='failed'?'本次变化结束':progress.status==='unlisted'?'变化待复核':'继续计算'} · 已走 ${progress.ply||0} 手${progress.total_min?' / 至少 '+progress.total_min+' 手':''}${progress.message?' · '+progress.message:''}`:'';
+ $('show-solution').hidden=state.mode!=='lesson'||!state.lesson?.sequence||!state.lesson_attempted||state.demo_active;
+ renderPractice();
  renderLessonSource(state.lesson);
  if(state.lesson_attempted&&!state.demo_active){$('turn-pill').querySelector('span').textContent='本题已作答';$('turn-pill').className='turn-pill answered';if(!inspection)$('inspection').textContent='反馈已生成。可以查看气，再选“重练这一题”或“练下一题”。'}
  if(a&&state.message?.includes(a.summary))$('message').hidden=true;
+}
+function renderPractice(){
+ const mode=state.practice_mode||'recommended',p=state.practice_progress||{};
+ $('practice-mode').value=mode;$('practice-mode').disabled=busy||state.demo_active;
+ const sequential=mode==='sequential',review=mode==='review',empty=(review&&p.review_count===0)||(sequential&&p.remaining===0);
+ $('practice-progress').textContent=sequential?`已通过 ${p.completed||0} / ${p.total||lessons.length} 关${p.current_index?' · 当前第 '+p.current_index+' 关':''}`:review?`待复习 ${p.review_count||0} 题`:'按你的学习记录安排';
+ $('next-practice-eyebrow').textContent=sequential?'顺序闯关':review?'错题复习':'适合你的下一题';
+ if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent='按题库顺序练习，完整做对后通关。看过解答再做对也能过关，但不增加独立答题积分。';}
+ if(review){$('recommendation-title').textContent=empty?'暂时没有待复习题':'再练一次，弄懂它';$('recommendation-reason').textContent=empty?'可以切换智能推荐，或去题库挑题。':'重练还没做对的题；未收录的变化也留在这里，做对后移出。';}
+ $('next-lesson').textContent=sequential?'继续闯关 →':review?'开始复习 →':'开始推荐练习 →';
+ $('next-result').textContent=sequential?'下一关 →':review?'复习下一题 →':'练下一题 →';
+ $('next-lesson').disabled=busy||empty||state.demo_active;$('next-result').disabled=busy||empty;
 }
 function lessonFamily(l){return l.base_id||l.family_id||(l.variant!==undefined?l.id.replace(/-\d+$/,''):l.id)}
 function sourceText(source){if(typeof source==='string')return source;if(!source)return '内置练习';return [source.title||source.book||source.name,source.page?'第 '+source.page+' 页':'',source.problem||source.problem_number||source.number?'题号 '+(source.problem||source.problem_number||source.number):'',source.kind==='licensed'&&source.author?'作者：'+source.author:'',source.kind==='licensed'?'':source.note].filter(Boolean).join(' · ')||'内置练习'}
@@ -96,7 +110,54 @@ function renderLessonPicker(){
  const families=new Set(options.map(lessonFamily));const chosen=options.find(l=>l.id===$('lesson-select').value);
  $('lesson-count').textContent=options.length?`${families.size} 个独立局面 · ${options.length} 个可练版本（含旋转 / 镜像）${chosen?'\n'+lessonSource(chosen):''}`:'这个知识点暂没有此难度，换一个难度或选择“吃子”。';
 }
-function renderBoard(){const root=$('board');root.replaceChildren();const defs=svg('defs');for(const [id,c1,c2]of[['blackStone','#48504a','#151c19'],['whiteStone','#fffefa','#d7d8cc']]){const g=svg('radialGradient',{id,cx:'33%',cy:'26%',r:'75%'});g.append(svg('stop',{offset:'0%','stop-color':c1}),svg('stop',{offset:'100%','stop-color':c2}));defs.append(g)}root.append(defs);const size=state.size||9,step=432/(size-1),at=n=>54+n*step;root.setAttribute('aria-label',`${size} 路围棋棋盘`);for(let i=0;i<size;i++){root.append(svg('line',{x1:at(0),y1:at(i),x2:at(size-1),y2:at(i),class:'board-line'}),svg('line',{x1:at(i),y1:at(0),x2:at(i),y2:at(size-1),class:'board-line'}));for(const yy of[24,516])root.append(svg('text',{x:at(i),y:yy,class:'coord'},cols[i]));for(const xx of[24,516])root.append(svg('text',{x:xx,y:at(i),class:'coord'},String(size-i)))}for(const [x,y]of(size===19?[3,9,15].flatMap(x=>[3,9,15].map(y=>[x,y])):[[2,2],[6,2],[4,4],[2,6],[6,6]]))root.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(3.1,step*.09),fill:'#6c583c'}));for(let y=0;y<size;y++)for(let x=0;x<size;x++){const color=state.board[y][x],g=svg('g',{class:'intersection',role:'button',tabindex:'0','aria-label':`${cols[x]}${size-y} ${color===1?'黑子':color===2?'白子':'空位'}`});g.append(svg('rect',{x:at(x)-step/2,y:at(y)-step/2,width:step,height:step,fill:'transparent',rx:7,class:'hit'}));if(color){g.append(svg('ellipse',{cx:at(x)+1,cy:at(y)+3,rx:step*.445,ry:step*.43,fill:'#5c48243a'}),svg('circle',{cx:at(x),cy:at(y),r:step*.435,fill:`url(#${color===1?'blackStone':'whiteStone'})`,stroke:color===1?'#1c2620':'#b7b6a4','stroke-width':.6}));if(state.last_move?.x===x&&state.last_move?.y===y)g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(5,step*.13),fill:'none',stroke:color===1?'#f1e7cc':'#526957','stroke-width':2}));}if(inspection?.stones?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx:at(x),cy:at(y),r:step*.46,fill:'none',stroke:'#58896d','stroke-width':3}));if(inspection?.liberties?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(9,step*.2),fill:'#f4fbdb',stroke:'#597a42','stroke-width':2}));if(pendingMove?.x===x&&pendingMove?.y===y)g.append(svg('circle',{cx:at(x),cy:at(y),r:step*.4,fill:state.to_play===1?'#253b34':'#fffdf7',opacity:.55,stroke:'#b7853c','stroke-width':2,'stroke-dasharray':'3 2'}));const mark=state.marks?.find(m=>m.x===x&&m.y===y);if(mark && !(mark.label==='气' && inspection)){g.append(svg('circle',{cx:at(x),cy:at(y),r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:at(x),y:at(y)+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'))}const onClick=()=>{if(busy)return;if(tool==='play'&&state.computer_turn){toast('现在轮到电脑，请等它落子。');return}if(tool==='play'&&(state.lesson_attempted||state.demo_active)){toast(state.demo_active?'请先返回原局面，再落子。':'这一题已作答，可以重练或开始下一题。');return}if(tool==='play'&&$('confirm-enabled').checked){if(color){toast('请选择空交叉点。');return}pendingMove={x,y,revision:state.revision,profile:state.profile?.id};render();return}act(tool==='inspect'?'inspect':'play',{x,y})};g.addEventListener('click',onClick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick()}});root.append(g)}}
+let boardFocusKey=null, boardFocusFull=false;
+function lessonBoardBounds(s){
+ const size=s.size||9;
+ if(s.mode!=='lesson'||!s.lesson||size!==19)return null;
+ const points=[],add=(x,y)=>{if(Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&y>=0&&x<size&&y<size)points.push([x,y]);};
+ for(const board of [s.initial_board,s.board])if(Array.isArray(board))for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(board[y]?.[x])add(x,y);
+ for(const p of s.lesson.stones||[])add(p.x,p.y);
+ const bounds=s.lesson.focus_bounds||s.focus_bounds;
+ if(bounds&&[bounds.min_x,bounds.min_y,bounds.max_x,bounds.max_y].every(Number.isInteger)&&bounds.min_x<=bounds.max_x&&bounds.min_y<=bounds.max_y){add(bounds.min_x,bounds.min_y);add(bounds.max_x,bounds.max_y);}
+ for(const p of [...(s.moves||[]),...(s.marks||[])])if(!p.pass)add(p.x,p.y);
+ if(!points.length)return null;
+ const padded=axis=>{let lo=Math.max(0,Math.min(...points.map(p=>p[axis]))-2),hi=Math.min(size-1,Math.max(...points.map(p=>p[axis]))+2);const missing=Math.max(0,9-(hi-lo+1));lo=Math.max(0,lo-Math.floor(missing/2));hi=Math.min(size-1,lo+Math.max(9,hi-lo+1)-1);lo=Math.max(0,Math.min(lo,hi-8));return [lo,hi]};
+ const [minX,maxX]=padded(0),[minY,maxY]=padded(1);
+ if(Math.max(maxX-minX,maxY-minY)>=size-1)return null;
+ return {minX,maxX,minY,maxY};
+}
+function renderBoard(){
+ const root=$('board'),size=state.size||9;
+ const focusKey=JSON.stringify([state.profile?.id,state.lesson?.id,size,state.initial_board]);
+ if(focusKey!==boardFocusKey){boardFocusKey=focusKey;boardFocusFull=false;}
+ const proposed=lessonBoardBounds(state),focused=!!proposed&&!boardFocusFull;
+ const {minX,maxX,minY,maxY}=focused?proposed:{minX:0,maxX:size-1,minY:0,maxY:size-1};
+ const width=maxX-minX,height=maxY-minY,step=432/Math.max(width,height);
+ const startX=54+(432-width*step)/2,startY=54+(432-height*step)/2;
+ const atX=x=>startX+(x-minX)*step,atY=y=>startY+(y-minY)*step;
+ const focusButton=$('board-focus');focusButton.hidden=!proposed;focusButton.textContent=focused?'查看全盘':'放大棋题局部';focusButton.setAttribute('aria-pressed',String(focused));focusButton.onclick=()=>{boardFocusFull=!boardFocusFull;renderBoard()};
+ const note=$('board-focus-note');note.hidden=!focused;note.textContent=focused?`当前显示 ${cols[minX]}${size-minY} 至 ${cols[maxX]}${size-maxY} 的局部，仍是 ${size} 路棋盘。虚线外仍有棋盘，虚线不是棋盘边缘。`:'';
+ $('board-zoom').hidden=size!==19||focused;document.querySelector('.board-shell').classList.toggle('board-focused',focused);document.querySelector('.board-shell').classList.toggle('board-zoomed',size===19&&boardZoom&&!focused);
+ root.setAttribute('aria-label',`${size} 路围棋棋盘`);root.dataset.focused=String(focused);root.dataset.visibleBounds=[minX,minY,maxX,maxY].join(',');if(focused)root.setAttribute('aria-describedby','board-focus-note');else root.removeAttribute('aria-describedby');
+ root.replaceChildren();const defs=svg('defs');
+ for(const [id,c1,c2]of[['blackStone','#48504a','#151c19'],['whiteStone','#fffefa','#d7d8cc']]){const g=svg('radialGradient',{id,cx:'33%',cy:'26%',r:'75%'});g.append(svg('stop',{offset:'0%','stop-color':c1}),svg('stop',{offset:'100%','stop-color':c2}));defs.append(g)}root.append(defs);
+ const left=atX(minX)-(minX>0?step*.3:0),right=atX(maxX)+(maxX<size-1?step*.3:0),top=atY(minY)-(minY>0?step*.3:0),bottom=atY(maxY)+(maxY<size-1?step*.3:0);
+ for(let y=minY;y<=maxY;y++){root.append(svg('line',{x1:left,y1:atY(y),x2:right,y2:atY(y),class:'board-line'+(y===0||y===size-1?' board-real-edge':'')}));for(const x of [atX(minX)-30,atX(maxX)+30])root.append(svg('text',{x,y:atY(y),class:'coord'},String(size-y)));}
+ for(let x=minX;x<=maxX;x++){root.append(svg('line',{x1:atX(x),y1:top,x2:atX(x),y2:bottom,class:'board-line'+(x===0||x===size-1?' board-real-edge':'')}));for(const y of [atY(minY)-30,atY(maxY)+30])root.append(svg('text',{x:atX(x),y,class:'coord'},cols[x]));}
+ if(focused){for(const [show,x1,y1,x2,y2]of[[minX>0,left,top,left,bottom],[maxX<size-1,right,top,right,bottom],[minY>0,left,top,right,top],[maxY<size-1,left,bottom,right,bottom]])if(show)root.append(svg('line',{x1,y1,x2,y2,class:'board-crop-boundary'}));}
+ for(const [x,y]of(size===19?[3,9,15].flatMap(x=>[3,9,15].map(y=>[x,y])):[[2,2],[6,2],[4,4],[2,6],[6,6]]))if(x>=minX&&x<=maxX&&y>=minY&&y<=maxY)root.append(svg('circle',{cx:atX(x),cy:atY(y),r:Math.min(3.1,step*.09),fill:'#6c583c'}));
+ for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+  const color=state.board[y][x],cx=atX(x),cy=atY(y),g=svg('g',{class:'intersection',role:'button',tabindex:'0','aria-label':`${cols[x]}${size-y} ${color===1?'黑子':color===2?'白子':'空位'}`});
+  g.append(svg('rect',{x:cx-step/2,y:cy-step/2,width:step,height:step,fill:'transparent',rx:7,class:'hit'}));
+  if(color){g.append(svg('ellipse',{cx:cx+1,cy:cy+3,rx:step*.445,ry:step*.43,fill:'#5c48243a'}),svg('circle',{cx,cy,r:step*.435,fill:`url(#${color===1?'blackStone':'whiteStone'})`,stroke:color===1?'#1c2620':'#b7b6a4','stroke-width':.6}));if(state.last_move?.x===x&&state.last_move?.y===y)g.append(svg('circle',{cx,cy,r:Math.min(5,step*.13),fill:'none',stroke:color===1?'#f1e7cc':'#526957','stroke-width':2}));}
+  if(inspection?.stones?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:step*.46,fill:'none',stroke:'#58896d','stroke-width':3}));
+  if(inspection?.liberties?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:Math.min(9,step*.2),fill:'#f4fbdb',stroke:'#597a42','stroke-width':2}));
+  if(pendingMove?.x===x&&pendingMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.4,fill:state.to_play===1?'#253b34':'#fffdf7',opacity:.55,stroke:'#b7853c','stroke-width':2,'stroke-dasharray':'3 2'}));
+  const mark=state.marks?.find(m=>m.x===x&&m.y===y);if(mark&&!(mark.label==='气'&&inspection)){g.append(svg('circle',{cx,cy,r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:cx,y:cy+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'));}
+  const onClick=()=>{if(busy)return;if(tool==='play'&&state.computer_turn){toast('现在轮到电脑，请等它落子。');return}if(tool==='play'&&(state.lesson_attempted||state.demo_active)){toast(state.demo_active?'请先返回原局面，再落子。':'这一题已作答，可以重练或开始下一题。');return}if(tool==='play'&&$('confirm-enabled').checked){if(color){toast('请选择空交叉点。');return}pendingMove={x,y,revision:state.revision,profile:state.profile?.id};render();return}act(tool==='inspect'?'inspect':'play',{x,y})};
+  g.addEventListener('click',onClick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick()}});root.append(g);
+ }
+}
 function render(){if(!state)return;renderPending();$('board-zoom').hidden=state.size!==19;document.querySelector('.board-shell').classList.toggle('board-zoomed',state.size===19&&boardZoom);$('board-zoom').textContent=boardZoom?'缩回棋盘':'放大棋盘';$('board-zoom').setAttribute('aria-pressed',String(boardZoom));$('board-prompt').textContent=state.lesson?.prompt||'';$('board-prompt').hidden=!state.lesson;renderBoard();$('board-title').textContent=state.demo_active?'看一看这段变化':state.lesson?.title||'自在落子，慢慢看清';$('board-eyebrow').textContent=`${state.size||9} 路 · ${state.mode==='lesson'?`练习 · 难度 ${state.lesson?.difficulty||1}`:'自由对弈'}`;$('turn-pill').className='turn-pill'+(state.to_play===2?' white':'');$('turn-pill').querySelector('span').textContent=state.ended?'本局已结束':`轮到${state.to_play===1?'黑':'白'}棋`;$('move-count').textContent=`第 ${state.move_number||0} 手`;$('captures').textContent=`黑提 ${state.captures?.black||0} 子 · 白提 ${state.captures?.white||0} 子`;$('prompt-title').textContent=state.lesson?.title||'每一手，都可以停下来想';$('prompt').textContent=state.lesson?.prompt||'黑白交替落子，试着观察棋子的气。需要对手时，点击“请陪练下一手”；想讨论时，把你的想法写下来。';$('message').textContent=state.message||'';$('message').hidden=!state.message||state.message===state.lesson?.prompt;$('hint').hidden=!state.lesson;$('restore-demo').hidden=!state.demo_active;$('demo-next').hidden=!state.demo_active;$('demo-next').disabled=(state.demo_step||0)>=(state.demo_total||0);$('demo-next').textContent=`演示下一手 · ${state.demo_step||0}/${state.demo_total||0}`;$('ai-move').hidden=state.mode!=='free'||state.demo_active;$('ai-move').disabled=!state.engine?.available||state.ended;$('pass').disabled=state.ended||state.demo_active||state.mode==='lesson';$('undo').disabled=!state.history?.length||state.demo_active;$('restart').textContent=state.mode==='lesson'?'重练这一题':'新开一局';$('inspection').textContent=inspection?.stones?.length?`${inspection.color===1?'黑':'白'}棋这一块：${inspection.stones.length} 颗棋子，${inspection.liberties.length} 口气。绿色小圆点标出了它们的气。`:tool==='inspect'?'点击任意一颗棋子，看看整块棋共有几口气。':'点击交叉点落子；也可以切换“查看棋子的气”。';$('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。${state.engine.note||'点击按钮才会下下一手。'}${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题、数气、黑白交替下棋。';document.querySelectorAll('.lesson-option').forEach(b=>b.classList.toggle('selected',b.dataset.id===state.lesson?.id));$('saved').textContent=cloudMode?'已保存到家庭账号':'已保存到本机';renderLearning();renderMatch();renderLLM();renderRating();}
 function selectTool(next){pendingMove=null;tool=next;inspection=null;for(const t of['play','inspect']){$('tool-'+t).classList.toggle('active',t===next);$('tool-'+t).setAttribute('aria-pressed',String(t===next))}if(state)render()}
 function renderPending(){$('pending-move').hidden=!pendingMove;$('pending-label').textContent=pendingMove?`准备落在 ${cols[pendingMove.x]}${state.size-pendingMove.y}`:'';}
@@ -106,6 +167,8 @@ $('cancel-move').onclick=()=>{pendingMove=null;if(state)render()};
 $('confirm-move').onclick=()=>{const move=pendingMove;if(!move||!state)return;if(move.revision!==state.revision||move.profile!==state.profile?.id){pendingMove=null;render();return}act('play',{x:move.x,y:move.y})};
 $('board-zoom').onclick=()=>{boardZoom=!boardZoom;if(state)render()};
 $('tool-play').onclick=()=>selectTool('play');$('tool-inspect').onclick=()=>selectTool('inspect');$('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').onclick=()=>act('hint');$('restart').onclick=()=>{if(state.lesson)act('retry');else startMatch(true)};$('ai-move').onclick=()=>{aiAttemptKey=null;aiFailedKey=null;act('ai_move')};$('restore-demo').onclick=()=>act('restore_demo');$('demo-next').onclick=()=>act('demo_next');$('send-feedback').onclick=()=>{const text=$('feedback').value.trim();if(!text){toast('先写一点你的想法吧，一句话也可以。');$('feedback').focus();return}act('feedback',{text})};
+$('show-solution').onclick=()=>act('solution');
+$('practice-mode').onchange=()=>act('practice_mode',{mode:$('practice-mode').value});
 $('retry-result').onclick=()=>act('retry');$('next-result').onclick=()=>act('next_lesson');$('next-lesson').onclick=()=>act('next_lesson');
 $('profile-form').onsubmit=e=>{e.preventDefault();const name=$('profile-name').value.trim();if(name)act('add_profile',{name})};
 $('skill-select').onchange=renderLessonPicker;$('difficulty-select').onchange=()=>{const difficulty=Number($('difficulty-select').value);if(difficulty&&!lessons.some(l=>l.skill===$('skill-select').value&&l.difficulty===difficulty)){const candidate=lessons.find(l=>l.difficulty===difficulty);if(candidate)$('skill-select').value=candidate.skill;}renderLessonPicker()};$('lesson-select').onchange=renderLessonPicker;
@@ -138,6 +201,7 @@ function renderMatch(){
  $('next-practice').hidden=state.mode!=='lesson';
  const match=state.match,profiles=state.profiles||[];
  for(const [id,mode] of [['mode-lesson','lesson'],['mode-human-ai','human_ai'],['mode-two-player','two_player']]){$(id).classList.toggle('selected',selectedMode===mode);$(id).setAttribute('aria-pressed',String(selectedMode===mode))}
+ $('practice-controls').hidden=selectedMode!=='lesson';
  $('match-form').hidden=selectedMode==='lesson';$('human-settings').hidden=selectedMode!=='human_ai';$('two-player-settings').hidden=selectedMode!=='two_player';
  for(const [id,fallback] of [['black-player',0],['white-player',1]]){const selected=$(id).value;$(id).replaceChildren(...profiles.map(p=>{const o=textEl('option',p.name);o.value=p.id;return o}));$(id).value=profiles.some(p=>p.id===selected)?selected:profiles[fallback]?.id||profiles[0]?.id||''}
  $('mode-description').textContent=selectedMode==='lesson'?'做题后自动讲解，按照各自的练习记录推荐下一题。':selectedMode==='human_ai'?'选好执黑或执白后开始。电脑会自动应手；当前引擎较强，可随时悔棋。':'两个人共用棋盘，按黑白轮流落子，无需切换档案。对局会同时保存在双方档案中。';

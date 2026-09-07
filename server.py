@@ -25,7 +25,34 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 def lesson_public(lesson):
-    return {k:copy.deepcopy(v) for k,v in lesson.items() if k not in ('objective','solutions','solution','tree')}
+    out={k:copy.deepcopy(v) for k,v in lesson.items() if k not in ('objective','solutions','solution','tree')}
+    points=[(p['x'],p['y']) if isinstance(p,dict) else tuple(p[:2]) for p in lesson.get('stones',[])]
+    def walk(node):
+        if node.get('move'): points.append(tuple(node['move']))
+        for child in node.get('children',[]): walk(child)
+    walk(lesson.get('tree',{}))
+    size=lesson.get('size',9)
+    points=[p for p in points if len(p)==2 and all(type(v)is int and 0<=v<size for v in p)]
+    out['focus_bounds']={'min_x':min(x for x,y in points),'min_y':min(y for x,y in points),'max_x':max(x for x,y in points),'max_y':max(y for x,y in points)} if points else None
+    return out
+
+
+def practice_progress(profile,current_id=None,advance=False):
+    import re
+    catalog=[l for l in curriculum.catalog() if not l.get('legacy')]
+    ids_order={l['id']:i for i,l in enumerate(catalog)}
+    group_start={}
+    for l in catalog: group_start.setdefault(re.sub(r'\d+$','',l['id']),ids_order[l['id']])
+    catalog.sort(key=lambda l:(group_start[re.sub(r'\d+$','',l['id'])],int(re.search(r'\d+$',l['id']).group()) if re.search(r'\d+$',l['id']) else 0))
+    mode=profile.get('practice_mode','recommended')
+    completed={a['lesson_id'] for a in profile['attempts'] if a.get('correct') is True}
+    review=set(profile.get('helped_lesson_ids',[]))|{a['lesson_id'] for a in profile['attempts'] if a.get('correct') is False}
+    ids=[l['id'] for l in catalog]
+    index=ids.index(current_id) if current_id in ids else -1
+    pool=[identity for identity in ids if identity not in completed and (mode!='review' or identity in review)]
+    next_id=next((identity for identity in pool if ids.index(identity)>index),pool[0] if pool else None) if advance else (pool[0] if pool else None)
+    return dict(mode=mode,total=len(ids),completed=len(set(ids)&completed),remaining=len(set(ids)-completed),current_index=index+1 if index>=0 else None,next_index=ids.index(next_id)+1 if next_id else None,review_count=len((set(ids)&review)-completed),next_id=next_id)
+
 
 def blank(revision=0, mode='free', size=9):
     if type(size) is not int or size not in (9,19): raise ValueError('棋盘尺寸须为 9 或 19 路。')
@@ -175,6 +202,8 @@ def public_store(store):
     current_key=context_key(out)
     out['context_key']=current_key
     out['llm_explanation']=next((copy.deepcopy(e) for e in reversed(profile.get('llm_explanations',[])) if e.get('context_key')==current_key),None)
+    out['practice_mode']=profile.get('practice_mode','recommended')
+    out['practice_progress']=practice_progress(profile,(out.get('lesson') or {}).get('id'),True)
     out['computer_turn']=computer_turn(out)
     out['recent_matches']=[{k:copy.deepcopy(v) for k,v in r.items() if k not in ('state','version')} for r in match_list(store,profile['id'])[:5]]
     return out
@@ -197,14 +226,31 @@ def apply_store(store,action,ai_choice=None):
     else:
         profile=store['profiles'][store['active_profile_id']]
         s=active_state(store)
-        if kind=='next_lesson':
-            choice=curriculum.recommend(profile['attempts'],(s.get('lesson') or {}).get('id'))
-            action={'type':'lesson','id':choice if isinstance(choice,str) else choice.get('id',choice.get('lesson_id'))}
+        if kind=='practice_mode' and action.get('mode') not in ('recommended','sequential','review'): raise ValueError('练习模式无效。')
+        if kind in ('next_lesson','practice_mode') and s.get('demo_active'): raise ValueError('请先返回原局面。')
+        if kind in ('next_lesson','practice_mode') and (s.get('lesson') or {}).get('sequence') and s.get('moves') and not s.get('lesson_attempted'):
+            pending=s['lesson']['id'];helped=profile.setdefault('helped_lesson_ids',[])
+            if pending not in helped: helped.append(pending)
+        if kind in ('next_lesson','practice_mode'):
+            if s.get('demo_active'): raise ValueError('请先返回原局面。')
+            if kind=='practice_mode':
+                if action.get('mode') not in ('recommended','sequential','review'): raise ValueError('练习模式无效。')
+                profile['practice_mode']=action['mode']
+            if profile.get('practice_mode','recommended')=='recommended':
+                choice=curriculum.recommend(profile['attempts'],(s.get('lesson') or {}).get('id'))
+                identity=choice if isinstance(choice,str) else choice.get('id',choice.get('lesson_id'))
+            else: identity=practice_progress(profile,(s.get('lesson') or {}).get('id'),kind=='next_lesson')['next_id']
+            if not identity:
+                s['message']='当前没有待复习的题目。' if profile.get('practice_mode')=='review' else '本轮题目已全部通关。'
+                store['revision']+=1
+                active_state(store)
+                return store
+            action={'type':'lesson','id':identity}
         notes=copy.deepcopy(profile['notes'])
         helped=profile.setdefault('helped_lesson_ids',[])
         lesson_id=(s.get('lesson') or {}).get('id')
         if lesson_id in helped: s['assisted']=True
-        if kind in ('retry','lesson','next_lesson','new','setup','resume_match') and (s.get('lesson') or {}).get('sequence') and s.get('moves') and not s.get('lesson_attempted'):
+        if kind in ('retry','lesson','next_lesson','practice_mode','new','setup','resume_match') and (s.get('lesson') or {}).get('sequence') and s.get('moves') and not s.get('lesson_attempted'):
             if lesson_id not in helped: helped.append(lesson_id)
         if kind=='new':
             match=create_match(store,action)
@@ -234,10 +280,10 @@ def apply_store(store,action,ai_choice=None):
             else:apply(s,action)
         if kind=='play' and s['mode']=='free':
             s['last_human_assessment']=copy.deepcopy(s.get('assessment'))
-        if lesson_id and (kind in ('hint','demo') or kind=='inspect' and s.get('inspection',{}).get('stones') or kind=='undo' and (s.get('lesson') or {}).get('sequence') or (s.get('lesson_progress') or {}).get('status')=='unlisted'):
+        if lesson_id and (kind in ('hint','demo','solution') or kind=='inspect' and s.get('inspection',{}).get('stones') or kind=='undo' and (s.get('lesson') or {}).get('sequence') or (s.get('lesson_progress') or {}).get('status')=='unlisted'):
             if lesson_id not in helped: helped.append(lesson_id)
         if (s.get('lesson') or {}).get('id') in helped: s['assisted']=True
-        if (s.get('lesson') or {}).get('sequence') and kind in ('lesson','next_lesson','retry'):
+        if (s.get('lesson') or {}).get('sequence') and kind in ('lesson','next_lesson','retry','practice_mode'):
             identity=s['lesson']['id']
             runs=profile.setdefault('lesson_runs',{})
             s['_branch_seed']=runs.get(identity,0)
@@ -270,6 +316,7 @@ def engine_info():
 
 def public(s):
     out=copy.deepcopy(s)
+    if s.get('lesson'): out['lesson']=lesson_public(s['lesson'])
     out.pop('_demo_backup',None)
     out.pop('_demo_moves',None)
     def redact(value):
@@ -333,8 +380,9 @@ def sequence_play(s,x,y):
     lesson=s['lesson']
     if child is None:
         s['lesson_attempted']=True
-        summary='这条变化尚未收录，暂不判对错。'
-        explanation='你的落子符合围棋规则，但题库没有这条后续答案。可以留下想法供老师复核，或重练本题；本次不计入正确率。'
+        summary='这手暂不判对错。'
+        explanation='题库没有收录这条变化。可以看参考解法，或重练换一手；本次不计正确率。'
+        s['assisted']=True
         status='unlisted'; correct=None
     else:
         explanation=child.get('explanation','')
@@ -350,7 +398,7 @@ def sequence_play(s,x,y):
         s['lesson_attempted']=solved
         correct=True if solved else None
         status='solved' if solved else 'playing'
-        summary='这条吃子变化完成，目标已提掉。' if solved else '对手已应手，请继续计算下一手。'
+        summary=('已完成作者收录的正确变化。' if lesson.get('objective',{}).get('kind')=='authored_solution' else '这条吃子变化完成，目标已提掉。') if solved else '对手已应手，请继续计算下一手。'
     s['assessment']={'correct':correct,'summary':summary,'explanation':explanation.strip(),'marks':[], 'skill':lesson['skill'],'difficulty':lesson['difficulty']}
     s['lesson_progress']={'status':status,'ply':len(s['moves']),'message':summary}
     s['message']=summary+' '+explanation.strip()
@@ -459,6 +507,24 @@ def apply(s,a):
             move(checked,m.get('x'),m.get('y'),c)
         s['_demo_backup']=copy.deepcopy(s)
         s.update(demo_active=True,demo_step=0,demo_total=len(moves),_demo_moves=copy.deepcopy(moves))
+        apply(s,{'type':'demo_next'})
+    elif t=='solution':
+        if s['demo_active'] or not (s.get('lesson') or {}).get('sequence'): raise ValueError('请在连续练习原局面查看参考解法。')
+        initial=lesson_state(s['lesson']['id'],s['revision'])
+        def path(node,state,moves):
+            if not node.get('children'): return moves if moves and node.get('correct') is not False else None
+            for child in node['children']:
+                checked=copy.deepcopy(state);checked['demo_active']=True
+                try: move(checked,*child['move'])
+                except ValueError: continue
+                result=path(child,checked,moves+[{'x':child['move'][0],'y':child['move'][1]}])
+                if result: return result
+            return None
+        moves=path(s['lesson']['tree'],initial,[])
+        if not moves: raise ValueError('这道题暂时没有可演示的合法参考解法。')
+        s['assisted']=True
+        backup=copy.deepcopy(s)
+        s.clear();s.update(initial,assisted=True,_demo_backup=backup,_demo_moves=moves,demo_active=True,demo_step=0,demo_total=len(moves))
         apply(s,{'type':'demo_next'})
     elif t=='demo_next':
         if not s['demo_active'] or s.get('demo_step',0)>=s.get('demo_total',0): raise ValueError('没有下一手演示。')

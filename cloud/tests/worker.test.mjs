@@ -77,3 +77,11 @@ test('LLM test uses manual redirects and rejects a 302 without forwarding its ke
  const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push({url:String(url),authorization:init.headers.Authorization});assert.equal(init.redirect,'manual');assert.equal(JSON.stringify(JSON.parse(init.body)).includes('board'),false);return new Response(null,{status:302,headers:{Location:'https://untrusted.example/collect'}});});
  const result=await request('/api/llm/test','POST',{});assert.equal(result.status,503);assert.deepEqual(calls,[{url:'https://model.example/v1/chat/completions',authorization:'Bearer test-only-model-key'}]);assert.ok(!JSON.stringify(result.body).includes('test-only-model-key'));
 });
+test('practice preference persists per profile, assisted completion clears review and sequential advances',async()=>{
+ const {request}=await session();let s=(await request('/api/state')).body;
+ const act=async a=>{const r=await request('/api/action','POST',{...a,revision:s.revision});assert.equal(r.status,200,JSON.stringify(r.body));s=r.body;return s;};
+ await act({type:'lesson',id:'escape-1-1'});await act({type:'hint'});await act({type:'practice_mode',mode:'review'});assert.equal(s.lesson.id,'escape-1-1');assert.equal(s.practice_progress.review_count,1);
+ await act({type:'play',x:2,y:4});assert.equal(s.recent_attempts[0].correct,true);assert.equal(s.rating.practice_xp,0);assert.equal(s.practice_progress.completed,1);assert.equal(s.practice_progress.review_count,0);
+ await act({type:'next_lesson'});assert.match(s.message,/没有待复习/);await act({type:'practice_mode',mode:'sequential'});const first=s.practice_progress.current_index;
+ await act({type:'next_lesson'});assert.ok(s.practice_progress.current_index>first);assert.equal((await request('/api/state')).body.practice_mode,'sequential');assert.equal((await request('/api/state','GET',undefined,'go_profile=child')).body.practice_mode,'recommended');
+});

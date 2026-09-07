@@ -41,3 +41,10 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 .records-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:20px}.records-column{display:flex;flex-direction:column;gap:20px;min-width:0}
 #view-records .section-heading{gap:12px;flex-wrap:wrap}#view-records .eyebrow{font-size:14px;letter-spacing:0;color:var(--ink)}#view-records .quiet{font-size:13px}#view-records .small-label{font-size:12px}#view-records .skill-row-heading{font-size:14px}#view-records .skill-row-heading span{font-size:12px}#view-records .skill-row small{font-size:12px}#view-records .skill-row{padding:8px 0 13px}#view-records .history-card li{padding:15px 0;gap:7px}#view-records .history-card li strong{font-size:14px}#view-records .history-card li span{font-size:13px}#view-records .history-card li small{font-size:12px}#view-records .history-card,#view-records .learning-card{padding:22px 24px}
 @media(max-width:740px){.records-grid{grid-template-columns:1fr}.record-overview{grid-template-columns:1fr;gap:10px}.record-overview p+p{border-left:0;padding-left:0}.records-column{gap:16px}#view-records>.rating-card,#view-records .history-card,#view-records .learning-card{padding:18px}.record-overview p{font-size:14px}}
+
+.practice-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line,#e4e7df)}
+.practice-controls label{font-size:13px;font-weight:650}.practice-controls select{width:auto;min-width:140px}.practice-controls .quiet{margin:0}.assessment-actions{flex-wrap:wrap}
+@media(max-width:600px){.practice-controls{gap:8px}.practice-controls .quiet{flex-basis:100%;font-size:12px}}
+
+/* Lesson viewport only: retain original board coordinates and mark cropped edges. */
+.board-focus-note{font-size:11px;line-height:1.7;color:#726243;margin:8px 0 0}.board-crop-boundary{stroke:#806a4d;stroke-width:1.6;stroke-dasharray:5 5;opacity:.8;pointer-events:none}.board-real-edge{stroke-width:1.6}#board-focus{color:var(--green);border:1px solid #cfddc4}.board-shell.board-focused{overflow:hidden}

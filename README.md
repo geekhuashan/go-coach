@@ -23,6 +23,8 @@
 
 顶部「棋盘 / 题库 / 学习记录 / 设置」切换内容，棋局保持不变。棋盘旁保留当前反馈与推荐下一题，AI 答疑和记想法默认收起；题目筛选与导入在题库，成长统计与历史对局在学习记录，AI 配置、手机安装与退出账号在设置。开始选题或继续历史对局后自动回到棋盘。
 
+练习方式可选「智能推荐 / 顺序闯关 / 错题复习」，按学习者分别保存。顺序闯关按题库顺序推进，完整做对即可通关，提示后完成不增加独立答题积分；复习模式保留还没做对的题。19 路局部题默认放大题目所在区域，保留真实坐标和边界提示，可随时切回全盘。遇到未收录变化，可从反馈里「看参考解法」，逐手查看后返回原局面重练。
+
 ## 学习水平与推荐
 
 水平表示入门知识点掌握情况，不是围棋段位。按不同题目的首次独立作答计算证据，少于3题标为待评估。提示、查看气、演示后的作答与重复尝试会留痕，不增加独立掌握证据。
@@ -65,7 +67,7 @@ KataGo 为可选的独立引擎，不随本仓库分发；未安装时仍可做�
 
 - GET `/api/state`、`/api/lessons`、`/api/history`、`/api/matches`、`/api/sgf`。
 - POST `/api/lessons/import`：`{revision, lesson}`，校验后新增本地题目。
-- POST `/api/action`：play、pass、undo、retry、next_lesson、switch_profile、add_profile、new、resume_match；也支持setup、annotate、demo、demo_next、restore_demo。
+- POST `/api/action`：play、pass、undo、retry、next_lesson、practice_mode（mode 为 recommended / sequential / review）、solution、switch_profile、add_profile、new、resume_match；也支持setup、annotate、demo、demo_next、restore_demo。
 - POST `/api/analyze`：只读分析，传revision。
 - GET/POST `/api/llm/settings`；POST `/api/llm/test`；POST `/api/llm/explain`（revision与可选question）。
 

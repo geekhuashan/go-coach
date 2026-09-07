@@ -44,3 +44,14 @@ test('assisted first evidence cannot become independent by repeated correct atte
 test('signed household session rejects tampering and foreign household; AES-GCM roundtrips',async()=>{
  const env={HOUSEHOLD_ID:'test',SESSION_SECRET:'unit-only-secret-material-32-characters-long'};const token=await makeSession(env),req=value=>new Request('https://go.example/api/state',{headers:{Cookie:'go_session='+value}});assert.equal(await authenticated(req(token),env),true);assert.equal(await authenticated(req(token+'x'),env),false);assert.equal(await authenticated(req(token),{...env,HOUSEHOLD_ID:'other'}),false);const encrypted=await encrypt('unit-only-api-key',env.SESSION_SECRET);assert.ok(!encrypted.includes('unit-only'));assert.equal(await decrypt(encrypted,env.SESSION_SECRET),'unit-only-api-key');await assert.rejects(decrypt(encrypted,env.SESSION_SECRET+'different'));
 });
+test('reference solution replays from initial board, restores unlisted move and cannot award XP',()=>{
+ const l=catalog.find(l=>l.sequence&&l.size===19),initial=lessonState(l);let s=initial;
+ let alternative;for(let y=0;y<s.size&&!alternative;y++)for(let x=0;x<s.size&&!alternative;x++)if(!l.tree.children.some(c=>c.move[0]===x&&c.move[1]===y))try{play(s.board,x,y,s.to_play);alternative={x,y};}catch{}
+ const unlisted=action(s,{type:'play',...alternative});s=unlisted.state;let r=action(s,{type:'solution'},ctx({helped:unlisted.helped}));assert.equal(r.event,null);assert.equal(r.state.demo_step,1);assert.equal(r.state.moves.length,1);assert.ok(r.state.assisted);assert.ok(r.helped.includes(l.id));assert.equal(publicState(r.state)._demo_moves,undefined);assert.equal(publicState(r.state).lesson.tree,undefined);assert.ok(publicState(r.state).lesson.focus_bounds);
+ while(r.state.demo_step<r.state.demo_total){r=action(r.state,{type:'demo_next'},ctx({helped:r.helped}));assert.equal(r.event,null);}
+ r=action(r.state,{type:'restore_demo'},ctx({helped:r.helped}));assert.deepEqual(r.state.board,s.board);assert.equal(r.state.lesson_progress.status,'unlisted');assert.ok(r.state.assisted);
+});
+test('switching a partial sequence into review immediately includes and restarts that lesson',()=>{
+ const l=catalog.find(l=>l.id==='tactic-short-ladder');let r=action(lessonState(l),{type:'play',x:l.tree.children[0].move[0],y:l.tree.children[0].move[1]});assert.equal(r.state.lesson_attempted,false);assert.equal(r.state.moves.length,2);
+ r=action(r.state,{type:'practice_mode',mode:'review'});assert.equal(r.state.lesson.id,l.id);assert.equal(r.state.moves.length,0);assert.ok(r.helped.includes(l.id));assert.ok(r.state.assisted);
+});
