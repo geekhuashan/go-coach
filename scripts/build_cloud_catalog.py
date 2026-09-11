@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-for book in ('data/gogameguru/lessons.json','data/original-extra/lessons.json'):
+for book in ('data/gogameguru/lessons.json','data/original-extra/lessons.json','data/original-extra/more.json'):
     if not (ROOT/book).is_file(): raise SystemExit(f'Required bundled catalog is missing: {book}')
 import curriculum
 lessons=curriculum.catalog()+[curriculum.get_lesson(identity) for identity in ('escape','capture','connect')]

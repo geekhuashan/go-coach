@@ -69,7 +69,8 @@ export function learning(catalog,evidence,attemptsCount=0){
  });
  return {stage:independent.length<3?'待评估':'按技能逐项练习（不对应段位）',attempts_count:attemptsCount,independent_attempts:independent.length,independent_correct:independent.filter(a=>a.correct).length,skills};
 }
-const CONCEPT_NAMES={double_atari:'双打吃',ladder:'征子',snapback:'倒扑',connection_trap:'接不归',edge_chase:'边线追吃',capture_race:'对杀',atari:'打吃'};
+const CONCEPT_NAMES={double_atari:'双打吃',ladder:'征吃',snapback:'倒扑',connection_trap:'接不归',edge_chase:'边线追吃',capture_race:'对杀',atari:'打吃',net:'枷吃',gate:'门吃',hug:'抱吃',wedge:'挖吃'};
+const CONCEPT_SEQUENCE={double_atari:10,ladder:20,net:30,gate:40,edge_chase:50,snapback:60,connection_trap:70,hug:80,wedge:90,atari:100};
 export function recommend(catalog,evidence,stats,recent=[],currentId=null){
  const byId=new Map(catalog.map(l=>[l.id,l])),groupKey=l=>l.concept?`concept:${l.skill}:${l.concept}`:`skill:${l.skill}`;
  const valid=recent.filter(a=>byId.has(a.lesson_id)&&typeof a.correct==='boolean').slice(0,30),seen=new Set(evidence.map(a=>a.lesson_id)),groups=[];
@@ -89,13 +90,21 @@ export function recommend(catalog,evidence,stats,recent=[],currentId=null){
 }
 
 export function focusBounds(lesson){const size=lesson.size||9,points=(lesson.stones||[]).map(p=>Array.isArray(p)?p:[p.x,p.y]);function walk(n){if(n?.move)points.push(n.move);for(const c of n?.children||[])walk(c);}walk(lesson.tree);const valid=points.filter(p=>p.length>=2&&p.every(Number.isInteger)&&p[0]>=0&&p[1]>=0&&p[0]<size&&p[1]<size);return valid.length?{min_x:Math.min(...valid.map(p=>p[0])),min_y:Math.min(...valid.map(p=>p[1])),max_x:Math.max(...valid.map(p=>p[0])),max_y:Math.max(...valid.map(p=>p[1]))}:null;}
+const LICENSED_CHAPTERS={3:'基础',4:'进阶',5:'挑战'};
+export function sequentialCollection(lesson){const source=lesson?.source||{};return ['book','licensed'].includes(source.kind)&&source.title?[source.kind,source.title]:null;}
+export function sequentialChapter(lesson){if(!lesson)return null;if(lesson.concept)return lesson.concept;if(lesson.source?.kind==='licensed')return LICENSED_CHAPTERS[lesson.difficulty]||'练习';return null;}
+export function sequentialProblemNumber(lesson){const values=String(lesson?.source?.problem||'').match(/\d+/g)||String(lesson?.id||'').match(/\d+/g);return values?Number(values.at(-1)):Infinity;}
+function sameCollection(a,b){return !!a&&!!b&&a[0]===b[0]&&a[1]===b[1];}
 export function practice(ctx,currentId=null,mode=ctx.runs?._practice_mode||'recommended',advance=false){
- const current=ctx.catalog.find(l=>l.id===currentId),bookTitle=mode==='sequential'&&current?.source?.kind==='book'?current.source.title:null;
- const number=l=>{const values=String(l.source?.problem||'').match(/\d+/g)||l.id.match(/\d+/g);return values?Number(values.at(-1)):Infinity;};
- const ordered=(bookTitle?ctx.catalog.filter(l=>l.source?.kind==='book'&&l.source.title===bookTitle):ctx.catalog).filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b)),catalog=ordered.filter(availableLesson),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
- if(bookTitle){ordered.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id));catalog.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id));}
+ const current=ctx.catalog.find(l=>l.id===currentId),collection=mode==='sequential'?sequentialCollection(current):null;
+ let ordered=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b));
+ if(mode==='sequential'){
+  if(collection){ordered=ordered.filter(l=>sameCollection(sequentialCollection(l),collection));ordered.sort((a,b)=>(collection[0]==='licensed'?(a.difficulty-b.difficulty)||0:0)||sequentialProblemNumber(a)-sequentialProblemNumber(b)||a.id.localeCompare(b.id));}
+  else {ordered=ordered.filter(l=>!sequentialCollection(l));const index=new Map(ordered.map((l,i)=>[l.id,i]));ordered.sort((a,b)=>{const ac=a.concept?1:0,bc=b.concept?1:0;if(ac!==bc)return ac-bc;if(!ac)return (index.get(a.id)-index.get(b.id));return (CONCEPT_SEQUENCE[a.concept]??99)-(CONCEPT_SEQUENCE[b.concept]??99)||(a.difficulty-b.difficulty)||(index.get(a.id)-index.get(b.id));});}
+ }
+ const catalog=ordered.filter(availableLesson),completed=new Set(ctx.completed||[]),review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
  const pool=catalog.filter(l=>!completed.has(l.id)&&(mode!=='review'||review.has(l.id))),index=catalog.findIndex(l=>l.id===currentId),anchor=ordered.findIndex(l=>l.id===currentId);
  let next=pool[0];if(advance&&anchor>=0)next=pool.find(l=>ordered.indexOf(l)>anchor)||pool[0];
  const reviewCount=catalog.filter(l=>review.has(l.id)&&!completed.has(l.id)).length;
- return {...(bookTitle?{book_title:bookTitle,chapter:current.concept||null,book_complete:pool.length===0}:{}),mode,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:catalog.filter(l=>!completed.has(l.id)).length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:reviewCount,next_id:next?.id||null};
+ return {...(collection?{book_title:collection[1],chapter:sequentialChapter(current),book_complete:pool.length===0}:{}),mode,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:catalog.filter(l=>!completed.has(l.id)).length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:reviewCount,next_id:next?.id||null};
 }

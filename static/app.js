@@ -122,29 +122,38 @@ function renderActionStatus(){
  $('review-move').disabled=busy;$('review-move').textContent=reviewing&&busyAction==='review_move'?'正在复核…':'重新复核';
  if(reviewing){$('inline-assessment').hidden=true;$('turn-pill').querySelector('span').textContent='正在复核…';}
 }
+function sequentialCollection(lesson){const source=lesson?.source||{};return ['book','licensed'].includes(source.kind)&&source.title?[source.kind,source.title]:null;}
+const CONCEPT_NAMES={double_atari:'双打吃',ladder:'征吃',snapback:'倒扑',connection_trap:'接不归',edge_chase:'边线追吃',atari:'打吃',net:'枷吃',gate:'门吃',hug:'抱吃',wedge:'挖吃'};
+function sequentialChapter(lesson){if(!lesson)return null;if(lesson.concept)return CONCEPT_NAMES[lesson.concept]||lesson.concept;if(lesson.source?.kind==='licensed')return ({3:'基础',4:'进阶',5:'挑战'})[lesson.difficulty]||'练习';if(!sequentialCollection(lesson)&&lesson.difficulty)return '难度 '+lesson.difficulty;return null;}
 function bookChapters(){
- const books=new Map();
+ const collections=new Map();
+ const number=lesson=>Number(String(lesson.source?.problem||'').match(/第(\d+)题/)?.[1]||String(lesson.source?.problem||lesson.id||'').match(/(\d+)$/)?.[1]||0);
  for(const lesson of lessons){
-  if(lesson.source?.kind!=='book'||!lesson.source.title||!lesson.concept)continue;
-  if(!books.has(lesson.source.title))books.set(lesson.source.title,new Map());
-  const chapters=books.get(lesson.source.title);
-  if(!chapters.has(lesson.concept))chapters.set(lesson.concept,[]);
-  chapters.get(lesson.concept).push(lesson);
+  const collection=sequentialCollection(lesson);
+  const title=collection?collection[1]:'入门课程';
+  const chapter=sequentialChapter(lesson);if(!chapter)continue;
+  const rank=collection?collection[0]==='licensed'?1:2:0;
+  if(!collections.has(title))collections.set(title,{title,rank,chapters:new Map()});
+  const chapters=collections.get(title).chapters;
+  if(!chapters.has(chapter))chapters.set(chapter,[]);
+  chapters.get(chapter).push(lesson);
  }
- const number=lesson=>Number(String(lesson.source.problem||'').match(/第(\d+)题/)?.[1]||String(lesson.id).match(/(\d+)$/)?.[1]||0);
- return [...books].map(([title,chapters])=>({title,chapters:[...chapters].map(([name,items])=>({name,items:items.sort((a,b)=>number(a)-number(b)||a.id.localeCompare(b.id))})).sort((a,b)=>number(a.items[0])-number(b.items[0]))}));
+ const chapterRank=name=>({'难度 1':1,'难度 2':2,'双打吃':3,'征吃':4,'枷吃':5,'门吃':6,'边线追吃':7,'倒扑':8,'接不归':9,'抱吃':10,'挖吃':11,'打吃':12,'基础':3,'进阶':4,'挑战':5}[name]||Number(String(name).match(/\d+/)?.[0]||99));
+ return [...collections.values()].sort((a,b)=>a.rank-b.rank||a.title.localeCompare(b.title,'zh')).map(book=>({title:book.title,chapters:[...book.chapters].map(([name,items])=>({name,items:items.sort((a,b)=>(a.difficulty-b.difficulty)||number(a)-number(b)||a.id.localeCompare(b.id))})).sort((a,b)=>chapterRank(a.name)-chapterRank(b.name)||number(a.items[0])-number(b.items[0]))}));
 }
 function renderChapterPicker(){
  const books=bookChapters(),select=$('chapter-select');
  $('chapter-picker').hidden=state.practice_mode!=='sequential'||!books.length;
  select.disabled=busy||state.demo_active;
- const placeholder=textEl('option','选择书本章节…');placeholder.value='';placeholder.disabled=true;
+ const placeholder=textEl('option','选择练习章节…');placeholder.value='';placeholder.disabled=true;
  select.replaceChildren(placeholder);
  const current=lessons.find(l=>l.id===state.lesson?.id)||state.lesson;
+ const currentTitle=sequentialCollection(current)?.[1]||(current?'入门课程':'');
+ const currentChapter=sequentialChapter(current);
  let selected='';
  for(const book of books){const group=document.createElement('optgroup');group.label=book.title;
   for(const chapter of book.chapters){const first=chapter.items[0],option=textEl('option',`${chapter.name} · ${chapter.items.length} 题`);option.value=first.id;group.append(option);
-   if(current?.source?.kind==='book'&&current.source.title===book.title&&current.concept===chapter.name)selected=first.id;
+   if(currentTitle===book.title&&currentChapter===chapter.name)selected=first.id;
   }select.append(group);
  }
  select.value=selected;
@@ -156,7 +165,7 @@ function renderPractice(){
  const sequential=mode==='sequential',review=mode==='review',empty=(review&&p.review_count===0)||(sequential&&p.remaining===0);
  $('practice-progress').textContent=sequential?`已通过 ${p.completed||0} / ${p.total||lessons.length} 关${p.current_index?' · 当前第 '+p.current_index+' 关':''}`:review?`待复习 ${p.review_count||0} 题`:'按你的学习记录安排';
  $('next-practice-eyebrow').textContent=sequential?'顺序练习':review?'错题复习':'适合你的下一题';
- if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent=(p.book_title?[p.book_title,p.chapter].filter(Boolean).join(' · ')+'。按书内题号继续，章末接续下一章。':'按题库顺序练习，完整做对后通关。')+'看过解答再做对也能过关，但不增加独立答题积分。';}
+ if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent=(p.book_title?[p.book_title,p.chapter].filter(Boolean).join(' · ')+'。按这一套题的难度和题号继续，章末接续下一章。':'按入门课程从基础到征吃、枷吃、门吃、倒扑、接不归、抱吃、挖吃推进。Go Game Guru 请从上方章节进入。')+'看过解答再做对也能过关，但不增加独立答题积分。';}
  if(review){$('recommendation-title').textContent=empty?'暂时没有待复习题':'再练一次，弄懂它';$('recommendation-reason').textContent=empty?'可以切换智能推荐，或去题库挑题。':'重练还没做对的题；未收录的变化也留在这里，做对后移出。';}
  $('next-lesson').textContent=sequential?'继续练习 →':review?'开始复习 →':'开始推荐练习 →';
  $('next-result').textContent=sequential?'下一题 →':review?'复习下一题 →':'练下一题 →';
@@ -335,7 +344,7 @@ function renderMatch(){
  $('practice-controls').hidden=selectedMode!=='lesson';
  $('match-form').hidden=selectedMode==='lesson';$('human-settings').hidden=selectedMode!=='human_ai';$('two-player-settings').hidden=selectedMode!=='two_player';
  for(const [id,fallback] of [['black-player',0],['white-player',1]]){const selected=$(id).value;$(id).replaceChildren(...profiles.map(p=>{const o=textEl('option',p.name);o.value=p.id;return o}));$(id).value=profiles.some(p=>p.id===selected)?selected:profiles[fallback]?.id||profiles[0]?.id||''}
- $('mode-description').textContent=selectedMode==='lesson'?(state.practice_mode==='sequential'?(state.practice_progress?.book_title?`${state.practice_progress.book_title} · ${state.practice_progress.chapter||state.lesson?.concept||''}`:'选择书本章节，从首题开始顺序练习。'):state.practice_mode==='review'?'重练还没做对的题。':'按练习记录推荐下一题。'):selectedMode==='human_ai'?'电脑自动应手，可随时悔棋。':'黑白轮流落子，对局存入双方档案。';
+ $('mode-description').textContent=selectedMode==='lesson'?(state.practice_mode==='sequential'?(state.practice_progress?.book_title?`${state.practice_progress.book_title} · ${state.practice_progress.chapter||sequentialChapter(state.lesson)||''}`:'选择入门课程章节，按征吃、枷吃、门吃、倒扑、接不归一档一档练。'):state.practice_mode==='review'?'重练还没做对的题。':'按练习记录推荐下一题。'):selectedMode==='human_ai'?'电脑自动应手，可随时悔棋。':'黑白轮流落子，对局存入双方档案。';
  if(selectionPending&&selectedMode!=='lesson')$('mode-description').textContent+=' 当前棋盘保持原局，点击“开始新对局”进入所选模式。';
  if(match&&state.mode!=='lesson'){
   const black=match.black?.name||'黑方',white=match.white?.name||'白方';const player=state.to_play===1?black:white;
@@ -436,7 +445,7 @@ $('llm-test').onclick=async()=>{
 };
 
 let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false,teachingVideosCheckedAt=0;
-const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形'};
+const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形',hug:'抱吃',wedge:'挖吃'};
 function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
 function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
 function teachingPlaybackUrl(video){

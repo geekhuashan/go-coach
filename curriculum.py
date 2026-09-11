@@ -109,7 +109,7 @@ def load_imports(path):
 # Avoid repeating full-tree checks here or during catalog reads.
 import tactics as _tactics
 _authored = _tactics.catalog()
-_ORIGINAL_CONCEPTS={'tactic-double-atari':'double_atari','tactic-double-group':'double_atari','tactic-edge-chase':'edge_chase','tactic-edge-chain':'edge_chase','tactic-snapback':'snapback','tactic-counter-atari':'atari','tactic-short-ladder':'ladder','tactic-two-stone-ladder':'ladder'}
+_ORIGINAL_CONCEPTS={'tactic-double-atari':'double_atari','tactic-double-group':'double_atari','tactic-edge-chase':'edge_chase','tactic-edge-chain':'edge_chase','tactic-snapback':'snapback','tactic-counter-atari':'atari','tactic-short-ladder':'ladder','tactic-two-stone-ladder':'ladder','tactic-net':'net','tactic-net-two':'net','tactic-gate':'gate','tactic-gate-run':'gate','tactic-gate-side':'gate','tactic-hug':'hug','tactic-hug-two':'hug','tactic-wedge':'wedge','tactic-snapback-pack':'snapback','tactic-trap-heavy':'connection_trap'}
 for _lesson in _authored: _lesson['concept']=_ORIGINAL_CONCEPTS[_lesson['id']]
 _authored_ids = [lesson['id'] for lesson in _authored]
 if len(set(_authored_ids)) != len(_authored_ids) or set(_authored_ids) & set(_BY_ID):
@@ -118,6 +118,7 @@ _original_start=len(_CATALOG)
 _commit_lessons(_authored)
 # The bundled licensed book is shared by local and cloud deployments.
 load_imports(Path(__file__).resolve().parent / 'data/original-extra/lessons.json')
+load_imports(Path(__file__).resolve().parent / 'data/original-extra/more.json')
 _CATALOG[_original_start:]=sorted(_CATALOG[_original_start:],key=lambda l:l['difficulty'])
 load_imports(Path(__file__).resolve().parent / 'data/gogameguru/lessons.json')
 
@@ -126,6 +127,33 @@ def available_lesson(lesson):
     if lesson.get('legacy') or lesson['id'] in ('escape','capture','connect'): return False
     match=None if lesson.get('sequence') else re.fullmatch(r'(escape|capture|connect|cut)-([12])-([1-8])',lesson['id'])
     return not match or int(match[3]) <= (3 if match[2]=='1' else 5)
+
+
+LICENSED_CHAPTERS = {3: '基础', 4: '进阶', 5: '挑战'}
+
+
+def sequential_collection(lesson):
+    source = (lesson or {}).get('source') or {}
+    if source.get('kind') in ('book', 'licensed') and source.get('title'):
+        return source['kind'], source['title']
+    return None
+
+
+def sequential_chapter(lesson):
+    if not lesson:
+        return None
+    if lesson.get('concept'):
+        return lesson['concept']
+    source = lesson.get('source') or {}
+    if source.get('kind') == 'licensed':
+        return LICENSED_CHAPTERS.get(lesson.get('difficulty'), '练习')
+    return None
+
+
+def sequential_problem_number(lesson):
+    numbers = re.findall(r'\d+', str((lesson.get('source') or {}).get('problem', '')))
+    fallback = re.findall(r'\d+', lesson.get('id', ''))
+    return int((numbers or fallback)[-1]) if numbers or fallback else float('inf')
 
 
 def catalog():
@@ -228,7 +256,20 @@ def learning(attempts):
     return {'stage': '待评估' if len(evidence) < 3 else '按技能逐项练习（不对应段位）', 'attempts_count': len(attempts), 'independent_correct': sum(bool(a.get('correct')) for a in evidence), 'independent_attempts': len(evidence), 'skills': skills, 'recommendation': {k: recommendation[k] for k in ('id','title','skill','difficulty','reason','adjustment')}}
 
 
-CONCEPT_NAMES={'double_atari':'双打吃','ladder':'征子','snapback':'倒扑','connection_trap':'接不归','edge_chase':'边线追吃','capture_race':'对杀','atari':'打吃'}
+CONCEPT_NAMES={'double_atari':'双打吃','ladder':'征吃','snapback':'倒扑','connection_trap':'接不归','edge_chase':'边线追吃','capture_race':'对杀','atari':'打吃','net':'枷吃','gate':'门吃','hug':'抱吃','wedge':'挖吃'}
+CONCEPT_SEQUENCE={'double_atari':10,'ladder':20,'net':30,'gate':40,'edge_chase':50,'snapback':60,'connection_trap':70,'hug':80,'wedge':90,'atari':100}
+
+
+def sequential_rank(lesson, group_start):
+    identity = lesson['id']
+    prefix = re.sub(r'\d+$', '', identity)
+    match = re.search(r'\d+$', identity)
+    number = int(match.group()) if match else 0
+    group = group_start.get(prefix, 0)
+    concept = lesson.get('concept')
+    if not concept:
+        return (0, group, number, identity)
+    return (1, CONCEPT_SEQUENCE.get(concept, 99), lesson.get('difficulty') or 99, group, number, identity)
 
 def _recommend(attempts, skills, current_id=None):
     def group_key(l): return f"concept:{l['skill']}:{l['concept']}" if l.get('concept') else f"skill:{l['skill']}"

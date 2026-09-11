@@ -46,18 +46,19 @@ def practice_progress(profile,current_id=None,advance=False):
     catalog.sort(key=lambda l:(group_start[re.sub(r'\d+$','',l['id'])],int(re.search(r'\d+$',l['id']).group()) if re.search(r'\d+$',l['id']) else 0))
     mode=profile.get('practice_mode','recommended')
     current=next((l for l in catalog if l['id']==current_id),None)
-    source=(current or {}).get('source') or {}
-    book_title=source.get('title') if mode=='sequential' and source.get('kind')=='book' else None
-    if book_title:
-        catalog=[l for l in catalog if (l.get('source') or {}).get('kind')=='book' and l['source'].get('title')==book_title]
-        def book_order(lesson):
-            numbers=re.findall(r'\d+',str(lesson['source'].get('problem','')))
-            fallback=re.findall(r'\d+',lesson['id'])
-            return (int((numbers or fallback)[-1]) if numbers or fallback else float('inf'),lesson['id'])
-        catalog.sort(key=book_order)
+    collection=curriculum.sequential_collection(current) if mode=='sequential' else None
+    if mode=='sequential':
+        if collection:
+            catalog=[l for l in catalog if curriculum.sequential_collection(l)==collection]
+            if collection[0]=='licensed':
+                catalog.sort(key=lambda l:(l.get('difficulty') or 99,curriculum.sequential_problem_number(l),l['id']))
+            else:
+                catalog.sort(key=lambda l:(curriculum.sequential_problem_number(l),l['id']))
+        else:
+            catalog=[l for l in catalog if curriculum.sequential_collection(l) is None]
+            catalog.sort(key=lambda l:curriculum.sequential_rank(l,group_start))
     ordered_ids=[l['id'] for l in catalog]
     catalog=[l for l in catalog if curriculum.available_lesson(l)]
-    mode=profile.get('practice_mode','recommended')
     completed={a['lesson_id'] for a in profile['attempts'] if a.get('correct') is True}
     review=set(profile.get('helped_lesson_ids',[]))|{a['lesson_id'] for a in profile['attempts'] if a.get('correct') is False}
     ids=[l['id'] for l in catalog]
@@ -66,7 +67,7 @@ def practice_progress(profile,current_id=None,advance=False):
     pool=[identity for identity in ids if identity not in completed and (mode!='review' or identity in review)]
     next_id=next((identity for identity in pool if ordered_ids.index(identity)>anchor),pool[0] if pool else None) if advance else (pool[0] if pool else None)
     result=dict(mode=mode,total=len(ids),completed=len(set(ids)&completed),remaining=len(set(ids)-completed),current_index=index+1 if index>=0 else None,next_index=ids.index(next_id)+1 if next_id else None,review_count=len((set(ids)&review)-completed),next_id=next_id)
-    if book_title: result.update(book_title=book_title,chapter=current.get('concept'),book_complete=not pool)
+    if collection: result.update(book_title=collection[1],chapter=curriculum.sequential_chapter(current),book_complete=not pool)
     return result
 
 

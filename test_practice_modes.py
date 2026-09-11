@@ -34,7 +34,7 @@ class PracticeTest(unittest.TestCase):
         self.assertEqual(s['lesson']['id'],'tactic-short-ladder');self.assertEqual(s['moves'],[]);self.assertTrue(s['assisted'])
     def test_variant_limits_keep_history_and_advance_from_hidden(self):
         visible=[l for l in curriculum.catalog() if curriculum.available_lesson(l)]
-        self.assertEqual(len(visible),474)
+        self.assertEqual(len(visible),567)
         for skill in ('escape','capture','connect','cut'):
             for difficulty,count in ((1,3),(2,5)):
                 self.assertEqual(sum(l.get('family_id')==f'{skill}-{difficulty}' for l in visible),count)
@@ -71,9 +71,42 @@ class PracticeTest(unittest.TestCase):
             self.assertEqual(profile['state']['lesson']['id'],'private-10')
             self.assertIn('已导入的题目全部完成',profile['state']['message'])
             self.assertTrue(server.practice_progress(profile,'private-10')['book_complete'])
-            self.assertEqual(server.practice_progress(profile,base['id'])['total'],5)
+            self.assertEqual(server.practice_progress(profile,base['id'])['total'],1)
             self.assertNotIn('book_title',server.practice_progress(profile,base['id']))
             for mode in ('review','recommended'):
                 profile['practice_mode']=mode
                 self.assertEqual(server.practice_progress(profile,'private-10')['total'],5)
                 self.assertNotIn('book_title',server.practice_progress(profile,'private-10'))
+
+    def test_sequential_keeps_curriculum_and_licensed_sets_apart(self):
+        store=self.store();profile=store['profiles']['parent'];profile['practice_mode']='sequential'
+        server.apply_store(store,dict(type='lesson',id='tactic-two-stone-ladder'))
+        original=[l for l in curriculum.catalog() if curriculum.available_lesson(l) and curriculum.sequential_collection(l) is None]
+        progress=server.practice_progress(profile,'tactic-two-stone-ladder',True)
+        self.assertEqual(progress['total'],len(original))
+        self.assertTrue((progress['next_id'] or '').startswith('tactic-'))
+        self.assertNotIn('book_title',progress)
+        self.assertFalse((progress.get('next_id') or '').startswith('ggg-'))
+        following=[]; current='tactic-two-stone-ladder'
+        for _ in range(80):
+            nxt=server.practice_progress(profile,current,True)['next_id']
+            if not nxt or nxt.startswith(('escape-','capture-','connect-','cut-')): break
+            following.append(nxt); current=nxt
+        self.assertGreaterEqual({curriculum.get_lesson(i).get('concept') for i in following},{'net','gate','snapback','connection_trap','hug','wedge'})
+        seq=[l for l in original if l.get('sequence')]
+        from collections import Counter
+        counts=Counter(l.get('concept') for l in seq)
+        for concept in ('double_atari','ladder','net','gate','edge_chase','snapback','connection_trap','hug','wedge','atari'):
+            self.assertGreaterEqual(counts[concept],10,concept)
+        profile['attempts']=[dict(lesson_id=l['id'],correct=True) for l in original]
+        done=server.practice_progress(profile,'tactic-two-stone-ladder',True)
+        self.assertIsNone(done['next_id']);self.assertEqual(done['remaining'],0)
+        server.apply_store(store,{'type':'next_lesson'})
+        self.assertEqual(profile['state']['lesson']['id'],'tactic-two-stone-ladder')
+        self.assertIn('本轮题目已全部通关',profile['state']['message'])
+        server.apply_store(store,dict(type='lesson',id='ggg-easy-140'))
+        ggg=server.practice_progress(profile,'ggg-easy-140',True)
+        self.assertEqual(ggg['book_title'],'Go Game Guru Weekly Go Problems')
+        self.assertEqual(ggg['chapter'],'基础')
+        self.assertEqual(ggg['next_id'],'ggg-intermediate-01')
+        self.assertEqual(ggg['total'],417)

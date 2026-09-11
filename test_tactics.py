@@ -17,7 +17,8 @@ class TacticsTests(unittest.TestCase):
 
     def test_all_branches_replay_to_actual_capture(self):
         lessons = tactics.catalog()
-        self.assertGreaterEqual(len(lessons),8)
+        self.assertGreaterEqual(len(lessons),18)
+        self.assertTrue({l['id'] for l in lessons} >= {'tactic-net','tactic-gate','tactic-hug','tactic-wedge','tactic-snapback-pack','tactic-trap-heavy'})
         depths, branching_replies = [], 0
         for lesson in lessons:
             self.assertEqual(tactics.validate_lesson(lesson),lesson)

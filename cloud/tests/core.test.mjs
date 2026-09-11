@@ -56,12 +56,12 @@ test('switching a partial sequence into review immediately includes and restarts
  r=action(r.state,{type:'practice_mode',mode:'review'});assert.equal(r.state.lesson.id,l.id);assert.equal(r.state.moves.length,0);assert.ok(r.helped.includes(l.id));assert.ok(r.state.assisted);
 });
 test('base variants are limited by family without deleting historical evidence or custom puzzles',async()=>{
- const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,474);
+ const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,567);
  for(const skill of ['escape','capture','connect','cut'])for(const [difficulty,count]of [[1,3],[2,5]])assert.equal(visible.filter(l=>l.family_id===`${skill}-${difficulty}`).length,count);
  assert.ok(availableLesson({id:'escape-1-9'}));assert.ok(availableLesson({id:'imported',family_id:'escape-1',variant:8}));assert.ok(availableLesson({id:'escape-1-8',sequence:true}));
  const evidence=[{lesson_id:'escape-1-8',correct:true,assisted:false,attempt_no:1}];const stats=learning(catalog,evidence);assert.equal(stats.independent_correct,1);assert.ok(catalog.find(l=>l.id==='escape-1-8'));
  assert.ok(availableLesson(recommend(catalog,evidence,stats,evidence,'escape-1-8')));
- const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,474);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
+ const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,150);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
 });
 test('recent independent streaks reduce frequency, errors reinforce then rotate, and assistance cannot fake mastery',async()=>{
  const {recommend}=await import('../curriculum.mjs');const attempt=(id,correct,assisted=false)=>({lesson_id:id,correct,assisted,attempt_no:1});
@@ -100,6 +100,18 @@ test('sequential books continue across chapters without mixing catalogs or clear
  let p=practice(c,'private-2','sequential',true);assert.equal(p.total,3);assert.equal(p.completed,2);assert.equal(p.current_index,2);assert.equal(p.next_id,'private-10');assert.equal(p.book_title,'我的手筋书');assert.equal(p.chapter,'第一章');assert.deepEqual(c,original);
  let r=action(lessonState(book.find(l=>l.id==='private-2')),{type:'next_lesson'},c);assert.equal(r.state.lesson.id,'private-10');assert.equal(r.state.lesson.concept,'第二章');assert.deepEqual(c,original);
  c.completed.push('private-10');r=action(r.state,{type:'next_lesson'},c);assert.equal(r.state.lesson.id,'private-10');assert.match(r.state.message,/已导入的题目全部完成/);assert.equal(practice(c,'private-10').book_complete,true);
- assert.equal(practice(c,base.id).total,5);assert.equal(practice(c,base.id).book_title,undefined);
+ assert.equal(practice(c,base.id).total,1);assert.equal(practice(c,base.id).book_title,undefined);
  for(const mode of ['recommended','review']){p=practice(c,'private-10',mode);assert.equal(p.total,5);assert.equal(p.book_title,undefined);}
+});
+test('sequential curriculum does not jump into Go Game Guru, which continues by difficulty',async()=>{
+ const {availableLesson,practice}=await import('../curriculum.mjs');
+ const original=catalog.filter(l=>availableLesson(l)&&l.source?.kind!=='licensed'&&l.source?.kind!=='book');
+ let p=practice(ctx(),'tactic-two-stone-ladder','sequential',true);
+ assert.equal(p.total,original.length);assert.equal(p.next_id?.startsWith('tactic-'),true);assert.equal(p.book_title,undefined);assert.notEqual(p.next_id?.startsWith('ggg-'),true);
+ p=practice(ctx({completed:original.map(l=>l.id)}),'tactic-two-stone-ladder','sequential',true);
+ assert.equal(p.next_id,null);assert.equal(p.remaining,0);
+ const r=action(lessonState(catalog.find(l=>l.id==='tactic-two-stone-ladder')),{type:'next_lesson'},ctx({runs:{_practice_mode:'sequential'},completed:original.map(l=>l.id)}));
+ assert.equal(r.state.lesson.id,'tactic-two-stone-ladder');assert.match(r.state.message,/本轮题目已全部通关/);
+ p=practice(ctx(),'ggg-easy-140','sequential',true);
+ assert.equal(p.book_title,'Go Game Guru Weekly Go Problems');assert.equal(p.chapter,'基础');assert.equal(p.next_id,'ggg-intermediate-01');assert.equal(p.total,417);
 });
