@@ -62,10 +62,13 @@ class EngineBridgeHTTPTest(unittest.TestCase):
 
     def test_health_is_authenticated_and_does_not_start_engine(self):
         self.assertEqual(self.request('/health', method='GET', auth=False)[0], 401)
-        with patch.object(engine_bridge.engine, 'info', return_value={'available': True}):
+        with patch.object(engine_bridge.engine, 'info', return_value={'available': True, 'busy': False}):
             self.assertEqual(self.request('/health', method='GET'),
-                             (200, {'ok': True, 'available': True}))
-        with patch.object(engine_bridge.engine, 'info', return_value={'available': False}):
+                             (200, {'ok': True, 'available': True, 'busy': False}))
+        with patch.object(engine_bridge.engine, 'info', return_value={'available': True, 'busy': True}):
+            self.assertEqual(self.request('/health', method='GET'),
+                             (200, {'ok': True, 'available': True, 'busy': True}))
+        with patch.object(engine_bridge.engine, 'info', return_value={'available': False, 'busy': False}):
             self.assertEqual(self.request('/health', method='GET')[0], 503)
         self.assertEqual(self.request('/other', method='GET')[0], 404)
         self.analyze.assert_not_called()

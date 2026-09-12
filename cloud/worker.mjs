@@ -47,7 +47,7 @@ function guard(){return 'EXISTS(SELECT 1 FROM households WHERE id=? AND op_token
 async function commit(env,ctx,build){const token=crypto.randomUUID();const statements=build(token);const out=await env.DB.batch([env.DB.prepare('UPDATE households SET revision=revision+1,op_token=? WHERE id=? AND revision=?').bind(token,ctx.hh,ctx.revision),...statements]);return (out[0].meta?.changes||0)===1;}
 async function conflict(env,request){return json({error:'棋盘已在另一设备更新，请查看最新局面后重试。',state:await publicContext(env,await load(env,request))},409);}
 function timeoutBudget(value,fallback,maximum){const numeric=Number(value);return Number.isFinite(numeric)&&numeric>0?Math.min(maximum,Math.max(1,Math.floor(numeric))):fallback;}
-function engineConfiguration(env,state){const primary=!!(env.ENGINE_PRIMARY_URL&&env.ENGINE_PRIMARY_TOKEN),fallback=!!(env.ENGINE_URL&&env.ENGINE_TOKEN);const last=['fnos','vps'].includes(state.engine_backend)?state.engine_backend:null;return {available:primary||fallback,primary_configured:primary,fallback_configured:fallback,backend:last,last_backend:last,name:'KataGo · 计算服务',status:last?`最近一次AI应手来自${last==='fnos'?'fnOS主力':'VPS后备'}`:primary||fallback?'已配置计算服务，尚无成功应手记录':'未连接计算服务',note:'每次计算先探测fnOS主力；网络、超时或服务故障时尝试VPS后备。配置与上次成功来源不代表此刻在线。',error:''};}
+function engineConfiguration(env,state){const primary=!!(env.ENGINE_PRIMARY_URL&&env.ENGINE_PRIMARY_TOKEN),fallback=!!(env.ENGINE_URL&&env.ENGINE_TOKEN);const last=['fnos','vps'].includes(state.engine_backend)?state.engine_backend:null;return {available:primary||fallback,primary_configured:primary,fallback_configured:fallback,backend:last,last_backend:last,name:'KataGo · 计算服务',status:last?`最近一次AI应手来自${last==='fnos'?'fnOS深度通道':'VPS快速通道'}`:primary||fallback?'已配置计算服务，尚无成功应手记录':'未连接计算服务',note:'实战应手优先使用低延迟VPS，故障时改用fnOS；局面分析与显式复核优先fnOS。上次成功来源不代表此刻在线。',error:''};}
 function backendError(label,message,retryable){return Object.assign(new Error(label+'计算服务'+message),{retryable,status:502});}
 function backendURL(config,path){let target;try{target=new URL(path,config.url.replace(/\/$/,'')+'/')}catch{fail(config.label+'计算服务地址无效。',503)}if(target.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(target.hostname))fail('引擎连接必须使用HTTPS。',503);if(target.username||target.password)fail('计算服务地址不能包含明文凭据。',503);return target;}
 async function backendRequest(config,path,payload,timeout,health=false){
@@ -57,7 +57,7 @@ async function backendRequest(config,path,payload,timeout,health=false){
  if(!response.ok){if(response.status>=400&&response.status<500)throw backendError(config.label,`拒绝请求（HTTP ${response.status}），请检查服务配置；未自动改用另一服务。`,false);throw backendError(config.label,`暂时不可用（HTTP ${response.status}）。`,true);}
  let result;try{result=await response.json()}catch{throw backendError(config.label,'返回了无效数据。',true)}
  if(!result||typeof result!=='object'||Array.isArray(result))throw backendError(config.label,'返回了无效数据。',true);
- if(health){if(result.ok!==true||result.available===false||result.engine?.available===false)throw backendError(config.label,'健康探测未通过。',true);}
+ if(health){if(result.ok!==true||result.available===false||result.engine?.available===false)throw backendError(config.label,'健康探测未通过。',true);if(result.busy===true)throw backendError(config.label,'正忙。',true);}
  else if(path==='move'){if(result.pass!==true&&(!Number.isInteger(result.x)||!Number.isInteger(result.y)||result.x<0||result.y<0||result.x>=payload.size||result.y>=payload.size))throw backendError(config.label,'未返回有效落点。',true);}
  else if(path==='review'){if(result.revision!==payload.revision||result.perspective!=='black'||!result.candidate||!result.reference||![result.candidate,result.reference].every(r=>r.rootInfo&&Array.isArray(r.moves)&&Array.isArray(r.ownership)))throw backendError(config.label,'返回的复核版本或格式不正确。',true);}
  else if(!Array.isArray(result.moves)||result.revision!==payload.revision)throw backendError(config.label,'返回的分析版本或格式不正确。',true);
@@ -69,8 +69,13 @@ export async function bridge(env,path,state){
  if(!primary&&!fallback)fail('计算服务尚未连接，仍可练题和双人对弈。',503);
  const payload={};for(const name of ['size','board','initial_board','moves','to_play','initial_player','revision'])payload[name]=state[name];
  if(path==='review')payload.review=state.review;
+ if(path==='move'){
+  const ordered=fallback?[fallback,primary].filter(Boolean):[primary].filter(Boolean);
+  for(const config of ordered){const budget=config.backend==='vps'?timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,6000,8000):timeoutBudget(env.ENGINE_PRIMARY_TIMEOUT_MS,8000,10000);try{const result=await backendRequest(config,path,payload,budget);return {...result,engine_backend:config.backend};}catch(e){if(e.retryable!==true)throw e;}}
+  fail(primary&&fallback?'两个KataGo通道均未完成应手，请稍后重试。':primary?'fnOS计算服务暂时不可用。':'VPS计算服务暂时不可用。',503);
+ }
  if(primary){try{await backendRequest(primary,'health',null,1500,true);const result=await backendRequest(primary,path,payload,timeoutBudget(env.ENGINE_PRIMARY_TIMEOUT_MS,15000,15000));return {...result,engine_backend:'fnos'};}catch(e){if(e.retryable!==true)throw e;if(!fallback)fail('fnOS主力暂不可用，尚未配置VPS后备；练题和双人对弈仍可用。',503);}}
- try{const result=await backendRequest(fallback,path,payload,timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,15000,30000));return {...result,engine_backend:'vps'};}catch(e){if(e.retryable===false)throw e;fail(primary?'fnOS主力与VPS后备均未完成计算，请稍后重试；练题和双人对弈仍可用。':'VPS计算服务暂时不可用，请稍后重试；练题和双人对弈仍可用。',503);}
+ try{const result=await backendRequest(fallback,path,payload,timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,15000,15000));return {...result,engine_backend:'vps'};}catch(e){if(e.retryable===false)throw e;fail(primary?'fnOS主力与VPS后备均未完成计算，请稍后重试；练题和双人对弈仍可用。':'VPS计算服务暂时不可用，请稍后重试；练题和双人对弈仍可用。',503);}
 }
 
 function persistState(s){const saved=clone(s);saved.feedback=[];delete saved.revision;return sizeCheck(saved);}
@@ -87,7 +92,8 @@ async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!
  if(a.type==='review_move'||(a.type==='play'&&state.lesson_progress?.status==='unlisted')){
   let before;try{before=reviewPosition(state);before.revision=ctx.revision;}catch(e){fail(e.message)}
   let review=ruleReview(state)||authorReview(state,builtinLessons.find(l=>l.id===state.lesson.id));
-  if(!review){try{review=engineReview(before,await bridge(env,'review',before));}catch{review=unavailableReview(before);}}
+  if(!review&&a.type==='review_move'){try{review=engineReview(before,await bridge(env,'review',before));}catch{review=unavailableReview(before);}}
+  if(!review)review=unavailableReview(before);
   setReview(state,review);state.assisted=true;if(!changed.helped.includes(state.lesson.id))changed.helped.push(state.lesson.id);
   if(['rules','author'].includes(review.source))changed.event={lesson_id:state.lesson.id,title:state.lesson.title,skill:state.lesson.skill,difficulty:state.lesson.difficulty,correct:review.source==='rules',assisted:true,move:clone(state.moves.at(-1)),summary:review.summary,created_at:now(),profile_id:ctx.profileId};
  }

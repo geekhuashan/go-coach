@@ -35,7 +35,8 @@ def info():
     binary, model = _paths()
     return {"available": bool(binary and model and Path(model).is_file()),
             "name": "KataGo · 本地陪练", "status": _status,
-            "note": "棋力较强，可暂停、悔棋；不是校准的入门段位。", "error": _last_error}
+            "note": "棋力较强，可暂停、悔棋；不是校准的入门段位。", "error": _last_error,
+            "busy": _lock.locked()}
 
 
 def close():
@@ -158,11 +159,15 @@ def _run_query(query, timeout=90):
 
 
 def analyze(state):
-    with _lock:
+    if not _lock.acquire(timeout=2):
+        raise RuntimeError("当前 KataGo 正在计算另一手，请稍后重试。")
+    try:
         query = analysis_query(state, uuid.uuid4().hex)
-        result = _run_query(query)
+        result = _run_query(query, timeout=8)
         return {"revision":state["revision"], "engine":"KataGo", "perspective":"black",
                 "rootInfo":result.get("rootInfo",{}), "moves":result["moveInfos"][:8]}
+    finally:
+        _lock.release()
 
 
 def review_points(state):

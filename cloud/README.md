@@ -20,12 +20,13 @@ D1 binding 为 `DB`，静态 binding 为 `ASSETS`。迁移按 `migrations/` 顺�
 
 ## 计算服务
 
-可选 `ENGINE_URL` 与 `ENGINE_TOKEN` 配置 KataGo 服务。Worker 以 Bearer token 发送：
+可选 `ENGINE_PRIMARY_URL` / `ENGINE_PRIMARY_TOKEN` 配置 fnOS 深度通道，`ENGINE_URL` / `ENGINE_TOKEN` 配置 VPS 快速通道。Worker 以 Bearer token 发送：
 
 - `POST /analyze {state}` → 原 KataGo 分析格式（包含 revision）。
 - `POST /move {state}` → `{x,y}` 或 `{pass:true}`。
+- `POST /review {state}` → 同一局面的候选点与参考点成对分析。
 
-只发送棋盘、初始摆子、落子历史、尺寸和执棋方；不发送家庭名字、学习文字或密钥。服务超时/离线返回 503，练题和双人模式继续可用。
+实战 `/move` 直接优先 VPS，失败后只回退一次 fnOS；`/analyze` 和用户显式触发的 `/review` 优先 fnOS，fnOS 正忙或故障时改用 VPS。只发送棋盘、初始摆子、落子历史、尺寸和执棋方；不发送家庭名字、学习文字或密钥。两条通道都超时、离线或正忙时返回 503，不无限排队；练题和双人模式继续可用。
 
 LLM 经用户在设置中显式启用后使用所填 OpenAI 兼容 HTTPS 服务。密钥用 SESSION_SECRET 派生的 AES-GCM 密钥加密存于 D1，读取设置不返回密钥。更换服务地址清除旧密钥，连接测试不发送棋盘。语言模型只讲解，不决定落子。
 

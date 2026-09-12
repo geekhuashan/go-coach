@@ -1,6 +1,6 @@
 """Board-size transport and defensive KataGo coordinate parsing."""
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import engine
 
 
@@ -66,6 +66,18 @@ class EngineSizesTests(unittest.TestCase):
         with patch.object(engine, 'analyze', return_value={'moves':[{'order':0, 'move':'T1'}]}):
             with self.assertRaises(RuntimeError):
                 engine.choose_move(state_for(9))
+
+    def test_analysis_queue_wait_and_query_time_are_bounded(self):
+        busy=Mock();busy.acquire.return_value=False
+        with patch.object(engine,'_lock',busy),patch.object(engine,'_run_query') as run:
+            with self.assertRaisesRegex(RuntimeError,'正在计算另一手'):
+                engine.analyze(state_for(19))
+            busy.acquire.assert_called_once_with(timeout=2);busy.release.assert_not_called();run.assert_not_called()
+        lock=Mock();lock.acquire.return_value=True
+        raw={'rootInfo':{},'moveInfos':[{'move':'D4'}]}
+        with patch.object(engine,'_lock',lock),patch.object(engine,'_run_query',return_value=raw) as run:
+            result=engine.analyze(state_for(19))
+        self.assertEqual(result['moves'],raw['moveInfos']);self.assertEqual(run.call_args.kwargs['timeout'],8);lock.release.assert_called_once_with()
 
 
 if __name__ == '__main__':

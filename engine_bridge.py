@@ -51,8 +51,8 @@ def handler(token):
                 return self.reply(401, {'error': 'Unauthorized'})
             if self.path != '/health':
                 return self.reply(404, {'error': 'Not found'})
-            available = engine.info()['available']
-            return self.reply(200 if available else 503, {'ok': available, 'available': available})
+            info = engine.info();available = info['available']
+            return self.reply(200 if available else 503, {'ok': available, 'available': available, 'busy': bool(info.get('busy'))})
 
         def do_POST(self):
             if not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):

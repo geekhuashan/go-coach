@@ -140,7 +140,7 @@ class LocalReviewHTTPTest(unittest.TestCase):
             return result(before)
         self.review.side_effect=reviewed
         state=self.action('review_move');self.assertEqual(state['assessment']['review']['source'],'katago');self.assertEqual(state['assessment']['review']['verdict'],'reasonable');self.assertIsNone(state['assessment']['correct']);self.assertEqual(state['lesson_progress']['status'],'unlisted');self.assertEqual(state['recent_attempts'],[]);self.assertEqual(state['practice_progress']['completed'],0)
-        restored=server.load_store();self.assertEqual(len(restored['profiles']['parent']['llm_explanations']),1);self.assertEqual(len(restored['profiles']['parent']['state']['moves']),1);self.assertEqual(self.review.call_count,2)
+        restored=server.load_store();self.assertEqual(len(restored['profiles']['parent']['llm_explanations']),1);self.assertEqual(len(restored['profiles']['parent']['state']['moves']),1);self.assertEqual(self.review.call_count,1)
     def test_author_refutation_is_failed_without_engine_and_recorded_once(self):
         self.action('lesson',id='ggg-easy-68');state=self.action('play',x=15,y=18)
         self.review.assert_not_called();self.assertEqual(state['assessment']['review']['source'],'author');self.assertIs(state['assessment']['correct'],False);self.assertEqual(state['lesson_progress']['status'],'failed');self.assertEqual(len(state['recent_attempts']),1);self.assertTrue(state['recent_attempts'][0]['assisted'])
@@ -151,13 +151,13 @@ class LocalReviewHTTPTest(unittest.TestCase):
         self.action('new');state=self.action('play',x=0,y=0)
         self.assertEqual(self.request('POST','/api/action',dict(type='review_move',revision=state['revision']))[0],400);self.review.assert_not_called()
     def test_late_review_cannot_write_into_changed_profile_or_board(self):
-        lesson=curriculum.get_lesson('ggg-easy-01');self.action('lesson',id=lesson['id']);revision=self.state()['revision'];entered=threading.Event();release=threading.Event();responses=[]
+        lesson=curriculum.get_lesson('ggg-easy-01');self.action('lesson',id=lesson['id']);self.action('play',**unknown_move(lesson));revision=self.state()['revision'];entered=threading.Event();release=threading.Event();responses=[]
         def delayed(before):entered.set();release.wait(5);return result(before)
         self.review.side_effect=delayed
-        pending=threading.Thread(target=lambda:responses.append(self.request('POST','/api/action',dict(type='play',revision=revision,expected_profile_id='parent',**unknown_move(lesson)))))
+        pending=threading.Thread(target=lambda:responses.append(self.request('POST','/api/action',dict(type='review_move',revision=revision,expected_profile_id='parent'))))
         pending.start()
         try:
             self.assertTrue(entered.wait(2));child=self.action('switch_profile',profile_id='child');self.assertEqual(child['profile']['id'],'child')
         finally:release.set();pending.join(3)
-        self.assertFalse(pending.is_alive());self.assertEqual(responses[0][0],409);self.assertEqual(self.state()['profile']['id'],'child');self.assertEqual(server.STORE['profiles']['parent']['state']['moves'],[]);self.assertEqual(server.STORE['profiles']['parent']['attempts'],[])
+        self.assertFalse(pending.is_alive());self.assertEqual(responses[0][0],409);self.assertEqual(self.state()['profile']['id'],'child');self.assertEqual(len(server.STORE['profiles']['parent']['state']['moves']),1);self.assertEqual(server.STORE['profiles']['parent']['attempts'],[])
         self.assertEqual(self.request('POST','/api/action',dict(type='new',revision=self.state()['revision'],expected_profile_id='parent'))[0],409)

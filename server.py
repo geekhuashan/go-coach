@@ -331,9 +331,10 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
             import lesson_review
             before=lesson_review.review_position(s);before['revision']=store['revision']
             review=lesson_review.rule_review(s) or lesson_review.author_review(s,curriculum.get_lesson(s['lesson']['id']))
-            if not review:
+            if not review and kind=='review_move':
                 try:review=lesson_review.engine_review(before,reviewer(before)) if reviewer else lesson_review.unavailable_review(before)
                 except Exception:review=lesson_review.unavailable_review(before)
+            if not review:review=lesson_review.unavailable_review(before)
             lesson_review.set_review(s,review);s['assisted']=True;did_review=True
             if lesson_id not in helped:helped.append(lesson_id)
         if lesson_id and (kind in ('hint','demo','solution') or kind=='inspect' and s.get('inspection',{}).get('stones') or kind=='undo' and (s.get('lesson') or {}).get('sequence') or (s.get('lesson_progress') or {}).get('status')=='unlisted'):
@@ -716,7 +717,7 @@ class Handler(SimpleHTTPRequestHandler):
                 learning=curriculum.learning(STORE['profiles'][profile_id]['attempts'])
                 if action.get('expected_profile_id') is not None and action['expected_profile_id']!=profile_id:
                     return self.respond(409,{'error':'学习者已切换，请刷新后重试。','state':public_store(STORE)})
-                review_store=copy.deepcopy(STORE) if self.path=='/api/action' and (action.get('type')=='review_move' or action.get('type')=='play' and (candidate.get('lesson') or {}).get('sequence')) else None
+                review_store=copy.deepcopy(STORE) if self.path=='/api/action' and action.get('type')=='review_move' else None
             if self.path=='/api/lessons/import':
                 import tactics
                 lesson=tactics.validate_lesson(action.get('lesson'))

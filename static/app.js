@@ -22,7 +22,7 @@ document.querySelectorAll('.app-drawer').forEach(dialog=>{
 });
 const cols = 'ABCDEFGHJKLMNOPQRST';
 let boardZoom=false, pendingMove=null;
-let cloudMode=false,authenticated=false,authEpoch=0,pollTimer=null,installPrompt=null;
+let cloudMode=false,authenticated=false,authEpoch=0,pollTimer=null,installPrompt=null,connectionFailures=0;
 const confirmDefault=false;
 let state = null, lessons = [], inspection = null, busy = false, toastTimer;
 let busyAction=null;
@@ -32,12 +32,14 @@ let llmSettings={enabled:false},llmBusy=false,llmAutoSeen=new Set(),llmResult=nu
 const svgNS = 'http://www.w3.org/2000/svg';
 function svg(tag, attrs={}, text='') { const el=document.createElementNS(svgNS,tag); Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v)); if(text)el.textContent=text;return el; }
 function toast(text){([...document.querySelectorAll('.app-drawer[open]')].at(-1)||document.body).append($('toast'));$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,4200)}
-function connected(online){$('connection').className='connection '+(online?'online':'offline');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?(cloudMode?'家庭棋盘已连接':'本地棋盘已连接'):'当前离线或连接中断'));}
-async function request(url, options={}){if(options.method==='POST'&&options.body&&state?.profile?.id){const payload=JSON.parse(options.body);if(!payload.expected_profile_id)payload.expected_profile_id=state.profile.id;options={...options,body:JSON.stringify(payload)};}const epoch=authEpoch;const response=await fetch(url,{cache:'no-store',...options,headers:{'Content-Type':'application/json',...options.headers}});if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(response.status===401){lockSession();throw new Error('请重新输入家庭密码。')}const result=await response.json();if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}throw new Error(result.error||result.message||'暂时没有完成，请再试一次。')}connected(true);return result;}
-async function refresh(){if(!authenticated||!navigator.onLine)return;try{const next=await request('/api/state');if(!state||next.revision!==state.revision||next.profile?.id!==state.profile?.id||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){setState(next)}}catch(error){connected(false)}}
+function connected(online,{force=false}={}){if(online)connectionFailures=0;else connectionFailures++;const interrupted=!online&&(force||!navigator.onLine||connectionFailures>=2);$('connection').className='connection '+(online?'online':interrupted?'offline':'reconnecting');$('connection').replaceChildren(Object.assign(document.createElement('i'),{}),document.createTextNode(online?(cloudMode?'家庭棋盘已连接':'本地棋盘已连接'):interrupted?'当前离线或连接中断':'网络波动，正在重连'));}
+function transientError(message,kind){const error=new Error(message);error.transient=true;error.kind=kind;return error}
+async function timedFetch(url,options={},timeoutMs=12000){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);try{return await fetch(url,{...options,signal:controller.signal})}catch(error){throw transientError(controller.signal.aborted?'连接等待超时，正在同步最新棋盘。':'网络暂时波动，正在重新连接。',controller.signal.aborted?'timeout':'network')}finally{clearTimeout(timer)}}
+async function request(url, options={}){let {timeoutMs,...requestOptions}=options;if(requestOptions.method==='POST'&&requestOptions.body&&state?.profile?.id){const payload=JSON.parse(requestOptions.body);if(!payload.expected_profile_id)payload.expected_profile_id=state.profile.id;requestOptions={...requestOptions,body:JSON.stringify(payload)};}const epoch=authEpoch;const response=await timedFetch(url,{cache:'no-store',...requestOptions,headers:{'Content-Type':'application/json',...requestOptions.headers}},timeoutMs||(requestOptions.method==='POST'?20000:12000));if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(response.status===401){lockSession();throw new Error('请重新输入家庭密码。')}let result;try{result=await response.json()}catch{throw transientError('服务响应暂时不完整，正在重新连接。','response')}if(epoch!==authEpoch)throw new Error('登录状态已改变，请重试。');if(!response.ok){if(response.status===409){await refresh();throw new Error('棋盘已经更新，请看一下当前局面再试。')}const error=new Error(result.error||result.message||'暂时没有完成，请再试一次。');error.transient=response.status>=500;throw error}connected(true);return result;}
+async function refresh(){if(!authenticated||!navigator.onLine)return false;try{const next=await request('/api/state',{timeoutMs:10000});if(!state||next.revision!==state.revision||next.profile?.id!==state.profile?.id||JSON.stringify(next.engine)!==JSON.stringify(state.engine)||JSON.stringify(next.llm_explanation)!==JSON.stringify(state.llm_explanation)){setState(next)}return true}catch(error){connected(false);return false}}
 function clearPrivateUI(){closeDrawers();document.body.classList.remove('session-ready','drawer-open');showView('board');document.querySelectorAll('.compact-disclosure').forEach(el=>el.open=false);state=null;lessons=[];inspection=null;pendingMove=null;llmResult=null;llmError=null;llmSettings={enabled:false};llmAutoSeen.clear();$('private-app').hidden=true;for(const id of ['board','profiles','attempts','matches','skills','skill-select','lesson-select','black-player','white-player','rating-sizes','book-select','chapter-select'])$(id).replaceChildren();document.querySelectorAll('#private-app input,#private-app textarea').forEach(el=>{if(el.type==='checkbox')el.checked=false;else el.value=''});document.querySelectorAll('#private-app p[id],#private-app h2[id]:not(#menu-title):not(#coach-title),#private-app h3[id],#private-app strong[id],#private-app .llm-answer,#private-app .inline-assessment,#private-app .inspection').forEach(el=>el.textContent='');document.querySelectorAll('#private-app span[id]').forEach(el=>{if(el.id==='turn-pill'){el.querySelector('span').textContent='';}else el.textContent='';});$('pending-move').hidden=true;$('resign-confirmation').hidden=true;$('toast').hidden=true;}
 function lockSession(){authEpoch++;authenticated=false;clearTimeout(pollTimer);clearPrivateUI();$('login-panel').hidden=false;$('logout').hidden=true;navigator.serviceWorker?.controller?.postMessage({type:'CLEAR_PRIVATE_CACHE'});}
-function schedulePoll(){clearTimeout(pollTimer);if(authenticated&&!document.hidden)pollTimer=setTimeout(async()=>{if(!busy)await refresh();schedulePoll()},8000);}
+function schedulePoll(){clearTimeout(pollTimer);if(authenticated&&!document.hidden)pollTimer=setTimeout(async()=>{if(!busy)await refresh();schedulePoll()},12000);}
 function feedbackText(value){return typeof value==='string'?value:Array.isArray(value)?value.at(-1)?.text||'':value?.text||''}
 function setState(next,{inspectionAck=false}={}){
  const sameInspectionView=!!state&&inspectionViewKey(state)===inspectionViewKey(next);
@@ -63,13 +65,13 @@ async function act(type,extra={}){
   return;
  }
  pendingMove=null;busy=true;busyAction=type;renderActionStatus();renderPractice();if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
- try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra})});setState(next,{inspectionAck:type==='inspect'});
+ try{const next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra}),timeoutMs:type==='ai_move'?22000:type==='review_move'?30000:15000});setState(next,{inspectionAck:type==='inspect'});
  if(['lesson','next_lesson','resume_match','new','solution','retry'].includes(type))showView('board',{focus:true});
  if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
  if(['switch_profile','add_profile','retry','lesson','next_lesson','practice_mode','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent=''}
  if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
  if(type==='add_profile'){$('profile-name').value='';document.querySelector('.add-profile').open=false}
- }catch(error){if(type==='ai_move')aiFailedKey=computerKey();toast(error.message)}finally{busy=false;busyAction=null;document.body.removeAttribute('aria-busy');render();scheduleComputer();scheduleExplanation()}
+ }catch(error){if(type==='ai_move')aiFailedKey=computerKey();toast(error.message);if(error.transient){connected(false);const revision=state?.revision;await refresh();if(authenticated&&state?.revision===revision)setTimeout(()=>refresh(),2000)}}finally{busy=false;busyAction=null;document.body.removeAttribute('aria-busy');render();scheduleComputer();scheduleExplanation()}
 }
 function textEl(tag,text,className=''){const node=document.createElement(tag);node.textContent=text;if(className)node.className=className;return node}
 function renderLearning(){
@@ -116,9 +118,9 @@ function renderMoveReview(assessment){
 }
 function renderActionStatus(){
  if(inspection||pendingInspectionHelp.has(inspectionHelpKey(state)))renderInspectionText();
- const reviewing=busy&&state?.mode==='lesson'&&['play','review_move'].includes(busyAction);
+ const reviewing=busy&&state?.mode==='lesson'&&busyAction==='review_move';
  $('board-action-status').hidden=!reviewing;
- $('board-action-status').textContent=reviewing?(busyAction==='play'?'正在落子并复核…':'正在重新复核…'):'';
+ $('board-action-status').textContent=reviewing?'正在重新复核…':'';
  $('review-move').disabled=busy;$('review-move').textContent=reviewing&&busyAction==='review_move'?'正在复核…':'重新复核';
  if(reviewing){$('inline-assessment').hidden=true;$('turn-pill').querySelector('span').textContent='正在复核…';}
 }
@@ -365,8 +367,8 @@ function renderMatch(){
   if(playout){$('coach-eyebrow').textContent='练习续弈 · KataGo 根据当前局面应手';if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'陪练暂时没有完成应手，可点击按钮重试。':'现在轮到 KataGo，它落子后你可以继续下。';}
  }
  const backend=state.engine_backend||state.match?.engine_backend;
- $('engine-source').hidden=state.match?.mode!=='human_ai'||!['fnos','vps'].includes(backend);$('engine-source').textContent=backend==='fnos'?'最近一次 AI 落子：fnOS 主力':backend==='vps'?'最近一次 AI 落子：VPS 后备':'';
- if(cloudMode){const engine=state.engine||{},configured=[];if(engine.primary_configured||engine.fnos_configured)configured.push('fnOS 主力已配置');if(engine.fallback_configured||engine.vps_configured)configured.push('VPS 后备已配置');$('engine-note').textContent=(configured.length?configured.join(' · ')+'。可用性以实际应手为准。':engine.available?'KataGo 计算服务已配置，可用性以实际应手为准。':'计算服务尚未配置。')+' 做题与双人对弈仍可使用。';}
+  $('engine-source').hidden=state.match?.mode!=='human_ai'||!['fnos','vps'].includes(backend);$('engine-source').textContent=backend==='fnos'?'最近一次 AI 落子：fnOS 深度通道':backend==='vps'?'最近一次 AI 落子：VPS 快速通道':'';
+ if(cloudMode){const engine=state.engine||{},configured=[];if(engine.primary_configured||engine.fnos_configured)configured.push('fnOS 深度通道已配置');if(engine.fallback_configured||engine.vps_configured)configured.push('VPS 快速通道已配置');$('engine-note').textContent=(configured.length?configured.join(' · ')+'。可用性以实际应手为准。':engine.available?'KataGo 计算服务已配置，可用性以实际应手为准。':'计算服务尚未配置。')+' 做题与双人对弈仍可使用。';}
  else $('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。人机模式自动应手，双人模式不调用引擎。${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题与双人对弈。';
  $('matches-title').textContent=`${state.profile?.name||'我'}的对局`;
  const matches=(state.recent_matches||[]).slice(0,5);
@@ -421,7 +423,7 @@ function scheduleExplanation(){setTimeout(()=>{
 async function explainCurrent(question){
  if(!state||llmBusy||!llmSettings.enabled)return;
  const revision=state.revision,profile_id=state.profile?.id;llmAutoSeen.add(explanationContext());llmBusy=true;llmError=null;renderLLM();
- try{const result=await request('/api/llm/explain',{method:'POST',body:JSON.stringify({revision,...(question?{question}:{})})});
+ try{const result=await request('/api/llm/explain',{method:'POST',body:JSON.stringify({revision,...(question?{question}:{})}),timeoutMs:45000});
  if(state&&!result.stale&&state.revision===revision&&state.profile?.id===profile_id&&result.revision===revision&&result.profile_id===profile_id){llmResult=result;$('llm-question').value=''}
  }catch(error){if(state&&state.revision===revision&&state.profile?.id===profile_id)llmError={revision,profile_id,message:'这次模型讲解暂时没有完成，请重试。'};}
  finally{llmBusy=false;renderLLM();scheduleExplanation()}
@@ -442,7 +444,7 @@ $('llm-settings-form').onsubmit=async e=>{
 };
 $('llm-test').onclick=async()=>{
  if(llmSettingsBusy)return;settingsPending(true);$('llm-settings-status').textContent='正在测试已保存的连接（不发送棋盘）…';
- try{const result=await request('/api/llm/test',{method:'POST',body:'{}'});$('llm-settings-status').textContent=result.ok?'连接测试通过。':'连接测试未通过，请核对已保存的地址、模型和密钥。';}
+ try{const result=await request('/api/llm/test',{method:'POST',body:'{}',timeoutMs:30000});$('llm-settings-status').textContent=result.ok?'连接测试通过。':'连接测试未通过，请核对已保存的地址、模型和密钥。';}
  catch(error){$('llm-settings-status').textContent='连接测试未完成，请核对已保存的地址、模型和密钥。';}
  finally{settingsPending(false)}
 };
@@ -544,11 +546,11 @@ function loadTeachingVideos(refresh=false){
 $('video-topic').onchange=renderVideoLibrary;$('video-author').onchange=renderVideoLibrary;
 
 async function init(){if(!authenticated)return;loadTeachingVideos();$('login-panel').hidden=true;$('private-app').hidden=false;$('logout').hidden=!cloudMode;$('confirm-enabled').checked=confirmDefault;await refresh();if(!authenticated)return;await loadLLMSettings();if(!authenticated)return;try{const data=await request('/api/lessons');lessons=Array.isArray(data)?data:data.lessons||[];renderSkillPicker();if(state)render()}catch(error){if(authenticated)toast('练习列表暂时未载入，请刷新重试。')}schedulePoll();}
-async function checkSession(){try{const response=await fetch('/api/session',{cache:'no-store'});if(response.status===404){cloudMode=false;authenticated=true;}else{if(!response.ok)throw new Error('session');const session=await response.json();cloudMode=!!session.cloud;authenticated=!!session.authenticated||!cloudMode;}if(authenticated)await init();else lockSession();}catch(error){$('login-panel').hidden=false;$('login-status').textContent='暂时无法连接，联网后重试。';connected(false);}}
+async function checkSession(){try{const response=await timedFetch('/api/session',{cache:'no-store'},12000);if(response.status===404){cloudMode=false;authenticated=true;}else{if(!response.ok)throw transientError('会话服务暂时不可用。','response');const session=await response.json();cloudMode=!!session.cloud;authenticated=!!session.authenticated||!cloudMode;}connected(true);if(authenticated)await init();else lockSession();}catch(error){$('login-panel').hidden=false;$('login-status').textContent='暂时无法连接，联网后重试。';connected(false,{force:true});}}
 $('login-form').onsubmit=async e=>{e.preventDefault();$('login-submit').disabled=true;$('login-status').textContent='正在登录…';try{const response=await fetch('/api/login',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:$('family-password').value})});if(!response.ok)throw new Error('密码不正确或请求过于频繁，请稍后重试。');$('family-password').value='';authEpoch++;authenticated=true;cloudMode=true;await init();$('login-status').textContent='';}catch(error){$('login-status').textContent=navigator.onLine?error.message:'当前离线，联网后继续。';}finally{$('family-password').value='';$('login-submit').disabled=false;}};
 $('logout').onclick=async()=>{lockSession();$('login-submit').disabled=true;$('login-status').textContent='正在退出…';try{await fetch('/api/logout',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:'{}'});$('login-status').textContent='已退出。';}catch(error){$('login-status').textContent='页面已锁定。退出请求未送达，请联网后刷新并退出。';}finally{$('login-submit').disabled=false;}};
-document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(pollTimer);else{schedulePoll();if(authenticated)loadTeachingVideos(true);}});
-function networkState(){$('offline-banner').hidden=navigator.onLine;if(!navigator.onLine){connected(false);pendingMove=null;if(state)render();}else if(authenticated){refresh();schedulePoll();}else checkSession();}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(pollTimer);else if(authenticated){refresh().finally(schedulePoll);loadTeachingVideos(true);}else checkSession();});
+function networkState(){$('offline-banner').hidden=navigator.onLine;if(!navigator.onLine){connected(false,{force:true});pendingMove=null;if(state)render();}else if(authenticated)refresh().finally(schedulePoll);else checkSession();}
 window.addEventListener('online',networkState);window.addEventListener('offline',networkState);$('offline-banner').hidden=navigator.onLine;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;$('install-app').hidden=false;});$('install-app').onclick=async()=>{if(installPrompt){await installPrompt.prompt();installPrompt=null;$('install-app').hidden=true;}};
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});

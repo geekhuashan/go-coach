@@ -65,10 +65,10 @@ test('migration includes shared matches and compact history without SQL partial 
  const result=await request('/api/migrate','POST',{revision:start.revision,store});assert.equal(result.status,200,JSON.stringify(result.body));assert.equal(result.body.matches_count,1);
  const parent=(await request('/api/state')).body,child=(await request('/api/state','GET',undefined,'go_profile=child')).body;assert.equal(parent.size,19);assert.equal(child.board[18][18],1);assert.equal(child.recent_matches.length,1);
 });
-test('fallback produces one persisted AI move with its actual backend',async t=>{
+test('failed fast channel produces one persisted fnOS move with its actual backend',async t=>{
  const {request,env}=await session();Object.assign(env,{ENGINE_PRIMARY_URL:'https://fnos.example',ENGINE_PRIMARY_TOKEN:'primary',ENGINE_URL:'https://vps.example',ENGINE_TOKEN:'fallback'});let s=(await request('/api/state')).body;assert.equal(s.engine.primary_configured,true);assert.equal(s.engine.last_backend,null);s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:2,size:19,revision:s.revision})).body;
- const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push(String(url));if(init.method==='GET')return new Response(JSON.stringify({ok:true,available:true}));if(String(url).includes('fnos'))return new Response('{}',{status:503});return new Response(JSON.stringify({x:15,y:3}));});
- const response=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(response.status,200);s=response.body;assert.equal(s.move_number,1);assert.equal(s.engine_backend,'vps');assert.equal(s.engine.last_backend,'vps');assert.match(s.engine.status,/最近一次/);assert.equal(calls.filter(x=>x.endsWith('/move')).length,2);assert.equal(s.moves.length,1);
+ const calls=[];t.mock.method(globalThis,'fetch',async url=>{calls.push(String(url));if(String(url).includes('vps'))return new Response('{}',{status:503});return new Response(JSON.stringify({x:15,y:3}));});
+ const response=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(response.status,200);s=response.body;assert.equal(s.move_number,1);assert.equal(s.engine_backend,'fnos');assert.equal(s.engine.last_backend,'fnos');assert.match(s.engine.status,/最近一次/);assert.equal(calls.filter(x=>x.endsWith('/move')).length,2);assert.equal(s.moves.length,1);
 });
 test('a wrong practice answer drives repeated KataGo moves without duplicate attempts',async t=>{
  const {request,env}=await session();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let s=(await request('/api/state')).body;
@@ -78,14 +78,14 @@ test('a wrong practice answer drives repeated KataGo moves without duplicate att
  s=(await request('/api/action','POST',{type:'play',x:2,y:0,revision:s.revision})).body;assert.equal(s.computer_turn,true);assert.equal(s.recent_attempts.length,1);
  r=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(r.status,200,JSON.stringify(r.body));s=r.body;assert.equal(s.move_number,4);assert.equal(s.computer_turn,false);assert.equal(s.recent_attempts.length,1);assert.deepEqual(payloads.map(p=>p.moves.length),[1,3]);
 });
-test('an off-answer sequence reviews once, then only asks KataGo for replies',async t=>{
+test('an off-answer sequence replies first and only reviews on explicit request',async t=>{
  const {request,env}=await session();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let s=(await request('/api/state')).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-01',revision:s.revision})).body;const calls=[];
  t.mock.method(globalThis,'fetch',async(url,init)=>{const path=new URL(url).pathname,payload=JSON.parse(init.body).state;calls.push(path);if(path==='/move')return new Response(JSON.stringify(legalPoint(payload)));const coords='ABCDEFGHJKLMNOPQRSTUVWXYZ',item=point=>{const move=coords[point.x]+(payload.size-point.y);return {move,rootInfo:{scoreLead:1,visits:64},moves:[{move,pv:[move]}],ownership:Array(payload.size*payload.size).fill(0)};};return new Response(JSON.stringify({revision:payload.revision,perspective:'black',candidate:item(payload.review.candidate),reference:item(payload.review.reference)}));});
- s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.deepEqual(calls,['/review']);assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);
- s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/review','/move']);assert.equal(s.computer_turn,false);
- s=(await request('/api/action','POST',{type:'play',...legalPoint(s),revision:s.revision})).body;assert.deepEqual(calls,['/review','/move']);assert.equal(s.computer_turn,true);
- s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/review','/move','/move']);assert.equal(s.recent_attempts.length,0);
+ s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.deepEqual(calls,[]);assert.equal(s.assessment.review.source,'unavailable');assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);
+ s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/move']);assert.equal(s.computer_turn,false);
+ s=(await request('/api/action','POST',{type:'play',...legalPoint(s),revision:s.revision})).body;assert.deepEqual(calls,['/move']);assert.equal(s.computer_turn,true);
+ s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/move','/move']);assert.equal(s.recent_attempts.length,0);
 });
 test('legacy answered state without a verdict is not guessed to be a playout',async()=>{
  const {request,env}=await session();await request('/api/state');const legacy=lessonState(lessons.find(l=>l.id==='escape-1-1'));legacy.lesson_attempted=true;legacy.assessment=null;delete legacy.lesson_playout;
