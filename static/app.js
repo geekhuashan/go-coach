@@ -85,7 +85,7 @@ function renderLearning(){
  $('history-title').textContent=`${profile.name}的最近练习`;
  const attempts=(state.recent_attempts||[]).slice(0,10);
  $('attempts').replaceChildren(...(attempts.length?attempts.map(a=>{const li=textEl('li');const date=new Date(a.created_at);const when=Number.isNaN(date.getTime())?'':date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});li.append(textEl('strong',a.title),textEl('span',`${a.correct?'答对了':'再练一练'} · ${a.assisted?'提示后作答':a.attempt_no>1?'再次尝试':'独立作答'}`,a.correct?'history-success':'history-retry'),textEl('small',`${when} · 难度 ${a.difficulty}`));return li}):[textEl('li','第一道题完成后，记录会出现在这里。','empty-history')]));
- const a=state.match?.mode==='human_ai'?(state.last_human_assessment||state.assessment):state.assessment, isResult=!!a&&!state.demo_active;
+ const a=state.match?.mode==='human_ai'||state.lesson_playout?(state.last_human_assessment||state.assessment):state.assessment, isResult=!!a&&!state.demo_active;
  $('assessment').hidden=!isResult;$('inline-assessment').hidden=!isResult;
  $('assessment-summary').textContent=a?.summary||'';const explanation=a?.review?.explanation||a?.explanation;$('assessment-explanation').textContent=Array.isArray(explanation)?explanation.join(' '):explanation||'';
  $('inline-assessment').textContent=a?`${a.correct===true?'✓ ':a.correct===false?'再试试 · ':''}${a.summary}`:'';
@@ -94,13 +94,13 @@ function renderLearning(){
  $('retry-result').hidden=state.mode!=='lesson'||!state.lesson_attempted;$('next-result').hidden=state.mode!=='lesson'||!state.lesson_attempted||state.demo_active;
  $('hint').hidden=!state.lesson||state.lesson_attempted||state.demo_active;
  $('coach-eyebrow').textContent=state.lesson?.sequence?'多手练习 · 对手自动应手':isResult?'这一手 · 本地自动反馈':'这一题 · 落子后自动讲解';
- const progress=state.lesson_progress;$('lesson-progress').hidden=!progress||state.mode!=='lesson'||state.demo_active;$('lesson-progress').textContent=progress?`${progress.status==='solved'?'✓ 变化完成':progress.status==='failed'?'本次变化结束':progress.status==='unlisted'?(a?.review?.source==='katago'?'已复核 · 尚未通关':'变化待复核'):'继续计算'} · 已走 ${progress.ply||0} 手${progress.total_min?' / 至少 '+progress.total_min+' 手':''}${progress.message?' · '+progress.message:''}`:'';
+ const progress=state.lesson_progress;$('lesson-progress').hidden=!progress||state.mode!=='lesson'||state.demo_active;$('lesson-progress').textContent=progress?`${progress.status==='solved'?'✓ 变化完成':state.lesson_playout?(progress.status==='ended'?'续弈已结束':'KataGo 续弈中'):progress.status==='failed'?'本次变化结束':progress.status==='unlisted'?(a?.review?.source==='katago'?'已复核 · 尚未通关':'变化待复核'):'继续计算'} · 已走 ${progress.ply||0} 手${progress.total_min?' / 至少 '+progress.total_min+' 手':''}${progress.message?' · '+progress.message:''}`:'';
  renderMoveReview(a);
  $('show-solution').hidden=state.mode!=='lesson'||!state.lesson?.sequence||!state.lesson_attempted||state.demo_active;
  renderPractice();
  renderLessonSource(state.lesson);
  renderTeachingVideos();
- if(state.lesson_attempted&&!state.demo_active){$('turn-pill').querySelector('span').textContent='本题已作答';$('turn-pill').className='turn-pill answered';if(!inspection)$('inspection').textContent='点棋子数气，或重练、换题。'}
+ if(state.lesson_attempted&&!state.lesson_playout&&!state.demo_active){$('turn-pill').querySelector('span').textContent='本题已作答';$('turn-pill').className='turn-pill answered';if(!inspection)$('inspection').textContent='点棋子数气，或重练、换题。'}
  if(a&&state.message?.includes(a.summary))$('message').hidden=true;
 }
 function renderMoveReview(assessment){
@@ -252,7 +252,7 @@ function renderBoard(){
   const onClick=()=>{
    if(color){inspectLocal(x,y);return;}if(busy)return;
    if(state.computer_turn){toast('现在轮到电脑，请等它落子。');return;}
-   if(state.lesson_attempted||state.demo_active){toast(state.demo_active?'请先返回原局面。':'本题已作答，请重练或换题。');return;}
+   if((state.lesson_attempted&&!state.lesson_playout)||state.demo_active){toast(state.demo_active?'请先返回原局面。':'本题已作答，请重练或换题。');return;}
    clearInspection();
    if($('confirm-enabled').checked){pendingMove={x,y,revision:state.revision,profile:state.profile?.id};render();return;}
    act('play',{x,y});
@@ -324,7 +324,7 @@ $('lesson-import-form').onsubmit=async e=>{
  }catch(error){$('import-status').textContent=error instanceof SyntaxError?'无法读取 JSON，请使用 Codex 生成并核对的题库文件。':error.message}
  finally{busy=false;$('import-lesson').disabled=false;}
 };
-function computerKey(){return state?.computer_turn?`${state.match?.id||state.match_id}:${state.move_number}:${state.to_play}`:null}
+function computerKey(){return state?.computer_turn?`${state.profile?.id||'profile'}:${state.match?.id||state.match_id||state.lesson?.id||state.mode}:${state.revision}:${state.move_number}:${state.to_play}`:null}
 function scheduleComputer(){setTimeout(()=>{const key=computerKey();if(!busy&&key&&!state.demo_active&&!state.ended&&state.engine?.available&&`${key}:${state.revision}`!==aiAttemptKey&&key!==aiFailedKey)act('ai_move')},0)}
 function selectMode(mode){if(busy)return;selectedMode=mode;selectionPending=true;if(mode==='lesson'){if(state.mode!=='lesson')act('next_lesson');else {selectionPending=false;renderMatch()}}else renderMatch()}
 function startMatch(useCurrent=false){
@@ -360,7 +360,10 @@ function renderMatch(){
   $('ai-move').textContent=busy?'电脑思考中…':aiFailedKey===computerKey()?'重试电脑落子':'电脑准备落子…';
   $('ai-move').disabled=busy||!state.engine?.available;
   if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'电脑暂时没有完成落子。可点击“重试电脑落子”，或悔棋后继续。':'现在轮到电脑，落子后会自动回到你。';
- }else if(state.mode==='lesson'){$('ai-move').hidden=true}
+ }else if(state.mode==='lesson'){
+  const playout=!!state.lesson_playout;$('ai-move').hidden=!playout||!state.computer_turn||state.demo_active||state.ended;$('ai-move').textContent=busy?'陪练思考中…':aiFailedKey===computerKey()?'重试 KataGo 应手':'KataGo 准备落子…';$('ai-move').disabled=busy||!state.engine?.available;$('pass').disabled=!playout||state.ended||state.demo_active||state.computer_turn;
+  if(playout){$('coach-eyebrow').textContent='练习续弈 · KataGo 根据当前局面应手';if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'陪练暂时没有完成应手，可点击按钮重试。':'现在轮到 KataGo，它落子后你可以继续下。';}
+ }
  const backend=state.engine_backend||state.match?.engine_backend;
  $('engine-source').hidden=state.match?.mode!=='human_ai'||!['fnos','vps'].includes(backend);$('engine-source').textContent=backend==='fnos'?'最近一次 AI 落子：fnOS 主力':backend==='vps'?'最近一次 AI 落子：VPS 后备':'';
  if(cloudMode){const engine=state.engine||{},configured=[];if(engine.primary_configured||engine.fnos_configured)configured.push('fnOS 主力已配置');if(engine.fallback_configured||engine.vps_configured)configured.push('VPS 后备已配置');$('engine-note').textContent=(configured.length?configured.join(' · ')+'。可用性以实际应手为准。':engine.available?'KataGo 计算服务已配置，可用性以实际应手为准。':'计算服务尚未配置。')+' 做题与双人对弈仍可使用。';}
@@ -566,5 +569,5 @@ function renderBoardChrome(){
  $('open-coach').classList.toggle('has-feedback',hasFeedback||aiReady);
  $('open-coach').setAttribute('aria-label',aiReady?'讲解已就绪':hasFeedback?'讲解，有新的落子反馈':'打开讲解');
  $('inspection').hidden=false;
- $('pass').hidden=state.mode==='lesson';
+ $('pass').hidden=state.mode==='lesson'&&!state.lesson_playout;
 }

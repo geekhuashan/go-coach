@@ -5,7 +5,9 @@ import {readFileSync} from 'node:fs';
 import worker,{contextKey} from '../worker.mjs';
 import {makeSession,digest} from '../auth.mjs';
 import {lessonState,blank,applyAction} from '../game.mjs';
+import {key,play} from '../rules.mjs';
 const lessons=JSON.parse(readFileSync(new URL('../builtin-lessons.json',import.meta.url)));
+function legalPoint(state){const seen=[key(state.board),...(state.history||[]).map(h=>key(h.board))];for(let y=0;y<state.size;y++)for(let x=0;x<state.size;x++)try{play(state.board,x,y,state.to_play,seen);return {x,y};}catch{}throw new Error('no legal point');}
 class D1 {
  constructor(){this.db=new DatabaseSync(':memory:');for(const name of ['0001_family.sql','0002_statistics.sql'])this.db.exec(readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));}
  prepare(sql){
@@ -42,8 +44,9 @@ test('confirmed result increments separated 19-road stats once; resume cannot aw
  const {request}=await session();let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'new',match_mode:'two_player',size:19,black_profile_id:'parent',white_profile_id:'child',revision:s.revision})).body;s=(await request('/api/action','POST',{type:'resign',revision:s.revision})).body;const match=s.match.id;assert.equal(s.rating.matches_played,1);assert.equal(s.rating.losses,1);assert.equal(s.rating.by_size[0].size,19);s=(await request('/api/action','POST',{type:'resume_match',match_id:match,revision:s.revision})).body;assert.equal(s.rating.matches_played,1);assert.equal(s.rating.by_size[0].rated_games,1);assert.equal((await request('/api/action','POST',{type:'resign',revision:s.revision})).status,400);
 });
 test('migration writes records atomically and refuses nonempty cloud overwrite',async()=>{
- const {request}=await session();const s=(await request('/api/state')).body;const state=lessonState(lessons.find(l=>l.id==='escape'));const local={schema:2,active_profile_id:'parent',profiles:{parent:{id:'parent',name:'我',state,attempts:[{lesson_id:'capture-1-1',correct:true,assisted:false,attempt_no:1}],notes:[{text:'自己的学习想法'}],helped_lesson_ids:[]},child:{id:'child',name:'测试孩子',state,attempts:[],notes:[]}},matches:{}};
+ const {request}=await session();const s=(await request('/api/state')).body;const state=lessonState(lessons.find(l=>l.id==='escape'));state.lesson_playout=true;const local={schema:2,active_profile_id:'parent',profiles:{parent:{id:'parent',name:'我',state,attempts:[{lesson_id:'capture-1-1',correct:true,assisted:false,attempt_no:1}],notes:[{text:'自己的学习想法'}],helped_lesson_ids:[]},child:{id:'child',name:'测试孩子',state,attempts:[],notes:[]}},matches:{}};
  const migrated=await request('/api/migrate','POST',{revision:s.revision,store:local});assert.equal(migrated.status,200,JSON.stringify(migrated.body));assert.equal(migrated.body.attempts_count,1);const after=(await request('/api/state')).body;assert.equal(after.profiles.find(p=>p.id==='child').name,'测试孩子');assert.equal(after.recent_attempts.length,1);const denied=await request('/api/migrate','POST',{revision:after.revision,store:local});assert.equal(denied.status,409);
+ assert.equal(after.lesson_playout,false);assert.equal(after.computer_turn,false);
 });
 
 test('a stale tab cannot write into the profile selected by another tab',async()=>{
@@ -66,6 +69,33 @@ test('fallback produces one persisted AI move with its actual backend',async t=>
  const {request,env}=await session();Object.assign(env,{ENGINE_PRIMARY_URL:'https://fnos.example',ENGINE_PRIMARY_TOKEN:'primary',ENGINE_URL:'https://vps.example',ENGINE_TOKEN:'fallback'});let s=(await request('/api/state')).body;assert.equal(s.engine.primary_configured,true);assert.equal(s.engine.last_backend,null);s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:2,size:19,revision:s.revision})).body;
  const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push(String(url));if(init.method==='GET')return new Response(JSON.stringify({ok:true,available:true}));if(String(url).includes('fnos'))return new Response('{}',{status:503});return new Response(JSON.stringify({x:15,y:3}));});
  const response=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(response.status,200);s=response.body;assert.equal(s.move_number,1);assert.equal(s.engine_backend,'vps');assert.equal(s.engine.last_backend,'vps');assert.match(s.engine.status,/最近一次/);assert.equal(calls.filter(x=>x.endsWith('/move')).length,2);assert.equal(s.moves.length,1);
+});
+test('a wrong practice answer drives repeated KataGo moves without duplicate attempts',async t=>{
+ const {request,env}=await session();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let s=(await request('/api/state')).body;
+ const payloads=[],replies=[{x:1,y:0},{x:3,y:0}];t.mock.method(globalThis,'fetch',async(url,init)=>{assert.equal(String(url),'https://engine.example/move');const payload=JSON.parse(init.body).state;payloads.push(payload);return new Response(JSON.stringify(replies.shift()));});
+ s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);assert.equal(s.recent_attempts.length,1);assert.equal(s.recent_attempts[0].correct,false);
+ let r=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(r.status,200,JSON.stringify(r.body));s=r.body;assert.equal(s.move_number,2);assert.equal(s.computer_turn,false);assert.equal(s.lesson_progress.status,'exploring');
+ s=(await request('/api/action','POST',{type:'play',x:2,y:0,revision:s.revision})).body;assert.equal(s.computer_turn,true);assert.equal(s.recent_attempts.length,1);
+ r=await request('/api/action','POST',{type:'ai_move',revision:s.revision});assert.equal(r.status,200,JSON.stringify(r.body));s=r.body;assert.equal(s.move_number,4);assert.equal(s.computer_turn,false);assert.equal(s.recent_attempts.length,1);assert.deepEqual(payloads.map(p=>p.moves.length),[1,3]);
+});
+test('an off-answer sequence reviews once, then only asks KataGo for replies',async t=>{
+ const {request,env}=await session();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let s=(await request('/api/state')).body;
+ s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-01',revision:s.revision})).body;const calls=[];
+ t.mock.method(globalThis,'fetch',async(url,init)=>{const path=new URL(url).pathname,payload=JSON.parse(init.body).state;calls.push(path);if(path==='/move')return new Response(JSON.stringify(legalPoint(payload)));const coords='ABCDEFGHJKLMNOPQRSTUVWXYZ',item=point=>{const move=coords[point.x]+(payload.size-point.y);return {move,rootInfo:{scoreLead:1,visits:64},moves:[{move,pv:[move]}],ownership:Array(payload.size*payload.size).fill(0)};};return new Response(JSON.stringify({revision:payload.revision,perspective:'black',candidate:item(payload.review.candidate),reference:item(payload.review.reference)}));});
+ s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.deepEqual(calls,['/review']);assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);
+ s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/review','/move']);assert.equal(s.computer_turn,false);
+ s=(await request('/api/action','POST',{type:'play',...legalPoint(s),revision:s.revision})).body;assert.deepEqual(calls,['/review','/move']);assert.equal(s.computer_turn,true);
+ s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/review','/move','/move']);assert.equal(s.recent_attempts.length,0);
+});
+test('legacy answered state without a verdict is not guessed to be a playout',async()=>{
+ const {request,env}=await session();await request('/api/state');const legacy=lessonState(lessons.find(l=>l.id==='escape-1-1'));legacy.lesson_attempted=true;legacy.assessment=null;delete legacy.lesson_playout;
+ env.DB.db.prepare("UPDATE profiles SET state_json=? WHERE household_id='test-home' AND id='parent'").run(JSON.stringify(legacy));
+ const state=(await request('/api/state')).body;assert.equal(state.lesson_playout,false);assert.equal(state.computer_turn,false);assert.equal(state.lesson_attempted,true);
+});
+test('legacy D1 history cannot retain playout after undo',async()=>{
+ const {request,env}=await session();await request('/api/state');let legacy=applyAction(lessonState(lessons.find(l=>l.id==='escape-1-1')),{type:'play',x:0,y:0},{profileId:'parent',profiles:[],catalog:lessons,helped:[],runs:{}}).state;delete legacy.history[0].lesson_playout;
+ env.DB.db.prepare("UPDATE profiles SET state_json=? WHERE household_id='test-home' AND id='parent'").run(JSON.stringify(legacy));let s=(await request('/api/state')).body;assert.equal(s.lesson_playout,true);
+ s=(await request('/api/action','POST',{type:'undo',revision:s.revision})).body;assert.equal(s.lesson_playout,false);assert.equal(s.lesson_attempted,false);assert.equal(s.computer_turn,false);assert.equal(s.move_number,0);
 });
 test('state remains unchanged if both engines fail and late primary output loses CAS',async t=>{
  const {request,env}=await session();Object.assign(env,{ENGINE_PRIMARY_URL:'https://fnos.example',ENGINE_PRIMARY_TOKEN:'primary',ENGINE_URL:'https://vps.example',ENGINE_TOKEN:'fallback'});let s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:2,size:19,revision:s.revision})).body;
@@ -93,11 +123,12 @@ test('fresh profiles start in visible first variant while hidden historical less
  s=(await request('/api/action','POST',{type:'add_profile',name:'新学习者',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-1');
 });
 test('exact author refutation grades once without asking KataGo or awarding XP',async t=>{
- const {request}=await session();let s=(await request('/api/state')).body;
+ const {request,env}=await session();let s=(await request('/api/state')).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-68',revision:s.revision})).body;
  t.mock.method(globalThis,'fetch',async()=>{throw new Error('author proof must not call the engine')});
  const response=await request('/api/action','POST',{type:'play',x:15,y:18,revision:s.revision});assert.equal(response.status,200);s=response.body;
  assert.equal(s.assessment.review.source,'author');assert.equal(s.assessment.correct,false);assert.equal(s.lesson_progress.status,'failed');assert.equal(s.recent_attempts.length,1);assert.equal(s.rating.practice_xp,0);
+ t.mock.restoreAll();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});const calls=[];t.mock.method(globalThis,'fetch',async(url)=>{calls.push(new URL(url).pathname);return new Response(JSON.stringify(legalPoint(s)));});s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/move']);assert.equal(s.computer_turn,false);
  assert.equal((await request('/api/action','POST',{type:'review_move',revision:s.revision})).status,400);assert.equal((await request('/api/state')).body.recent_attempts.length,1);
 });
 test('unlisted move survives an outage, retries compute evidence, and stale reviews cannot write',async t=>{

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {play,group,key,boardFor} from '../rules.mjs';
 import {validateLesson,learning} from '../curriculum.mjs';
-import {blank,lessonState,applyAction,sequenceNode,publicState,sgf} from '../game.mjs';
+import {blank,lessonState,applyAction,sequenceNode,computerTurn,publicState,sgf} from '../game.mjs';
 import {authenticated,makeSession,digest,encrypt,decrypt} from '../auth.mjs';
 const catalog=JSON.parse(readFileSync(new URL('../builtin-lessons.json',import.meta.url)));
 const profiles=[{id:'parent',name:'我'},{id:'child',name:'宝宝'}];
@@ -37,6 +37,36 @@ test('two passes do not invent result; confirmation requires other participant; 
 });
 test('human-ai denies user move on computer turn; undo returns human decision',()=>{
  let s=action(blank(),{type:'new',match_mode:'human_ai',human_color:2,size:19}).state;assert.throws(()=>action(s,{type:'play',x:0,y:0}));s=action(s,{type:'ai_move'},ctx({aiMove:{x:3,y:3}})).state;s=action(s,{type:'play',x:15,y:15}).state;s=action(s,{type:'ai_move'},ctx({aiMove:{x:15,y:3}})).state;s=action(s,{type:'undo'}).state;assert.equal(s.to_play,2);assert.equal(s.move_number,1);
+});
+test('an off-answer sequence becomes a persistent KataGo playout with paired undo and passes',()=>{
+ const l=catalog.find(l=>l.id==='ggg-easy-01');let s=lessonState(l),alternative;
+ for(let y=0;y<s.size&&!alternative;y++)for(let x=0;x<s.size&&!alternative;x++)if(!l.tree.children.some(c=>c.move[0]===x&&c.move[1]===y))try{play(s.board,x,y,s.to_play);alternative={x,y};}catch{}
+ let r=action(s,{type:'play',...alternative});s=r.state;assert.equal(r.event,null);assert.equal(s.lesson_playout,true);assert.equal(s.lesson_attempted,true);assert.equal(s.lesson_progress.status,'unlisted');assert.equal(s.to_play,3-s.initial_player);assert.equal(s.moves.length,1);assert.equal(computerTurn(s),true);
+ const legalPoint=state=>{for(let y=0;y<state.size;y++)for(let x=0;x<state.size;x++)try{play(state.board,x,y,state.to_play,[key(state.board),...state.history.map(h=>key(h.board))]);return {x,y};}catch{}throw new Error('no legal point');};
+ s=action(s,{type:'ai_move'},ctx({aiMove:legalPoint(s)})).state;assert.equal(s.lesson_progress.status,'exploring');assert.equal(s.moves.length,2);assert.equal(computerTurn(s),false);
+ r=action(s,{type:'play',...legalPoint(s)});s=r.state;assert.equal(r.event,null);assert.equal(s.moves.length,3);assert.equal(computerTurn(s),true);
+ s=action(s,{type:'ai_move'},ctx({aiMove:legalPoint(s)})).state;assert.equal(s.moves.length,4);s=action(s,{type:'undo'}).state;assert.equal(s.moves.length,2);assert.equal(s.to_play,s.initial_player);assert.equal(s.lesson_playout,true);
+ s=action(s,{type:'pass'}).state;assert.equal(computerTurn(s),true);s=action(s,{type:'ai_move'},ctx({aiMove:{pass:true}})).state;assert.equal(s.ended,true);assert.equal(s.lesson_progress.status,'ended');
+ s=action(s,{type:'undo'}).state;assert.equal(s.ended,false);assert.equal(s.passes,0);assert.equal(s.moves.length,2);assert.equal(s.to_play,s.initial_player);
+ s=action(s,{type:'retry'}).state;assert.equal(s.lesson_playout,false);assert.equal(s.move_number,0);assert.equal(s.lesson_attempted,false);
+});
+test('a wrong one-move answer is recorded once, then continues without regrading',()=>{
+ const l=catalog.find(l=>l.id==='escape-1-1');let s=lessonState(l),r=action(s,{type:'play',x:0,y:0});s=r.state;
+ assert.equal(r.event?.correct,false);assert.equal(s.lesson_playout,true);assert.equal(computerTurn(s),true);
+ s=action(s,{type:'ai_move'},ctx({aiMove:{x:1,y:0}})).state;r=action(s,{type:'play',x:2,y:0});s=r.state;assert.equal(r.event,null);assert.equal(s.assessment.correct,null);assert.equal(computerTurn(s),true);
+ const correct=action(lessonState(l),{type:'play',x:2,y:4});assert.equal(correct.event.correct,true);assert.equal(correct.state.lesson_playout,false);assert.equal(correct.state.lesson_attempted,true);
+});
+test('undo clears playout state from legacy history snapshots',()=>{
+ const l=catalog.find(l=>l.id==='escape-1-1');let s=action(lessonState(l),{type:'play',x:0,y:0}).state;
+ delete s.history[0].lesson_playout;
+ s=action(s,{type:'undo'}).state;
+ assert.equal(s.lesson_playout,false);assert.equal(s.lesson_attempted,false);assert.equal(s.lesson_progress,undefined);assert.equal(s.move_number,0);
+ const retried=action(s,{type:'play',x:2,y:4});assert.equal(retried.event.correct,true);assert.equal(retried.state.lesson_playout,false);
+});
+test('an invalid playout flag cannot bypass an unanswered or solved lesson',()=>{
+ const l=catalog.find(l=>l.id==='escape-1-1');let s=lessonState(l);s.lesson_playout=true;
+ assert.equal(computerTurn(s),false);let r=action(s,{type:'play',x:2,y:4});assert.equal(r.event.correct,true);assert.equal(r.state.lesson_playout,false);
+ r.state.lesson_playout=true;assert.equal(computerTurn(r.state),false);assert.throws(()=>action(r.state,{type:'play',x:0,y:0}));
 });
 test('assisted first evidence cannot become independent by repeated correct attempts',()=>{
  const records=[1,2,3].map(i=>({lesson_id:`capture-1-${i}`,correct:true,assisted:true,attempt_no:1}));const stat=learning(catalog,records).skills.find(s=>s.id==='capture');assert.equal(stat.next_difficulty,1);assert.equal(stat.independent_attempts,0);

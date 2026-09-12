@@ -73,7 +73,7 @@ def practice_progress(profile,current_id=None,advance=False):
 
 def blank(revision=0, mode='free', size=9):
     if type(size) is not int or size not in (9,19): raise ValueError('棋盘尺寸须为 9 或 19 路。')
-    return dict(last_human_assessment=None,assessment=None,assisted=False,revision=revision,size=size,board=[[0]*size for _ in range(size)],to_play=1,move_number=0,captures={'black':0,'white':0},last_move=None,mode=mode,lesson=None,message='黑棋先行。可以落子，也可以选择一项练习。',marks=[],history=[],ended=False,engine={'available':False},feedback=[],passes=0,demo_active=False,lesson_attempted=False,demo_step=0,demo_total=0,initial_board=[[0]*size for _ in range(size)],initial_player=1,moves=[])
+    return dict(last_human_assessment=None,assessment=None,assisted=False,revision=revision,size=size,board=[[0]*size for _ in range(size)],to_play=1,move_number=0,captures={'black':0,'white':0},last_move=None,mode=mode,lesson=None,message='黑棋先行。可以落子，也可以选择一项练习。',marks=[],history=[],ended=False,engine={'available':False},feedback=[],passes=0,demo_active=False,lesson_attempted=False,lesson_playout=False,demo_step=0,demo_total=0,initial_board=[[0]*size for _ in range(size)],initial_player=1,moves=[])
 
 
 def lesson_state(identity, revision):
@@ -137,10 +137,27 @@ def load_store():
     return dict(schema=2,matches={},revision=state.get('revision',0),active_profile_id='parent',profiles={'parent':parent,'child':make_profile('child','宝宝')})
 
 
+def lesson_playout_active(s):
+    lesson=s.get('lesson') or {}
+    if s.get('mode')!='lesson' or not lesson or not s.get('lesson_attempted'):
+        return False
+    status=(s.get('lesson_progress') or {}).get('status')
+    valid=status in ('unlisted','failed','exploring','ended') if lesson.get('sequence') else lesson.get('id')=='custom' or (s.get('assessment') or {}).get('correct') is False or status in ('exploring','ended')
+    return bool(valid and (s.get('lesson_playout') is True or 'lesson_playout' not in s))
+
+
+def normalize_lesson_playout(s):
+    s['lesson_playout']=lesson_playout_active(s)
+    return s['lesson_playout']
+
+
 def computer_turn(s):
+    if s.get('ended') or s.get('demo_active'): return False
+    if lesson_playout_active(s):
+        return s['to_play']!=s['initial_player']
     match=s.get('match') or {}
     side=match.get('black' if s['to_play']==1 else 'white',{})
-    return s['mode']=='free' and not s['ended'] and not s['demo_active'] and side.get('type')=='ai'
+    return s['mode']=='free' and side.get('type')=='ai'
 
 
 def participants(record):
@@ -201,6 +218,7 @@ def active_state(store):
     if record and not s.get('demo_active') and record['version']>s.get('_match_version',-1):
         s=copy.deepcopy(record['state']);profile['state']=s
         s['feedback']=copy.deepcopy(profile['notes'])
+    normalize_lesson_playout(s)
     s['revision']=store['revision']
     return s
 
@@ -247,6 +265,7 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
     else:
         profile=store['profiles'][store['active_profile_id']]
         s=active_state(store)
+        was_lesson_playout=bool(s.get('lesson_playout'))
         if kind=='practice_mode' and action.get('mode') not in ('recommended','sequential','review'): raise ValueError('练习模式无效。')
         if kind in ('next_lesson','practice_mode') and s.get('demo_active'): raise ValueError('请先返回原局面。')
         if kind in ('next_lesson','practice_mode') and (s.get('lesson') or {}).get('sequence') and s.get('moves') and not s.get('lesson_attempted'):
@@ -290,7 +309,12 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
             s['message']='已恢复这盘棋的最新进度。'
         elif kind=='ai_move':
             if not computer_turn(s):raise ValueError('当前没有轮到电脑。')
-            apply(s,{'type':'pass'} if ai_choice is None or ai_choice.get('pass') else {'type':'play','x':ai_choice['x'],'y':ai_choice['y']})
+            if s.get('lesson_playout'):
+                if ai_choice is None or ai_choice.get('pass'):apply(s,{'type':'pass'})
+                else:move(s,ai_choice['x'],ai_choice['y'])
+                s['lesson_progress']={'status':'ended' if s.get('ended') else 'exploring','ply':len(s['moves']),'message':'双方已停一手，本次续弈结束。' if s.get('ended') else 'KataGo 已应手，请继续下一手。'}
+                s['message']=s['lesson_progress']['message']
+            else:apply(s,{'type':'pass'} if ai_choice is None or ai_choice.get('pass') else {'type':'play','x':ai_choice['x'],'y':ai_choice['y']})
         else:
             if kind in ('play','pass') and computer_turn(s):raise ValueError('现在轮到电脑，请等待电脑应手。')
             if kind=='undo' and (s.get('match') or {}).get('mode')=='human_ai':
@@ -303,7 +327,7 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
         if kind=='play' and s['mode']=='free':
             s['last_human_assessment']=copy.deepcopy(s.get('assessment'))
         did_review=False
-        if kind=='review_move' or kind=='play' and (s.get('lesson_progress') or {}).get('status')=='unlisted':
+        if kind=='review_move' or (kind=='play' and (s.get('lesson_progress') or {}).get('status')=='unlisted'):
             import lesson_review
             before=lesson_review.review_position(s);before['revision']=store['revision']
             review=lesson_review.rule_review(s) or lesson_review.author_review(s,curriculum.get_lesson(s['lesson']['id']))
@@ -325,7 +349,7 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
             notes.append(note)
         profile['notes']=notes
         s['feedback']=copy.deepcopy(notes)
-        if (kind=='play' or kind=='review_move' and did_review) and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
+        if (kind=='play' or (kind=='review_move' and did_review)) and (not was_lesson_playout or did_review) and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
             lesson=s['lesson'];assessment=s['assessment']
             if isinstance(assessment.get('correct'),bool):
                 count=sum(a['lesson_id']==lesson['id'] for a in profile['attempts'])+1
@@ -381,7 +405,7 @@ def move(s,x,y,color=None):
         s['assessment']=free_feedback(before,board,{'x':x,'y':y},color,captured)
         s['marks']=copy.deepcopy(s['assessment'].get('marks',[]))
         s['message']=s['assessment'].get('summary','')+' '+s['assessment'].get('explanation','')
-    if s['mode']=='lesson' and not s['demo_active'] and not s['lesson'].get('sequence'):
+    if s['mode']=='lesson' and not s['demo_active'] and not s['lesson'].get('sequence') and not s.get('lesson_playout'):
         s['lesson_attempted']=True
         if s['lesson']['id']=='custom':
             s['assessment']=None
@@ -393,6 +417,9 @@ def move(s,x,y,color=None):
             explanation=assessment.get('explanation','')
             if isinstance(explanation,list): explanation=' '.join(explanation)
             s['message']+=' '+assessment.get('summary','')+' '+explanation
+        if s['lesson']['id']=='custom' or (s.get('assessment') or {}).get('correct') is not True:
+            s['lesson_playout']=True
+            s['lesson_progress']={'status':'exploring','ply':len(s['moves']),'message':'KataGo 会按当前局面应手，你可以继续下。'}
 
 
 def sequence_node(s):
@@ -416,8 +443,9 @@ def sequence_play(s,x,y):
         summary='目标已提掉，这手完成了题目。';explanation='已按棋盘规则核对实际提子结果，不要求落子与参考答案完全相同。'
     elif child is None:
         s['lesson_attempted']=True
+        s['lesson_playout']=True
         summary='这手走出了参考变化，等待复核。'
-        explanation='可以复核这手的效果，也可以看参考解法或重练。'
+        explanation='复核后 KataGo 会按当前局面应手，你仍可以继续下。'
         s['assisted']=True
         status='unlisted'; correct=None
     else:
@@ -444,15 +472,22 @@ def apply(s,a):
     t=a.get('type')
     if t=='play':
         if s['demo_active']: raise ValueError('正在演示，请先返回原局面。')
-        if s['mode']=='lesson' and s.get('lesson_attempted'): raise ValueError('本轮练习已结束，请重试或选择下一题。')
-        if (s.get('lesson') or {}).get('sequence'):
+        if s['mode']=='lesson' and s.get('lesson_attempted') and not s.get('lesson_playout'): raise ValueError('本轮练习已结束，请重试或选择下一题。')
+        if s.get('lesson_playout'):
+            before=copy.deepcopy(s['board']);color=s['to_play'];x,y=a.get('x'),a.get('y');captured_before=s['captures']['black' if color==1 else 'white'];move(s,x,y)
+            from feedback import free_feedback
+            s['assessment']=free_feedback(before,s['board'],{'x':x,'y':y},color,s['captures']['black' if color==1 else 'white']-captured_before)
+            s['last_human_assessment']=copy.deepcopy(s['assessment']);s['marks']=copy.deepcopy(s['assessment'].get('marks',[]))
+            s['lesson_progress']={'status':'exploring','ply':len(s['moves']),'message':'已保留这手，KataGo 正在根据当前局面应对。'}
+            s['message']=s['assessment'].get('summary','')+' '+s['assessment'].get('explanation','')
+        elif (s.get('lesson') or {}).get('sequence'):
             sequence_play(s,a.get('x'),a.get('y'))
         else: move(s,a.get('x'),a.get('y'))
     elif t=='review_move':
         import lesson_review
         lesson_review.review_position(s)
     elif t=='ai_move':
-        if s['demo_active'] or s['mode']=='lesson': raise ValueError('请在自由对弈中使用电脑应手。')
+        if s['demo_active'] or (s['mode']=='lesson' and not s.get('lesson_playout')): raise ValueError('请在自由对弈中使用电脑应手。')
         try:
             import engine
         except ImportError:
@@ -462,22 +497,27 @@ def apply(s,a):
             apply(s,{'type':'pass'})
         else:
             move(s,choice['x'],choice['y'])
+        if s.get('lesson_playout'):
+            s['lesson_progress']={'status':'ended' if s.get('ended') else 'exploring','ply':len(s['moves']),'message':'双方已停一手，本次续弈结束。' if s.get('ended') else 'KataGo 已应手，请继续下一手。'}
+            s['message']=s['lesson_progress']['message']
     elif t=='pass':
-        if s['demo_active'] or s['mode']=='lesson': raise ValueError('教学题与演示中不需要停一手。')
+        if s['demo_active'] or (s['mode']=='lesson' and not s.get('lesson_playout')): raise ValueError('教学题与演示中不需要停一手。')
         if s['ended']: raise ValueError('对局已结束。')
         s['history'].append(snapshot(s))
         s.setdefault('moves',[]).append({'color':s['to_play'],'pass':True})
         s.update(to_play=3-s['to_play'],move_number=s['move_number']+1,last_move=None,passes=s['passes']+1)
         s['ended']=s['passes']>=2
-        s['message']='双方连续停一手，对局结束。本版不自动判定死活与数目。' if s['ended'] else '已停一手，轮到对方。'
+        s['message']=('双方连续停一手，本次续弈结束。' if s.get('lesson_playout') else '双方连续停一手，对局结束。本版不自动判定死活与数目。') if s['ended'] else '已停一手，轮到对方。'
     elif t=='undo':
         if s['demo_active']: raise ValueError('请先返回演示前的局面。')
         if not s['history']: raise ValueError('还没有可以撤回的落子。')
         sequence=(s.get('lesson') or {}).get('sequence')
+        paired=sequence or s.get('lesson_playout')
         hist=s['history']
         old=hist.pop()
-        if sequence:
+        if paired:
             while hist and old['to_play']!=s['initial_player']: old=hist.pop()
+        normalize_lesson_playout(old)
         revision=s['revision']
         feedback=copy.deepcopy(s.get('feedback',[]))
         s.clear();s.update(old,history=hist,revision=revision,feedback=feedback)
