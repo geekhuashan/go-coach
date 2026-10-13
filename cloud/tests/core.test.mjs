@@ -86,12 +86,12 @@ test('switching a partial sequence into review immediately includes and restarts
  r=action(r.state,{type:'practice_mode',mode:'review'});assert.equal(r.state.lesson.id,l.id);assert.equal(r.state.moves.length,0);assert.ok(r.helped.includes(l.id));assert.ok(r.state.assisted);
 });
 test('base variants are limited by family without deleting historical evidence or custom puzzles',async()=>{
- const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,567);
+ const {availableLesson,practice,recommend}=await import('../curriculum.mjs');const visible=catalog.filter(availableLesson);assert.equal(visible.length,492);
  for(const skill of ['escape','capture','connect','cut'])for(const [difficulty,count]of [[1,3],[2,5]])assert.equal(visible.filter(l=>l.family_id===`${skill}-${difficulty}`).length,count);
  assert.ok(availableLesson({id:'escape-1-9'}));assert.ok(availableLesson({id:'imported',family_id:'escape-1',variant:8}));assert.ok(availableLesson({id:'escape-1-8',sequence:true}));
  const evidence=[{lesson_id:'escape-1-8',correct:true,assisted:false,attempt_no:1}];const stats=learning(catalog,evidence);assert.equal(stats.independent_correct,1);assert.ok(catalog.find(l=>l.id==='escape-1-8'));
  assert.ok(availableLesson(recommend(catalog,evidence,stats,evidence,'escape-1-8')));
- const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,150);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
+ const p=practice(ctx({evidence,helped:['escape-1-8']}),'escape-1-8','sequential',true);assert.equal(p.total,75);assert.equal(p.next_id,'escape-2-1');assert.equal(practice(ctx({helped:['escape-1-8']}),null,'review').review_count,0);
 });
 test('recent independent streaks reduce frequency, errors reinforce then rotate, and assistance cannot fake mastery',async()=>{
  const {recommend}=await import('../curriculum.mjs');const attempt=(id,correct,assisted=false)=>({lesson_id:id,correct,assisted,attempt_no:1});
@@ -119,6 +119,16 @@ test('private book answers require verified provenance, replay legally and hide 
  const unmarked=structuredClone(value);delete unmarked.tree.children[0].author_verdict;assert.throws(()=>validateLesson(unmarked));
  const initial=lessonState(clean);assert.equal(publicState(initial).lesson.tree,undefined);assert.equal(publicState(initial).lesson.objective,undefined);
  const result=action(initial,{type:'play',x:1,y:0},ctx({catalog:[clean]}));assert.equal(result.state.lesson_progress.status,'solved');assert.equal(result.event.correct,true);assert.match(result.state.assessment.summary,/作者/);assert.equal(publicState(result.state).lesson.tree,undefined);
+});
+
+test('private book stone-selection problems hide targets and grade exact sets without moves',()=>{
+ const value={id:'private-selection-test',title:'选择白子',prompt:'找出需要逃跑的白子。',hint:'先数气。',size:9,skill:'escape',sequence:false,difficulty:1,to_play:1,stones:[{x:1,y:1,color:1},{x:2,y:1,color:2},{x:3,y:1,color:2}],marks:[{x:1,y:1,label:'▲'}],objective:{kind:'select_stones',targets:[[2,1]]},source:{kind:'book',usage:'household_private',answer_verified:true,title:'手筋书',page:'71',problem:'385'}};
+ const clean=validateLesson(value),visible=publicState(lessonState(clean));assert.equal(clean.sequence,false);assert.equal(clean.tree,undefined);assert.equal(visible.lesson.objective,undefined);assert.equal(visible.lesson.interaction,'select_stones');assert.equal(visible.lesson.selection_color,2);assert.deepEqual(visible.lesson.marks,[{x:1,y:1,label:'▲'}]);
+ let initial=lessonState(clean);assert.throws(()=>action(initial,{type:'play',x:0,y:0},ctx({catalog:[clean]})),/点选白子/);assert.throws(()=>action(initial,{type:'submit_selection',points:[[2,1],[2,1]]},ctx({catalog:[clean]})),/重复/);
+ let result=action(initial,{type:'submit_selection',points:[[3,1]]},ctx({catalog:[clean]}));assert.equal(result.event.correct,false);assert.equal(result.event.move,null);assert.equal(result.state.lesson_progress.status,'failed');assert.equal(result.state.lesson_playout,false);assert.deepEqual(result.state.marks,[{x:1,y:1,label:'▲'},{x:3,y:1,label:'已选'}]);
+ result=action(result.state,{type:'retry'},ctx({catalog:[clean]}));assert.equal(result.state.lesson_attempted,false);assert.deepEqual(result.state.marks,[{x:1,y:1,label:'▲'}]);
+ result=action(result.state,{type:'submit_selection',points:[[2,1]]},ctx({catalog:[clean]}));assert.equal(result.event.correct,true);assert.equal(result.state.lesson_progress.status,'solved');assert.deepEqual(result.state.marks,[{x:1,y:1,label:'▲'},{x:2,y:1,label:'△'}]);assert.equal(publicState(result.state).lesson.objective,undefined);
+ for(const change of ['source','marks','tree']){const bad=structuredClone(value);if(change==='source')bad.source.answer_verified=false;else if(change==='marks')bad.marks=[{x:2,y:1,label:'△'}];else bad.tree={children:[]};assert.throws(()=>validateLesson(bad));}
 });
 
 test('sequential books continue across chapters without mixing catalogs or clearing evidence',async()=>{

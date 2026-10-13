@@ -600,5 +600,199 @@
     "checked_at": "2026-09-07",
     "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
     "playback_url": "/api/videos/peiqi-12.mp4"
+  },
+  {
+    "id": "chen-38",
+    "title": "攻杀及对杀",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=38",
+    "author": "棋士陈林涛",
+    "duration_seconds": 231,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "capture_race"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-38.mp4"
+  },
+  {
+    "id": "chen-40",
+    "title": "有眼杀无眼",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=40",
+    "author": "棋士陈林涛",
+    "duration_seconds": 317,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "eye_vs_no_eye",
+      "capture_race"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-40.mp4"
+  },
+  {
+    "id": "chen-41",
+    "title": "延气",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=41",
+    "author": "棋士陈林涛",
+    "duration_seconds": 461,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "extend_liberties",
+      "capture_race"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-41.mp4"
+  },
+  {
+    "id": "chen-16",
+    "title": "滚打包收",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=16",
+    "author": "棋士陈林涛",
+    "duration_seconds": 215,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "squeeze"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-16.mp4"
+  },
+  {
+    "id": "chen-62",
+    "title": "第七章：手筋1.金鸡独立",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=62",
+    "author": "棋士陈林涛",
+    "duration_seconds": 405,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "golden_rooster"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-62.mp4"
+  },
+  {
+    "id": "chen-63",
+    "title": "2.老鼠偷油",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=63",
+    "author": "棋士陈林涛",
+    "duration_seconds": 383,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "rat_steals_oil"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-63.mp4"
+  },
+  {
+    "id": "chen-66",
+    "title": "5.大头鬼",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=66",
+    "author": "棋士陈林涛",
+    "duration_seconds": 504,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "big_head_ghost"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-66.mp4"
+  },
+  {
+    "id": "chen-67",
+    "title": "6.倒脱靴",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=67",
+    "author": "棋士陈林涛",
+    "duration_seconds": 296,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "under_the_stones"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开视频元数据、分集标题与时长已核对；未逐集观看；概念讲解，不是本书逐题解答；在原作者页面观看",
+    "playback_url": "/api/videos/chen-67.mp4"
+  },
+  {
+    "id": "chen-9",
+    "title": "抱吃",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=9",
+    "author": "棋士陈林涛",
+    "duration_seconds": 217,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "hug"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开分集、标题、作者与时长已核对；未逐集完整观看",
+    "playback_url": "/api/videos/chen-9.mp4"
+  },
+  {
+    "id": "peiqi-5",
+    "title": "入门系列之吃子技巧：抱吃",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=5",
+    "author": "佩棋教育",
+    "duration_seconds": 105,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "hug"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开分集、标题、作者与时长已核对；未逐集完整观看",
+    "playback_url": "/api/videos/peiqi-5.mp4"
+  },
+  {
+    "id": "peiqi-11",
+    "title": "入门系列之吃子技巧：挖吃",
+    "url": "https://www.bilibili.com/video/BV147411V7kj/?p=11",
+    "author": "佩棋教育",
+    "duration_seconds": 222,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "wedge"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开分集、标题、作者与时长已核对；未逐集完整观看",
+    "playback_url": "/api/videos/peiqi-11.mp4"
+  },
+  {
+    "id": "chen-74",
+    "title": "5.挖",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=74",
+    "author": "棋士陈林涛",
+    "duration_seconds": 284,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "wedge"
+    ],
+    "checked_at": "2026-09-12",
+    "verification": "原作者公开分集、标题、作者与时长已核对；未逐集完整观看",
+    "playback_url": "/api/videos/chen-74.mp4"
   }
 ]

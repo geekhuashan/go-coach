@@ -45,3 +45,5 @@ python3 scripts/import_gogameguru.py --download --self-test
 ```
 
 命令只在本机写入 `data/gogameguru/`；不会发布到 GitHub、登录家庭站点或上传照片。云题库发布由应用的独立发布流程完成，并继续携带来源、署名与许可字段。
+
+2026-09-12 更新：417 道激活的 Go Game Guru 题保持原样；原创重复精简后，内置可选总数为 492（32 个基础版本 + 43 道原创专项 + 417 道第三方题）。家庭书题另计。

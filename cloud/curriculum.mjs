@@ -1,8 +1,17 @@
+import curation from '../data/original-extra/curation.json' with {type:'json'};
 import {clone,group,play,key,boardFor,coord} from './rules.mjs';
+import {studyPath,studyScope} from './study-path.mjs';
 export const SKILLS={escape:'救棋与数气',capture:'打吃与提子',connect:'连接棋块',cut:'阻断直接连接',life:'死活与计算',tsumego:'死活与手筋'};
 // Only the original eight base families have interchangeable rotation variants.
-export function availableLesson(lesson){if(lesson.legacy||['escape','capture','connect'].includes(lesson.id))return false;const match=!lesson.sequence&&/^(escape|capture|connect|cut)-([12])-([1-8])$/.exec(lesson.id);return !match||Number(match[3])<=(match[2]==='1'?3:5);}
-export function publicLesson(lesson){const{objective,solutions,solution,tree,...visible}=lesson;return {...clone(visible),focus_bounds:focusBounds(lesson)};}
+export function availableLesson(lesson){if(Object.hasOwn(curation.retired,lesson.id))return false;if(lesson.legacy||['escape','capture','connect'].includes(lesson.id))return false;const match=!lesson.sequence&&/^(escape|capture|connect|cut)-([12])-([1-8])$/.exec(lesson.id);return !match||Number(match[3])<=(match[2]==='1'?3:5);}
+const availableCatalogs=new WeakMap();
+// Frozen arrays are Worker-owned immutable snapshots. Mutable callers continue
+// to be evaluated on every call so edits and tests cannot receive stale views.
+export function availableLessons(catalog){
+ if(!Object.isFrozen(catalog))return catalog.filter(availableLesson);
+ let available=availableCatalogs.get(catalog);if(!available){available=Object.freeze(catalog.filter(availableLesson));availableCatalogs.set(catalog,available);}return available;
+}
+export function publicLesson(lesson){const{objective,answer,solutions,solution,tree,study_path,...visible}=lesson,kind=objective?.kind,path=studyPath(lesson);return {...clone(visible),...(path?{study_path:path}:{}),...(kind==='select_stones'?{interaction:kind,selection_color:3-lesson.to_play}:kind==='choose_answer'?{interaction:kind}:{}),focus_bounds:focusBounds(lesson)};}
 export function validateLesson(value,{trustedAuthored=false}={}){
  const size=value?.size||9;if(![9,19].includes(size))throw new Error('题目棋盘需为9路或19路。');
  const fail=t=>{throw new Error('题目校验失败：'+t)};
@@ -10,31 +19,44 @@ export function validateLesson(value,{trustedAuthored=false}={}){
  const point=(v,label)=>{if(!Array.isArray(v)||v.length!==2||v.some(c=>!Number.isInteger(c)||c<0||c>=size))fail(label+'坐标超出棋盘。');return [...v]};
  if(!value||typeof value!=='object'||Array.isArray(value))fail('需要一个题目对象。');
  const id=text(value.id,'id',80);if(!/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(id))fail('id只支持字母数字和短横线下划线。');
- if(value.sequence!==true||!SKILLS[value.skill])fail('需要支持的连续题技能。');
+ const objective=value.objective||value.goal,kind=objective?.kind,selection=kind==='select_stones',choice=kind==='choose_answer',nonMove=selection||choice;
+ if(!SKILLS[value.skill]||(nonMove?(value.sequence!==false||(selection&&!['escape','tsumego'].includes(value.skill))):value.sequence!==true))fail('需要支持的连续题、选择棋子题或判断题技能。');
  if(!Number.isInteger(value.difficulty)||value.difficulty<1||value.difficulty>5)fail('难度需为1至5。');
  if(![1,2].includes(value.to_play))fail('先行方无效。');
- const out={id,title:text(value.title,'标题',160),prompt:text(value.prompt,'题目'),hint:text(value.hint,'提示'),skill:value.skill,difficulty:value.difficulty,to_play:value.to_play,sequence:true,size};
+ const out={id,title:text(value.title,'标题',160),prompt:text(value.prompt,'题目'),hint:text(value.hint,'提示'),skill:value.skill,difficulty:value.difficulty,to_play:value.to_play,sequence:!nonMove,size};
  if(value.concept!==undefined)out.concept=text(value.concept,'题型',80);
  if(!Array.isArray(value.stones)||value.stones.length<1||value.stones.length>size*size-1)fail('初始棋子数量无效。');
  const board=Array.from({length:size},()=>Array(size).fill(0));out.stones=[];
  for(const s of value.stones){const[x,y]=point([s?.x,s?.y],'棋子');if(![1,2].includes(s.color)||board[y][x])fail('初始棋子重复或颜色无效。');board[y][x]=s.color;out.stones.push({x,y,color:s.color});}
  for(const s of out.stones)if(!group(board,s.x,s.y).liberties.length)fail('初始棋块没有气。');
- const objective=value.objective||value.goal,kind=objective?.kind;
- if(!['capture','capture_any','authored_solution'].includes(kind))fail('目标类型无效。');
+ if(!['capture','capture_any','authored_solution','select_stones','choose_answer'].includes(kind))fail('目标类型无效。');
  const privateBook=value.source?.kind==='book'&&value.source?.usage==='household_private'&&value.source?.answer_verified===true;
+ if(nonMove&&!privateBook)fail('选择题仅接受已核对的家庭私用书题来源。');
  if(kind==='authored_solution'&&!trustedAuthored&&!(value.source?.kind==='licensed'&&value.source?.license&&value.source?.url)&&!privateBook)fail('作者答案题需要授权来源、许可和来源链接，或已核对的家庭私用书题来源。');
- if(kind==='authored_solution'&&privateBook)for(const name of ['title','page','problem']){const raw=value.source[name];text((name==='page'||name==='problem')&&Number.isInteger(raw)?String(raw):raw,'书题来源 '+name,600);}
- const targets=kind==='authored_solution'?[]:objective.targets;
- if(!Array.isArray(targets)|| (kind!=='authored_solution'&&(targets.length<1||targets.length>40)))fail('目标坐标无效。');
- const ps=targets.map(p=>point(p,'目标')),defender=3-out.to_play;
- if(new Set(ps.map(p=>p.join(','))).size!==ps.length||ps.some(([x,y])=>board[y][x]!==defender))fail('目标必须是初始对方棋子。');
+ if((kind==='authored_solution'||nonMove)&&privateBook)for(const name of ['title','page','problem']){const raw=value.source[name];text((name==='page'||name==='problem')&&Number.isInteger(raw)?String(raw):raw,'书题来源 '+name,600);}
+ const targets=kind==='authored_solution'||choice?[]:objective.targets;
+ if(!Array.isArray(targets)|| (kind!=='authored_solution'&&!choice&&(targets.length<1||targets.length>40)))fail('目标坐标无效。');
+ const ps=targets.map(p=>point(p,'目标')),defender=3-out.to_play,targetSet=new Set(ps.map(p=>p.join(',')));
+ if(targetSet.size!==ps.length||ps.some(([x,y])=>board[y][x]!==defender))fail('目标必须是初始对方棋子。');
  out.objective={kind,targets:ps};
+ if(choice){
+  if(!Array.isArray(value.choices)||value.choices.length<2||value.choices.length>8)fail('选项需为2至8项。');
+  const ids=new Set(),labels=new Set();out.choices=value.choices.map(item=>{
+   const id=text(item?.id,'选项id',32),label=text(item?.label,'选项文字',80);
+   if(!/^[A-Za-z0-9_-]+$/.test(id)||ids.has(id)||labels.has(label))fail('选项id或文字重复，或id格式无效。');
+   ids.add(id);labels.add(label);return {id,label};
+  });
+  if(typeof objective.answer!=='string'||!ids.has(objective.answer))fail('正确答案必须是已有选项的字符串id。');
+  out.objective={kind,answer:objective.answer};
+ }
  const source=value.source||{kind:'manual'};if(!['original','book','manual','licensed'].includes(source.kind))fail('来源类型无效。');
  out.source={kind:source.kind};for(const name of ['title','page','problem','note',...(source.kind==='licensed'?['url','license','attribution','author','commit','original_prompt']:[])])if(source[name]!==undefined)out.source[name]=text(String(source[name]),'来源',1200,false);
  if(privateBook)Object.assign(out.source,{usage:'household_private',answer_verified:true});
  out.marks=[];if(value.marks!==undefined&&!Array.isArray(value.marks))fail('标记需为列表。');
  for(const m of value.marks||[]){if(out.marks.length>=40)fail('标记过多。');const[x,y]=point([m.x,m.y],'标记');out.marks.push({x,y,label:text(m.label,'标记文字',16)});}
- let count=0;const active=new Set(),targetSet=new Set(ps.map(p=>p.join(',')));
+ if(choice){if(value.tree!==undefined&&value.tree!==null)fail('判断题不使用落子答案树。');return out;}
+ if(selection){if(out.marks.some(mark=>board[mark.y][mark.x]!==out.to_play||mark.label!=='▲'))fail('选择棋子题只能在先手方棋子上预显示题干▲标记。');if(value.tree!==undefined&&value.tree!==null)fail('选择棋子题不使用落子答案树。');return out;}
+ let count=0;const active=new Set();
  function visit(node,before,seen,removed,depth){
   if(!node||typeof node!=='object'||active.has(node)||++count>2000||depth>31)fail('答案树过大、过深或存在循环。');active.add(node);
   const clean={},captured=new Set(removed);let after=before;
@@ -71,7 +93,14 @@ export function learning(catalog,evidence,attemptsCount=0){
 }
 const CONCEPT_NAMES={double_atari:'双打吃',ladder:'征吃',snapback:'倒扑',connection_trap:'接不归',edge_chase:'边线追吃',capture_race:'对杀',atari:'打吃',net:'枷吃',gate:'门吃',hug:'抱吃',wedge:'挖吃'};
 const CONCEPT_SEQUENCE={double_atari:10,ladder:20,net:30,gate:40,edge_chase:50,snapback:60,connection_trap:70,hug:80,wedge:90,atari:100};
-export function recommend(catalog,evidence,stats,recent=[],currentId=null){
+export function recommend(catalog,evidence,stats,recent=[],currentId=null,completedIds=[]){
+ const scope=studyScope(availableLessons(catalog),currentId,completedIds);
+ if(scope){
+  const pool=scope.lessons.filter(l=>!scope.completed.has(l.id)),index=scope.lessons.findIndex(l=>l.id===currentId);
+  const lesson=(index>=0?scope.lessons.slice(index+1).find(l=>!scope.completed.has(l.id)):null)||pool[0];
+  if(!lesson)return null;
+  return {...publicLesson(lesson),reason:scope.explicit_extra?'继续当前自选的拓展题集。':`按《${scope.path.title}》原书题号继续练习。`,adjustment:{kind:scope.explicit_extra?'study_extra':'study_path',skill:lesson.skill,concept:lesson.concept||null,group:scope.path.title,streak:0,window:30}};
+ }
  const byId=new Map(catalog.map(l=>[l.id,l])),groupKey=l=>l.concept?`concept:${l.skill}:${l.concept}`:`skill:${l.skill}`;
  const valid=recent.filter(a=>byId.has(a.lesson_id)&&typeof a.correct==='boolean').slice(0,30),seen=new Set(evidence.map(a=>a.lesson_id)),groups=[];
  for(const l of catalog.filter(availableLesson)){const id=groupKey(l);if(!groups.some(g=>g.id===id))groups.push({id,skill:l.skill,name:CONCEPT_NAMES[l.concept]||l.concept||SKILLS[l.skill],lessons:[],records:[]});groups.find(g=>g.id===id).lessons.push(l);}
@@ -91,13 +120,25 @@ export function recommend(catalog,evidence,stats,recent=[],currentId=null){
 
 export function focusBounds(lesson){const size=lesson.size||9,points=(lesson.stones||[]).map(p=>Array.isArray(p)?p:[p.x,p.y]);function walk(n){if(n?.move)points.push(n.move);for(const c of n?.children||[])walk(c);}walk(lesson.tree);const valid=points.filter(p=>p.length>=2&&p.every(Number.isInteger)&&p[0]>=0&&p[1]>=0&&p[0]<size&&p[1]<size);return valid.length?{min_x:Math.min(...valid.map(p=>p[0])),min_y:Math.min(...valid.map(p=>p[1])),max_x:Math.max(...valid.map(p=>p[0])),max_y:Math.max(...valid.map(p=>p[1]))}:null;}
 const LICENSED_CHAPTERS={3:'基础',4:'进阶',5:'挑战'};
-export function sequentialCollection(lesson){const source=lesson?.source||{};return ['book','licensed'].includes(source.kind)&&source.title?[source.kind,source.title]:null;}
+export function sequentialCollection(lesson){const path=studyPath(lesson);if(path?.role==='main')return ['book',path.title];const source=lesson?.source||{};return ['book','licensed'].includes(source.kind)&&source.title?[source.kind,source.title]:null;}
 export function sequentialChapter(lesson){if(!lesson)return null;if(lesson.concept)return lesson.concept;if(lesson.source?.kind==='licensed')return LICENSED_CHAPTERS[lesson.difficulty]||'练习';return null;}
 export function sequentialProblemNumber(lesson){const values=String(lesson?.source?.problem||'').match(/\d+/g)||String(lesson?.id||'').match(/\d+/g);return values?Number(values.at(-1)):Infinity;}
 function sameCollection(a,b){return !!a&&!!b&&a[0]===b[0]&&a[1]===b[1];}
+const lessonIdCollator=new Intl.Collator(undefined,{numeric:true});
 export function practice(ctx,currentId=null,mode=ctx.runs?._practice_mode||'recommended',advance=false){
+ if(mode!=='review'){
+  const scope=studyScope(availableLessons(ctx.catalog),currentId,ctx.completed||[]);
+  if(scope){
+   const current=ctx.catalog.find(l=>l.id===currentId),currentPath=studyPath(current),path=scope.path?.id===currentPath?.id?currentPath:scope.path||(currentPath?.role==='main'?currentPath:null);
+   const catalog=scope.path?scope.lessons:scope.main.filter(l=>studyPath(l).id===path?.id),completed=scope.completed,pool=catalog.filter(l=>!completed.has(l.id)),index=catalog.findIndex(l=>l.id===currentId);
+   const next=(advance&&index>=0?catalog.slice(index+1).find(l=>!completed.has(l.id)):null)||pool[0],nextPath=studyPath(next);
+   const review=new Set([...(ctx.helped||[]),...(ctx.evidence||[]).filter(a=>a.correct===false).map(a=>a.lesson_id)]);
+   return {mode,study_path:path,path_title:scope.explicit_extra?'自选拓展':'三书主线',book_title:path?.title||null,chapter:path?.chapter||null,book_complete:pool.length===0,main_path_complete:scope.main.every(l=>completed.has(l.id)),next_book_title:nextPath&&nextPath.id!==currentPath?.id?nextPath.title:null,total:catalog.length,completed:catalog.filter(l=>completed.has(l.id)).length,remaining:pool.length,current_index:index<0?null:index+1,next_index:next?catalog.indexOf(next)+1:null,review_count:pool.filter(l=>review.has(l.id)).length,next_id:next?.id||null};
+  }
+ }
  const current=ctx.catalog.find(l=>l.id===currentId),collection=mode==='sequential'?sequentialCollection(current):null;
- let ordered=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?a.id.localeCompare(b.id,undefined,{numeric:true}):ctx.catalog.indexOf(a)-ctx.catalog.indexOf(b));
+ const catalogIndex=new Map(ctx.catalog.map((l,i)=>[l,i]));
+ let ordered=ctx.catalog.filter(l=>!l.legacy).sort((a,b)=>a.id.replace(/\d+$/,'')===b.id.replace(/\d+$/,'')?lessonIdCollator.compare(a.id,b.id):catalogIndex.get(a)-catalogIndex.get(b));
  if(mode==='sequential'){
   if(collection){ordered=ordered.filter(l=>sameCollection(sequentialCollection(l),collection));ordered.sort((a,b)=>(collection[0]==='licensed'?(a.difficulty-b.difficulty)||0:0)||sequentialProblemNumber(a)-sequentialProblemNumber(b)||a.id.localeCompare(b.id));}
   else {ordered=ordered.filter(l=>!sequentialCollection(l));const index=new Map(ordered.map((l,i)=>[l.id,i]));ordered.sort((a,b)=>{const ac=a.concept?1:0,bc=b.concept?1:0;if(ac!==bc)return ac-bc;if(!ac)return (index.get(a.id)-index.get(b.id));return (CONCEPT_SEQUENCE[a.concept]??99)-(CONCEPT_SEQUENCE[b.concept]??99)||(a.difficulty-b.difficulty)||(index.get(a.id)-index.get(b.id));});}

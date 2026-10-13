@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Fill each capture concept to at least 10 original lessons."""
+"""Retired: remote filler stones do not create a new reading exercise."""
+raise SystemExit("已停用凑题生成器：请在 diverse.json 收录真正不同的局面，并验证所有答案分支。")
 import json
 import sys
 from collections import defaultdict

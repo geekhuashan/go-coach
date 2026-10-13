@@ -51,6 +51,20 @@ class AuthoredTacticsTests(unittest.TestCase):
     def test_capture_still_requires_actual_capture(self):
         value=self.lesson();value['skill']='capture';value['objective']={'kind':'capture','targets':[[18,18]]}
         with self.assertRaises(ValueError):tactics.validate_lesson(value)
+    def test_private_book_selection_targets_are_sanitized_without_tree(self):
+        value=dict(id='book-selection',title='选择白子',prompt='找出需要逃跑的白子。',hint='先数每块白棋的气。',size=9,
+                   to_play=1,skill='escape',difficulty=1,sequence=False,
+                   stones=[dict(x=1,y=1,color=1),dict(x=2,y=1,color=2),dict(x=3,y=1,color=2)],marks=[],
+                   objective=dict(kind='select_stones',targets=[[2,1]]),
+                   source=dict(kind='book',usage='household_private',answer_verified=True,title='手筋书',page='71',problem='385'))
+        clean=tactics.validate_lesson(value)
+        self.assertFalse(clean['sequence']);self.assertEqual(clean['objective'],value['objective']);self.assertNotIn('tree',clean)
+        for change in ('source','marks','tree'):
+            bad=deepcopy(value)
+            if change=='source':bad['source']['answer_verified']=False
+            elif change=='marks':bad['marks']=[{'x':2,'y':1,'label':'△'}]
+            else:bad['tree']={'children':[]}
+            with self.subTest(change=change),self.assertRaises(ValueError):tactics.validate_lesson(bad)
     def test_all_417_data_lessons_validate_preserving_attribution(self):
         path=Path(__file__).parent/'data'/'gogameguru'/'lessons.json'
         lessons=json.loads(path.read_text())

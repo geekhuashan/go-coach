@@ -13,6 +13,7 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from go_rules import group, key, play
 import curriculum
+from study_path import study_path, study_progress
 
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = Path(os.environ.get('GO_COACH_DATA_DIR',str(ROOT / '.local')))
@@ -25,7 +26,11 @@ def now():
     return datetime.now(timezone.utc).isoformat()
 
 def lesson_public(lesson):
-    out={k:copy.deepcopy(v) for k,v in lesson.items() if k not in ('objective','solutions','solution','tree')}
+    out={k:copy.deepcopy(v) for k,v in lesson.items() if k not in ('objective','answer','solutions','solution','tree','study_path')}
+    path=study_path(lesson)
+    if path: out['study_path']=path
+    if (lesson.get('objective') or {}).get('kind')=='select_stones':
+        out.update(interaction='select_stones',selection_color=3-lesson.get('to_play',1))
     points=[(p['x'],p['y']) if isinstance(p,dict) else tuple(p[:2]) for p in lesson.get('stones',[])]
     def walk(node):
         if node.get('move'): points.append(tuple(node['move']))
@@ -45,6 +50,10 @@ def practice_progress(profile,current_id=None,advance=False):
     for l in catalog: group_start.setdefault(re.sub(r'\d+$','',l['id']),ids_order[l['id']])
     catalog.sort(key=lambda l:(group_start[re.sub(r'\d+$','',l['id'])],int(re.search(r'\d+$',l['id']).group()) if re.search(r'\d+$',l['id']) else 0))
     mode=profile.get('practice_mode','recommended')
+    completed={a['lesson_id'] for a in profile['attempts'] if a.get('correct') is True}
+    review=set(profile.get('helped_lesson_ids',[]))|{a['lesson_id'] for a in profile['attempts'] if a.get('correct') is False}
+    progress=study_progress([l for l in catalog if curriculum.available_lesson(l)],current_id,completed,review,mode,advance)
+    if progress is not None: return progress
     current=next((l for l in catalog if l['id']==current_id),None)
     collection=curriculum.sequential_collection(current) if mode=='sequential' else None
     if mode=='sequential':
@@ -92,6 +101,8 @@ def lesson_state(identity, revision):
     s['initial_board']=copy.deepcopy(s['board'])
     if lesson.get('sequence'):
         s['lesson_progress']={'status':'playing','ply':0,'message':'连续计算题：你落子后，对手会按收录变化自动应手。'}
+    elif (lesson.get('objective') or {}).get('kind')=='select_stones':
+        s['lesson_progress']={'status':'selecting','ply':0,'message':'点选符合题意的白子，再提交答案。'}
     return s
 
 
@@ -139,7 +150,7 @@ def load_store():
 
 def lesson_playout_active(s):
     lesson=s.get('lesson') or {}
-    if s.get('mode')!='lesson' or not lesson or not s.get('lesson_attempted'):
+    if s.get('mode')!='lesson' or not lesson or not s.get('lesson_attempted') or (lesson.get('objective') or {}).get('kind')=='select_stones':
         return False
     status=(s.get('lesson_progress') or {}).get('status')
     valid=status in ('unlisted','failed','exploring','ended') if lesson.get('sequence') else lesson.get('id')=='custom' or (s.get('assessment') or {}).get('correct') is False or status in ('exploring','ended')
@@ -237,7 +248,7 @@ def public_store(store):
     out=public(active_state(store))
     out.update(profile={'id':profile['id'],'name':profile['name']},profiles=[{'id':p['id'],'name':p['name']} for p in store['profiles'].values()],learning=curriculum.learning(profile['attempts']),recent_attempts=copy.deepcopy(profile['attempts'][-10:][::-1]))
     suggested=curriculum.recommend(profile['attempts'],(out.get('lesson') or {}).get('id'))
-    out['learning']['recommendation']={k:suggested[k] for k in ('id','title','skill','difficulty','reason','adjustment','concept') if k in suggested}
+    out['learning']['recommendation']={k:suggested[k] for k in ('id','title','skill','difficulty','reason','adjustment','concept','study_path') if k in suggested} if suggested else None
     current_key=context_key(out)
     out['context_key']=current_key
     out['llm_explanation']=next((copy.deepcopy(e) for e in reversed(profile.get('llm_explanations',[])) if e.get('context_key')==current_key),None)
@@ -278,11 +289,11 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
                 profile['practice_mode']=action['mode']
             if profile.get('practice_mode','recommended')=='recommended':
                 choice=curriculum.recommend(profile['attempts'],(s.get('lesson') or {}).get('id'))
-                identity=choice if isinstance(choice,str) else choice.get('id',choice.get('lesson_id'))
+                identity=choice if isinstance(choice,str) else (choice or {}).get('id',(choice or {}).get('lesson_id'))
             else: identity=practice_progress(profile,(s.get('lesson') or {}).get('id'),kind=='next_lesson')['next_id']
             if not identity:
                 progress=practice_progress(profile,(s.get('lesson') or {}).get('id'))
-                s['message']='当前没有待复习的题目。' if profile.get('practice_mode')=='review' else f'《{progress["book_title"]}》已导入的题目全部完成。' if progress.get('book_title') else '本轮题目已全部通关。'
+                s['message']='当前没有待复习的题目。' if profile.get('practice_mode')=='review' else '三书主线已完成，可自选配套巩固或拓展题。' if progress.get('main_path_complete') and (progress.get('study_path') or {}).get('role')!='extra' else f'《{progress["book_title"]}》已导入的题目全部完成。' if progress.get('book_title') else '本轮题目已全部通关。'
                 store['revision']+=1
                 active_state(store)
                 return store
@@ -334,7 +345,7 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
             if not review and kind=='review_move':
                 try:review=lesson_review.engine_review(before,reviewer(before)) if reviewer else lesson_review.unavailable_review(before)
                 except Exception:review=lesson_review.unavailable_review(before)
-            if not review:review=lesson_review.unavailable_review(before)
+            if not review:review=lesson_review.deferred_review(before)
             lesson_review.set_review(s,review);s['assisted']=True;did_review=True
             if lesson_id not in helped:helped.append(lesson_id)
         if lesson_id and (kind in ('hint','demo','solution') or kind=='inspect' and s.get('inspection',{}).get('stones') or kind=='undo' and (s.get('lesson') or {}).get('sequence') or (s.get('lesson_progress') or {}).get('status')=='unlisted'):
@@ -350,11 +361,11 @@ def apply_store(store,action,ai_choice=None,reviewer=None):
             notes.append(note)
         profile['notes']=notes
         s['feedback']=copy.deepcopy(notes)
-        if (kind=='play' or (kind=='review_move' and did_review)) and (not was_lesson_playout or did_review) and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
+        if (kind in ('play','submit_selection') or (kind=='review_move' and did_review)) and (not was_lesson_playout or did_review) and s.get('assessment') and s.get('lesson') and s['lesson'].get('id')!='custom':
             lesson=s['lesson'];assessment=s['assessment']
             if isinstance(assessment.get('correct'),bool):
                 count=sum(a['lesson_id']==lesson['id'] for a in profile['attempts'])+1
-                event=dict(created_at=now(),profile_id=profile['id'],lesson_id=lesson['id'],title=lesson['title'],skill=lesson['skill'],difficulty=lesson['difficulty'],correct=assessment['correct'],assisted=s.get('assisted',False),attempt_no=count,move=copy.deepcopy(s['moves'][-1]),summary=assessment.get('summary',''))
+                event=dict(created_at=now(),profile_id=profile['id'],lesson_id=lesson['id'],title=lesson['title'],skill=lesson['skill'],difficulty=lesson['difficulty'],correct=assessment['correct'],assisted=s.get('assisted',False),attempt_no=count,move=copy.deepcopy(s['moves'][-1]) if kind=='play' else None,summary=assessment.get('summary',''))
                 profile['attempts'].append(event)
     if kind not in ('switch_profile','add_profile'):
         save_match(store,store['profiles'][store['active_profile_id']]['state'])
@@ -481,12 +492,41 @@ def apply(s,a):
             s['last_human_assessment']=copy.deepcopy(s['assessment']);s['marks']=copy.deepcopy(s['assessment'].get('marks',[]))
             s['lesson_progress']={'status':'exploring','ply':len(s['moves']),'message':'已保留这手，KataGo 正在根据当前局面应对。'}
             s['message']=s['assessment'].get('summary','')+' '+s['assessment'].get('explanation','')
+        elif ((s.get('lesson') or {}).get('objective') or {}).get('kind')=='select_stones':
+            raise ValueError('请点选白子并提交答案，不要在棋盘上落子。')
         elif (s.get('lesson') or {}).get('sequence'):
             sequence_play(s,a.get('x'),a.get('y'))
         else: move(s,a.get('x'),a.get('y'))
     elif t=='review_move':
         import lesson_review
         lesson_review.review_position(s)
+    elif t=='submit_selection':
+        lesson=s.get('lesson') or {}
+        if s.get('mode')!='lesson' or (lesson.get('objective') or {}).get('kind')!='select_stones' or s.get('demo_active'):
+            raise ValueError('当前不是选择棋子题。')
+        if s.get('lesson_attempted'):
+            raise ValueError('本题已作答，请重练或选择下一题。')
+        points=a.get('points')
+        if not isinstance(points,list) or not 1<=len(points)<=s['size']*s['size']:
+            raise ValueError('请至少选择一颗棋子。')
+        selected=[]
+        for point in points:
+            if not isinstance(point,(list,tuple)) or len(point)!=2 or any(type(v)is not int or not 0<=v<s['size'] for v in point):
+                raise ValueError('选择坐标无效。')
+            selected.append(list(point))
+        ids={tuple(p) for p in selected}
+        if len(ids)!=len(selected):
+            raise ValueError('不能重复选择同一颗棋子。')
+        targets={tuple(p) for p in lesson['objective']['targets']}
+        correct=ids==targets
+        summary='选择正确，所有目标白子都找到了。' if correct else '这次有遗漏或选多了，再对照每块白棋的气。'
+        explanation='这些白棋正是题目要求标记的目标。' if correct else '本次只标出你已选择的位置；重练后可以重新判断。'
+        s['lesson_attempted']=True
+        answer_marks=[{'x':x,'y':y,'label':'△' if correct else '已选'} for x,y in selected]
+        s['assessment']={'correct':correct,'summary':summary,'explanation':explanation,'marks':answer_marks,'skill':lesson['skill'],'difficulty':lesson['difficulty']}
+        s['marks']=copy.deepcopy(lesson.get('marks',[]))+copy.deepcopy(answer_marks)
+        s['lesson_progress']={'status':'solved' if correct else 'failed','ply':0,'message':summary}
+        s['message']=summary+' '+explanation
     elif t=='ai_move':
         if s['demo_active'] or (s['mode']=='lesson' and not s.get('lesson_playout')): raise ValueError('请在自由对弈中使用电脑应手。')
         try:
@@ -681,6 +721,13 @@ class Handler(SimpleHTTPRequestHandler):
             with LOCK: return self.respond(200,[lesson_public(l) for l in curriculum.catalog() if curriculum.available_lesson(l)])
         if route=='/api/profiles':
             with LOCK: return self.respond(200,public_store(STORE)['profiles'])
+        if route=='/api/match-patterns':
+            with LOCK:
+                identity=parse_qs(urlparse(self.path).query).get('match_id',[STATE.get('match_id')])[0]
+                record=STORE.get('matches',{}).get(identity)
+                if not record or STORE['active_profile_id'] not in participants(record):return self.respond(404,{'error':'对局不存在。'})
+                snapshot={k:copy.deepcopy(record['state'].get(k)) for k in ('size','mode','match','match_id','initial_board','initial_player','moves')}
+                return self.respond(200,{'state':snapshot,'profile_id':STORE['active_profile_id']})
         if route=='/api/matches':
             with LOCK:return self.respond(200,copy.deepcopy(match_list(STORE,STORE['active_profile_id'])))
         if route=='/api/history':

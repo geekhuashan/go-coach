@@ -35,3 +35,13 @@
 | 15 | 接不归：两子竖块接上也无路 | `connection_trap` | 3 | 2 |
 | 16 | 接不归：三子弯块越接越重 | `connection_trap` | 3 | 2 |
 | 17 | 短征吃：三子弯块连续转向 | `ladder` | 5 | 1 |
+
+## 2026-09-12：按战术核心精简
+
+用户反馈后，复核发现 `fill_to_ten.py` 在远处添加无关黑子，虽能通过全盘去重，却没有改变解题过程。该凑题生成器已停用。`curation.json` 列出 77 个不再出现在选题、推荐和错题复习中的重复题号及保留代表；原始题目、答案树和旧成绩全部保留，历史题仍可读取。此名单只针对已审阅的原创题，不自动修改家庭书题或授权题。
+
+现有 118 道原创连续题按目标、答案经过点及其相邻限制子归一，并比较旋转、镜像和平移，保留 41 个战术核心。再新增 `diverse.json` 的 2 道不同局面，共 43 道原创连续题；全站内置可选题由 567 题精简至 492 题（含 32 道基础题和 417 道授权题）。枷吃 3 道、门吃 5 道、一线追吃 8 道、倒扑 6 道、接不归 4 道。不再为每类凑够 10 题。
+
+新增 `original-diverse-edge-turn` 为 5 手一线追吃，需要途中改从内侧紧气；`original-diverse-snapback-center` 为中央两点空位倒扑，保留两端都正确的 2 条分支。重建命令 `python3 data/original-extra/diversify.py`，之后 `python3 scripts/build_cloud_catalog.py`。新增题保持原创来源和原有“只验证收录分支，不声称唯一最佳或穷尽防守”的边界。
+
+验证：`python3 -m unittest test_curriculum_diversity test_practice_modes test_curriculum test_curriculum_v3 -q`，以及 `node --test cloud/tests/curriculum-diversity.test.mjs cloud/tests/core.test.mjs`。检查保留题战术核心不重复、所有分支在本地和云端均合法并完成提子、77 个旧 ID 原局面原答案不变且旧成绩仍能识别。

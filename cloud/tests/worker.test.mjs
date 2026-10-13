@@ -52,7 +52,7 @@ test('migration writes records atomically and refuses nonempty cloud overwrite',
 test('a stale tab cannot write into the profile selected by another tab',async()=>{
  const {request}=await session();const original=(await request('/api/state')).body;
  const changed=await request('/api/action','POST',{type:'switch_profile',profile_id:'child',revision:original.revision});assert.equal(changed.status,200);
- for(const path of ['/api/action','/api/llm/explain']){const result=await request(path,'POST',{type:'feedback',text:'belongs to parent',expected_profile_id:'parent',revision:original.revision},'go_profile=child');assert.equal(result.status,409);}
+ for(const path of ['/api/action','/api/llm/explain']){const result=await request(path,'POST',{type:'feedback',trigger:'manual',text:'belongs to parent',expected_profile_id:'parent',revision:original.revision},'go_profile=child');assert.equal(result.status,409);}
  assert.equal((await request('/api/history','GET',undefined,'go_profile=child')).body.notes.length,0);
 });
 test('migration includes shared matches and compact history without SQL partial writes',async()=>{
@@ -82,7 +82,7 @@ test('an off-answer sequence replies first and only reviews on explicit request'
  const {request,env}=await session();Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let s=(await request('/api/state')).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-01',revision:s.revision})).body;const calls=[];
  t.mock.method(globalThis,'fetch',async(url,init)=>{const path=new URL(url).pathname,payload=JSON.parse(init.body).state;calls.push(path);if(path==='/move')return new Response(JSON.stringify(legalPoint(payload)));const coords='ABCDEFGHJKLMNOPQRSTUVWXYZ',item=point=>{const move=coords[point.x]+(payload.size-point.y);return {move,rootInfo:{scoreLead:1,visits:64},moves:[{move,pv:[move]}],ownership:Array(payload.size*payload.size).fill(0)};};return new Response(JSON.stringify({revision:payload.revision,perspective:'black',candidate:item(payload.review.candidate),reference:item(payload.review.reference)}));});
- s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.deepEqual(calls,[]);assert.equal(s.assessment.review.source,'unavailable');assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);
+ s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;assert.deepEqual(calls,[]);assert.equal(s.assessment.review.source,'deferred');assert.equal(s.assessment.correct,null);assert.equal(s.recent_attempts.length,0);assert.equal(s.rating.practice_xp,0);assert.equal(s.lesson_playout,true);assert.equal(s.computer_turn,true);
  s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/move']);assert.equal(s.computer_turn,false);
  s=(await request('/api/action','POST',{type:'play',...legalPoint(s),revision:s.revision})).body;assert.deepEqual(calls,['/move']);assert.equal(s.computer_turn,true);
  s=(await request('/api/action','POST',{type:'ai_move',revision:s.revision})).body;assert.deepEqual(calls,['/move','/move']);assert.equal(s.recent_attempts.length,0);
@@ -116,7 +116,7 @@ test('practice preference persists per profile, assisted completion clears revie
  await act({type:'next_lesson'});assert.ok(s.practice_progress.current_index>first);assert.equal((await request('/api/state')).body.practice_mode,'sequential');assert.equal((await request('/api/state','GET',undefined,'go_profile=child')).body.practice_mode,'recommended');
 });
 test('fresh profiles start in visible first variant while hidden historical lessons remain readable',async()=>{
- const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.lesson.id,'escape-1-1');assert.equal((await request('/api/lessons')).body.length,567);
+ const {request}=await session();let s=(await request('/api/state')).body;assert.equal(s.lesson.id,'escape-1-1');assert.equal((await request('/api/lessons')).body.length,492);
  s=(await request('/api/action','POST',{type:'practice_mode',mode:'sequential',revision:s.revision})).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'escape-1-8',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-1-8');
  s=(await request('/api/action','POST',{type:'next_lesson',revision:s.revision})).body;assert.equal(s.lesson.id,'escape-2-1');
@@ -135,7 +135,8 @@ test('unlisted move survives an outage, retries compute evidence, and stale revi
  const {request,env}=await session();let s=(await request('/api/state')).body;
  s=(await request('/api/action','POST',{type:'lesson',id:'ggg-easy-01',revision:s.revision})).body;
  let r=await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision});assert.equal(r.status,200);s=r.body;
- assert.equal(s.board[0][0],1);assert.equal(s.assessment.review.source,'unavailable');assert.equal(s.recent_attempts.length,0);
+ assert.equal(s.board[0][0],1);assert.equal(s.assessment.review.source,'deferred');assert.equal(s.recent_attempts.length,0);
+ r=await request('/api/action','POST',{type:'review_move',revision:s.revision});assert.equal(r.status,200);s=r.body;assert.equal(s.assessment.review.source,'unavailable');assert.equal(s.assessment.correct,null);assert.equal(s.recent_attempts.length,0);assert.equal(s.rating.practice_xp,0);assert.equal(s.board[0][0],1);assert.equal(s.computer_turn,true);
  Object.assign(env,{ENGINE_URL:'https://engine.example',ENGINE_TOKEN:'unit-only'});let stale=false;
  t.mock.method(globalThis,'fetch',async(url,init)=>{
   assert.equal(String(url),'https://engine.example/review');const p=JSON.parse(init.body).state;assert.equal(p.board[0][0],0);assert.equal(p.moves.length,0);assert.equal(p.lesson,undefined);assert.ok(p.review);
@@ -167,4 +168,50 @@ test('private book batch import is atomic, scoped and leaves current practice un
  assert.equal(response.status,200);assert.equal((await response.json()).some(l=>l.id==='private-1'),false);
  assert.equal((await request('/api/lessons/import','POST',{revision:before.revision,lessons:[book('stale')]})).status,409);
  assert.equal(env.DB.db.prepare('SELECT COUNT(*) AS n FROM lessons').get().n,2);
+});
+
+test('moving to another lesson while AI is calculating wins; old AI cannot overwrite it',async t=>{
+ const {request,env}=await session();env.ENGINE_URL='https://engine.example';env.ENGINE_TOKEN='unit-only';let s=(await request('/api/state')).body;
+ s=(await request('/api/action','POST',{type:'play',x:0,y:0,revision:s.revision})).body;
+ let reply;const started=new Promise(resolve=>t.mock.method(globalThis,'fetch',()=>new Promise(r=>{reply=r;resolve();})));
+ const ai=request('/api/action','POST',{type:'ai_move',revision:s.revision});await started;
+ const next=await request('/api/action','POST',{type:'lesson',id:'capture-1-1',revision:s.revision});assert.equal(next.status,200);
+ reply(new Response(JSON.stringify({x:1,y:0})));assert.equal((await ai).status,409);
+ const final=(await request('/api/state')).body;assert.equal(final.lesson.id,'capture-1-1');assert.equal(final.move_number,0);
+});
+test('historical pattern input is participant-only and contains no answers, scores or writes',async()=>{
+ const {request,env}=await session();let s=(await request('/api/state')).body;
+ s=(await request('/api/action','POST',{type:'new',match_mode:'human_ai',human_color:1,revision:s.revision})).body;
+ const id=s.match.id,revision=s.revision;
+ const result=await request('/api/match-patterns?match_id='+id);assert.equal(result.status,200);assert.equal(result.body.profile_id,'parent');
+ assert.deepEqual(Object.keys(result.body.state).sort(),['initial_board','initial_player','match','match_id','mode','moves','size']);
+ assert.equal((await request('/api/match-patterns?match_id='+id,'GET',undefined,'go_profile=child')).status,404);
+ assert.equal((await request('/api/state')).body.revision,revision);
+ assert.equal((await worker.fetch(new Request('https://go.example/api/match-patterns?match_id='+id),env)).status,401);
+});
+test('catalog cache sees same-size imports updated elsewhere and keeps households isolated',async()=>{
+ const {request,env}=await session();await request('/api/state');const value={...lessons.find(l=>l.id==='capture-1-1'),id:'cached-test',title:'before'};
+ env.DB.db.prepare('INSERT INTO lessons(household_id,id,lesson_json) VALUES(?,?,?)').run('test-home',value.id,JSON.stringify(value));
+ assert.equal((await request('/api/lessons')).body.find(l=>l.id===value.id).title,'before');
+ value.title='after';env.DB.db.prepare('UPDATE lessons SET lesson_json=? WHERE household_id=? AND id=?').run(JSON.stringify(value),'test-home',value.id);
+ assert.equal((await request('/api/lessons')).body.find(l=>l.id===value.id).title,'after');
+ const other=await session();assert.equal((await other.request('/api/lessons')).body.some(l=>l.id===value.id),false);
+});
+test('choice-answer import, redaction, exact grading, retries and first-attempt XP use the existing worker contract',async()=>{
+ const {env,request}=await session();let state=(await request('/api/state')).body;
+ const make=(id,answer='0')=>({id,title:'判断测试',prompt:'选择一个答案。',hint:'观察棋形。',size:9,skill:'life',sequence:false,difficulty:1,to_play:1,stones:[{x:3,y:3,color:1}],choices:[{id:'0',label:'0'},{id:'1',label:'1'},{id:'2',label:'2'},{id:'3',label:'3'}],objective:{kind:'choose_answer',answer},source:{kind:'book',usage:'household_private',answer_verified:true,title:'合成书',page:'1',problem:id}});
+ const imported=await request('/api/lessons/import','POST',{revision:state.revision,lessons:[make('choice-first'),make('choice-retry'),make('choice-assisted')]});assert.equal(imported.status,200);assert.equal(imported.body.imported,3);
+ const catalog=(await request('/api/lessons')).body,visible=catalog.find(l=>l.id==='choice-first');assert.equal(visible.interaction,'choose_answer');assert.deepEqual(visible.choices,make('choice-first').choices);assert.equal(visible.objective,undefined);assert.equal(visible.answer,undefined);
+ async function action(type,extra={}){state=(await request('/api/state')).body;return request('/api/action','POST',{revision:state.revision,type,...extra});}
+ let result=await action('lesson',{id:'choice-first'});state=result.body;const board=state.board,initialXp=state.rating.practice_xp;assert.equal(state.lesson.objective,undefined);assert.equal(state.lesson.answer,undefined);
+ const count=()=>Number(env.DB.db.prepare('SELECT count(*) AS n FROM attempts').get().n);
+ result=await action('submit_answer',{answer:0});assert.equal(result.status,400);assert.equal(count(),0);
+ result=await action('submit_answer',{answer:'0'});assert.equal(result.status,200);assert.equal(result.body.assessment.correct,true);assert.equal(result.body.rating.practice_xp,initialXp+10);assert.deepEqual(result.body.board,board);assert.equal(result.body.move_number,0);assert.equal(count(),1);
+ result=await action('submit_answer',{answer:'0'});assert.equal(result.status,400);assert.equal(count(),1);
+ await action('retry');result=await action('submit_answer',{answer:'0'});assert.equal(result.body.rating.practice_xp,initialXp+10);assert.equal(count(),2);
+ await action('lesson',{id:'choice-retry'});result=await action('submit_answer',{answer:'3'});assert.equal(result.body.assessment.correct,false);assert.equal(result.body.demo_answer,undefined);assert.equal(result.body.lesson.objective,undefined);assert.equal(result.body.lesson_playout,false);
+ await action('retry');result=await action('submit_answer',{answer:'0'});assert.equal(result.body.rating.practice_xp,initialXp+10);
+ await action('lesson',{id:'choice-assisted'});result=await action('solution');assert.equal(result.body.demo_answer.label,'0');assert.equal(result.body.assisted,true);assert.equal(result.body.move_number,0);
+ await action('restore_demo');result=await action('submit_answer',{answer:'0'});assert.equal(result.body.rating.practice_xp,initialXp+10);assert.equal(result.body.assessment.correct,true);assert.equal(result.body.assisted,true);
+ assert.equal(env.DB.db.prepare('SELECT COUNT(*) AS n FROM evidence').get().n,3);
 });

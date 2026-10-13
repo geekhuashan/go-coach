@@ -37,14 +37,19 @@ def validate_lesson(value):
     identity = text(value.get('id'), 'id', 80)
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', identity):
         fail('id 只支持英文字母、数字、短横线和下划线。')
-    if value.get('skill') not in ('capture', 'tsumego') or value.get('sequence') is not True:
-        fail('当前导入支持连续吃子题或作者解答题（skill=capture/tsumego、sequence=true）。')
+    objective = value.get('objective')
+    selection = isinstance(objective, dict) and objective.get('kind') == 'select_stones'
+    if selection:
+        if value.get('skill') not in ('escape', 'tsumego') or value.get('sequence') is not False:
+            fail('选择棋子题需使用 escape/tsumego、sequence=false。')
+    elif value.get('skill') not in ('capture', 'tsumego') or value.get('sequence') is not True:
+        fail('当前导入支持连续吃子题、作者解答题或选择棋子题。')
     if type(value.get('difficulty')) is not int or value['difficulty'] not in (1, 2, 3, 4, 5):
         fail('难度必须是 1–5 的整数。')
     if type(value.get('to_play')) is not int or value['to_play'] not in (1, 2):
         fail('先行方必须是 1（黑）或 2（白）。')
     out = {k: text(value.get(k), k, 160 if k == 'title' else 1200) for k in ('title', 'prompt', 'hint')}
-    out.update(id=identity, size=size, skill=value['skill'], sequence=True, difficulty=value['difficulty'], to_play=value['to_play'])
+    out.update(id=identity, size=size, skill=value['skill'], sequence=not selection, difficulty=value['difficulty'], to_play=value['to_play'])
     if 'concept' in value: out['concept']=text(value['concept'],'题型',80)
     defender = 3 - out['to_play']
     stones = value.get('stones')
@@ -64,11 +69,10 @@ def validate_lesson(value):
     for stone in out['stones']:
         if not group(board, stone['x'], stone['y'])[1]:
             fail('初始局面存在无气棋块。')
-    objective = value.get('objective')
-    if not isinstance(objective, dict) or objective.get('kind') not in ('capture', 'capture_any', 'authored_solution'):
-        fail('目标类型需为 capture、capture_any 或 authored_solution。')
+    if not isinstance(objective, dict) or objective.get('kind') not in ('capture', 'capture_any', 'authored_solution', 'select_stones'):
+        fail('目标类型需为 capture、capture_any、authored_solution 或 select_stones。')
     authored = objective['kind'] == 'authored_solution'
-    if (authored and value['skill'] != 'tsumego') or (not authored and value['skill'] != 'capture'):
+    if not selection and ((authored and value['skill'] != 'tsumego') or (not authored and value['skill'] != 'capture')):
         fail('作者解答使用 tsumego 分类，提子目标使用 capture 分类。')
     raw_targets = [] if authored else objective.get('targets')
     if not authored and (not isinstance(raw_targets, list) or not 1 <= len(raw_targets) <= capacity):
@@ -91,9 +95,11 @@ def validate_lesson(value):
     if not isinstance(source, dict) or source.get('kind') not in ('original', 'book', 'manual', 'licensed'):
         fail('来源类型需为 original、book、manual 或 licensed。')
     private_book = source.get('kind') == 'book' and source.get('usage') == 'household_private' and source.get('answer_verified') is True
+    if selection and not private_book:
+        fail('选择棋子题仅接受已核对的家庭私用书题来源。')
     if authored and not ((source.get('kind') == 'licensed' and source.get('license') and source.get('url')) or private_book):
         fail('作者答案题需要授权来源、许可和来源链接，或已核对的家庭私用书题来源。')
-    if authored and private_book:
+    if (authored or selection) and private_book:
         for field in ('title', 'page', 'problem'):
             raw = source.get(field)
             if field in ('page', 'problem') and type(raw) is int:
@@ -111,6 +117,12 @@ def validate_lesson(value):
             if field in ('page', 'problem') and type(raw) is int:
                 raw = str(raw)
             out['source'][field] = text(raw, '来源 ' + field, 2000 if field == 'original_prompt' else 600, required=False)
+    if selection:
+        if any(board[mark['y']][mark['x']] != out['to_play'] or mark['label'] != '▲' for mark in out['marks']):
+            fail('选择棋子题只能在先手方棋子上预显示题干▲标记。')
+        if value.get('tree') is not None:
+            fail('选择棋子题不使用落子答案树。')
+        return out
     counter = [0]
     active = set()
 

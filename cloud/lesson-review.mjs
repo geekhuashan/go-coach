@@ -29,6 +29,7 @@ function variation(before,values){
  }
  return pv;
 }
+export function deferredReview(before){return {source:'deferred',verdict:'uncertain',summary:'这手已保留，可以继续下。',explanation:'这手没有收录在参考变化中，先让 KataGo 按当前局面应手；需要时再复核，或查看参考解法。本次不计对错。',pv:[],reference_move:before?.review?.reference||null};}
 export function unavailableReview(before){return {source:'unavailable',verdict:'uncertain',summary:'复核服务暂时没有完成，请再试一次。',explanation:'这手已保留。可以点击“重新复核”，或查看参考解法；本次不计对错。',pv:[],reference_move:before?.review?.reference||null};}
 export function ruleReview(state){return captureGoalComplete(state)?{source:'rules',verdict:'solved',summary:'目标已提掉，这手完成了题目。',explanation:'已按实际落子历史核对目标提子，可以通过本题，不要求与参考答案完全相同。',pv:[],reference_move:null}:null;}
 export function authorReview(state,trustedLesson){

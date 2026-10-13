@@ -14,6 +14,17 @@ class MatchesTest(unittest.TestCase):
     state=test_profiles.ProfilesHTTPTest.state
     action=test_profiles.ProfilesHTTPTest.action
 
+    def test_pattern_history_is_read_only_and_participant_scoped(self):
+        s=self.action('new',match_mode='human_ai',human_color=1)
+        match=s['match']['id']
+        code,result=self.request('GET','/api/match-patterns?match_id='+match)
+        self.assertEqual(code,200)
+        self.assertEqual(set(result['state']),{'size','mode','match','match_id','initial_board','initial_player','moves'})
+        self.assertEqual(self.state()['revision'],s['revision'])
+        other=next(p['id'] for p in s['profiles'] if p['id']!=s['profile']['id'])
+        self.action('switch_profile',profile_id=other)
+        self.assertEqual(self.request('GET','/api/match-patterns?match_id='+match)[0],404)
+
     def test_human_black_auto_turn_and_feedback(self):
         s=self.action('new',match_mode='human_ai',human_color=1)
         self.assertFalse(s['computer_turn'])

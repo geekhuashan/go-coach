@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 from copy import deepcopy
 from go_rules import group
+from study_path import study_path, study_scope
 
 SKILLS = {'escape': '救棋与数气', 'capture': '打吃与提子', 'connect': '连接棋块', 'cut': '阻断直接连接', 'tsumego': '死活与手筋'}
 
@@ -119,11 +120,16 @@ _commit_lessons(_authored)
 # The bundled licensed book is shared by local and cloud deployments.
 load_imports(Path(__file__).resolve().parent / 'data/original-extra/lessons.json')
 load_imports(Path(__file__).resolve().parent / 'data/original-extra/more.json')
+load_imports(Path(__file__).resolve().parent / 'data/original-extra/diverse.json')
 _CATALOG[_original_start:]=sorted(_CATALOG[_original_start:],key=lambda l:l['difficulty'])
 load_imports(Path(__file__).resolve().parent / 'data/gogameguru/lessons.json')
 
 
+_CURATION = json.loads((Path(__file__).resolve().parent / 'data/original-extra/curation.json').read_text(encoding='utf-8'))
+
+
 def available_lesson(lesson):
+    if lesson['id'] in _CURATION['retired']: return False
     if lesson.get('legacy') or lesson['id'] in ('escape','capture','connect'): return False
     match=None if lesson.get('sequence') else re.fullmatch(r'(escape|capture|connect|cut)-([12])-([1-8])',lesson['id'])
     return not match or int(match[3]) <= (3 if match[2]=='1' else 5)
@@ -133,6 +139,9 @@ LICENSED_CHAPTERS = {3: '基础', 4: '进阶', 5: '挑战'}
 
 
 def sequential_collection(lesson):
+    path = study_path(lesson)
+    if path and path['role'] == 'main':
+        return 'book', path['title']
     source = (lesson or {}).get('source') or {}
     if source.get('kind') in ('book', 'licensed') and source.get('title'):
         return source['kind'], source['title']
@@ -253,7 +262,7 @@ def learning(attempts):
             difficulty = 2 if ready else 1
         skills.append({'id': skill, 'name': name, 'stage': stage, 'independent_attempts': total, 'correct': correct, 'total': total, 'accuracy': round(correct/total,3) if total else None, 'next_difficulty': difficulty})
     recommendation = _recommend(attempts, skills)
-    return {'stage': '待评估' if len(evidence) < 3 else '按技能逐项练习（不对应段位）', 'attempts_count': len(attempts), 'independent_correct': sum(bool(a.get('correct')) for a in evidence), 'independent_attempts': len(evidence), 'skills': skills, 'recommendation': {k: recommendation[k] for k in ('id','title','skill','difficulty','reason','adjustment')}}
+    return {'stage': '待评估' if len(evidence) < 3 else '按技能逐项练习（不对应段位）', 'attempts_count': len(attempts), 'independent_correct': sum(bool(a.get('correct')) for a in evidence), 'independent_attempts': len(evidence), 'skills': skills, 'recommendation': {k: recommendation[k] for k in ('id','title','skill','difficulty','reason','adjustment','study_path') if k in recommendation} if recommendation else None}
 
 
 CONCEPT_NAMES={'double_atari':'双打吃','ladder':'征吃','snapback':'倒扑','connection_trap':'接不归','edge_chase':'边线追吃','capture_race':'对杀','atari':'打吃','net':'枷吃','gate':'门吃','hug':'抱吃','wedge':'挖吃'}
@@ -272,6 +281,21 @@ def sequential_rank(lesson, group_start):
     return (1, CONCEPT_SEQUENCE.get(concept, 99), lesson.get('difficulty') or 99, group, number, identity)
 
 def _recommend(attempts, skills, current_id=None):
+    scope = study_scope([l for l in _CATALOG if available_lesson(l)], current_id,
+                        [a['lesson_id'] for a in attempts if a.get('correct') is True])
+    if scope is not None:
+        ids = [l['id'] for l in scope['lessons']]
+        index = ids.index(current_id) if current_id in ids else -1
+        pool = [l for l in scope['lessons'] if l['id'] not in scope['completed']]
+        chosen = next((l for l in pool if ids.index(l['id']) > index), None) if index >= 0 else None
+        chosen = chosen or next(iter(pool), None)
+        if chosen is None:
+            return None
+        lesson = deepcopy(chosen)
+        lesson.update(study_path=study_path(chosen),
+                      reason='继续当前自选的拓展题集。' if scope['explicit_extra'] else f"按《{scope['path']['title']}》原书题号继续练习。",
+                      adjustment=dict(kind='study_extra' if scope['explicit_extra'] else 'study_path', skill=lesson['skill'], concept=lesson.get('concept'), group=scope['path']['title'], streak=0, window=30))
+        return lesson
     def group_key(l): return f"concept:{l['skill']}:{l['concept']}" if l.get('concept') else f"skill:{l['skill']}"
     valid=[a for a in reversed(attempts) if a.get('lesson_id') in _BY_ID and isinstance(a.get('correct'),bool)][:30]
     seen={a['lesson_id'] for a in attempts}

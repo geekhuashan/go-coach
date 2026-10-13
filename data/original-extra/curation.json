@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "note": "Reviewed original exercises only. Keep historical IDs, positions and answers; omit repeated tactical cores from new selection. No minimum count per concept.",
+  "retired": {
+    "extra-doubleatari-01": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-02": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-03": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-04": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-05": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-06": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-doubleatari-07": {
+      "representative": "original-l3-01",
+      "reason": "same_tactical_core"
+    },
+    "extra-snapback-32": {
+      "representative": "original-l3-03",
+      "reason": "same_tactical_core"
+    },
+    "extra-snapback-33": {
+      "representative": "original-l3-03",
+      "reason": "same_tactical_core"
+    },
+    "extra-snapback-34": {
+      "representative": "original-l3-03",
+      "reason": "same_tactical_core"
+    },
+    "extra-snapback-35": {
+      "representative": "original-l3-03",
+      "reason": "same_tactical_core"
+    },
+    "extra-snapback-36": {
+      "representative": "original-l3-03",
+      "reason": "same_tactical_core"
+    },
+    "extra-connectiontrap-37": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "extra-connectiontrap-38": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "extra-connectiontrap-39": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "extra-connectiontrap-40": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "extra-connectiontrap-41": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "tactic-trap-wide": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "tactic-trap-low": {
+      "representative": "original-l3-04",
+      "reason": "same_tactical_core"
+    },
+    "extra-edgechase-28": {
+      "representative": "original-l3-05",
+      "reason": "same_tactical_core"
+    },
+    "extra-edgechase-29": {
+      "representative": "original-l3-05",
+      "reason": "same_tactical_core"
+    },
+    "extra-edgechase-30": {
+      "representative": "original-l3-05",
+      "reason": "same_tactical_core"
+    },
+    "extra-edgechase-31": {
+      "representative": "original-l3-05",
+      "reason": "same_tactical_core"
+    },
+    "tactic-edge-four": {
+      "representative": "original-l3-05",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-57": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-58": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-59": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-60": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-61": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-62": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-63": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-64": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-atari-65": {
+      "representative": "original-l3-10",
+      "reason": "same_tactical_core"
+    },
+    "extra-ladder-08": {
+      "representative": "original-l3-11",
+      "reason": "same_tactical_core"
+    },
+    "extra-ladder-09": {
+      "representative": "original-l3-11",
+      "reason": "same_tactical_core"
+    },
+    "extra-ladder-10": {
+      "representative": "original-l3-11",
+      "reason": "same_tactical_core"
+    },
+    "extra-ladder-11": {
+      "representative": "original-l3-11",
+      "reason": "same_tactical_core"
+    },
+    "extra-ladder-12": {
+      "representative": "original-l3-11",
+      "reason": "same_tactical_core"
+    },
+    "tactic-snapback-extra": {
+      "representative": "tactic-snapback",
+      "reason": "same_tactical_core"
+    },
+    "tactic-ladder-extra": {
+      "representative": "tactic-short-ladder",
+      "reason": "same_tactical_core"
+    },
+    "tactic-net-extra": {
+      "representative": "tactic-net",
+      "reason": "same_tactical_core"
+    },
+    "tactic-gate-extra": {
+      "representative": "tactic-gate",
+      "reason": "same_tactical_core"
+    },
+    "tactic-hug-row": {
+      "representative": "tactic-hug",
+      "reason": "same_tactical_core"
+    },
+    "tactic-hug-extra": {
+      "representative": "tactic-hug",
+      "reason": "same_tactical_core"
+    },
+    "tactic-wedge-wide": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "tactic-wedge-mark": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-49": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-50": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-51": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-52": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-53": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-54": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-55": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "extra-wedge-56": {
+      "representative": "tactic-wedge",
+      "reason": "same_tactical_core"
+    },
+    "tactic-snapback-far": {
+      "representative": "tactic-snapback-pack",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-21": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-22": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-23": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-24": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-25": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-26": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-gate-27": {
+      "representative": "tactic-gate-four",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-42": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-43": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-44": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-45": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-46": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-47": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-hug-48": {
+      "representative": "tactic-hug-three",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-13": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-14": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-15": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-16": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-17": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-18": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-19": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    },
+    "extra-net-20": {
+      "representative": "tactic-net-pair",
+      "reason": "same_tactical_core"
+    }
+  }
+}

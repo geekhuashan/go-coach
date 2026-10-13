@@ -51,6 +51,10 @@ def _variation(before,values):
     return pv
 
 
+def deferred_review(before=None):
+    return dict(source='deferred',verdict='uncertain',summary='这手已保留，可以继续下。',explanation='这手没有收录在参考变化中，先让 KataGo 按当前局面应手；需要时再复核，或查看参考解法。本次不计对错。',pv=[],reference_move=(before or {}).get('review',{}).get('reference'))
+
+
 def unavailable_review(before=None):
     return dict(source='unavailable',verdict='uncertain',summary='复核服务暂时没有完成，请再试一次。',explanation='这手已保留。可以点击“重新复核”，或查看参考解法；本次不计对错。',pv=[],reference_move=(before or {}).get('review',{}).get('reference'))
 
