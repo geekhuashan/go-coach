@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "go-coach",
-  "main": "cloud/worker.mjs",
+  "main": "cloud/family-entry.mjs",
   "compatibility_date": "2026-09-01",
   "account_id": "ed5f390cdcb11823287d7e4cc55c85b0",
   "workers_dev": false,
