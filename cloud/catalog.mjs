@@ -5,6 +5,7 @@ import {studyPath} from './study-path.mjs';
 export const builtinLessons=builtins.map(l=>({...l,legacy:['escape','capture','connect'].includes(l.id)}));
 const builtinById=new Map(builtinLessons.map(l=>[l.id,l]));
 const caches=new WeakMap(),snapshotDetails=new WeakMap();
+const growthShapes=new WeakMap();
 const rows=async stmt=>(await stmt.all()).results||[];
 const missingSchema=error=>/no such table|does not exist/i.test(error?.message||'');
 const version=row=>row?`${row.epoch}:${row.revision}`:'empty:0';
@@ -48,6 +49,21 @@ export async function loadCatalog(env,hh){
  const catalog=Object.freeze([...builtinLessons,...texts.map(text=>JSON.parse(text))]),details={version:null,texts,catalog,publicText:null};cache.set(hh,details);snapshotDetails.set(catalog,details);return catalog;
 }
 export function snapshotVersion(catalog){return snapshotDetails.get(catalog)?.version??null}
+// Growth needs real positions to avoid awarding rotated copies twice. Keep the
+// small geometry projection per catalog generation; warm responses add no SQL.
+export async function growthCatalog(env,hh,catalog,evidence){
+ const details=snapshotDetails.get(catalog);if(!details?.version)return catalog;
+ let cache=growthShapes.get(catalog);if(!cache){cache={shapes:new Map(),projection:null};growthShapes.set(catalog,cache);}const shapes=cache.shapes;
+ const byId=new Map(catalog.map(lesson=>[lesson.id,lesson]));
+ const missing=[...new Set(evidence.map(record=>record.lesson_id))].filter(id=>byId.has(id)&&!Array.isArray(byId.get(id).stones)&&!shapes.has(id));
+ for(let offset=0;offset<missing.length;offset+=90){
+  const ids=missing.slice(offset,offset+90);
+  const entries=await rows(env.DB.prepare(`SELECT v.epoch,v.revision,l.id,json_extract(l.lesson_json,'$.size') AS size,json_extract(l.lesson_json,'$.to_play') AS to_play,json_extract(l.lesson_json,'$.stones') AS stones FROM catalog_versions v LEFT JOIN lessons l ON l.household_id=v.household_id AND l.id IN (${ids.map(()=>'?').join(',')}) WHERE v.household_id=?`).bind(...ids,hh));
+  if(formatVersion+':'+version(entries[0])!==details.version)throw catalogChanged();
+  for(const row of entries)if(row.id){shapes.set(row.id,{size:row.size,to_play:row.to_play,...(row.stones?{stones:JSON.parse(row.stones)}:{})});cache.projection=null;}
+ }
+ if(!cache.projection)cache.projection=Object.freeze(catalog.map(lesson=>shapes.has(lesson.id)?{...lesson,...shapes.get(lesson.id)}:lesson));return cache.projection;
+}
 export async function fullLesson(env,hh,catalog,id){
  const builtin=builtinById.get(id);if(builtin)return builtin;
  const details=snapshotDetails.get(catalog);if(!details?.version)return catalog.find(l=>l.id===id)||null;

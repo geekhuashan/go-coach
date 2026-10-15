@@ -5,7 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import worker,{contextKey} from '../worker.mjs';
 import {makeSession} from '../auth.mjs';
 import {lessonState} from '../game.mjs';
-import {lessonListItem} from '../catalog.mjs';
+import {lessonListItem,loadCatalog,growthCatalog} from '../catalog.mjs';
 import {STUDY_PATHS} from '../study-path.mjs';
 
 const sql=name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8');
@@ -22,6 +22,34 @@ async function session({migrated=true}={}){
  const state=(l,profile='parent',mode='sequential')=>env.DB.db.prepare('UPDATE profiles SET state_json=?,runs_json=? WHERE household_id=? AND id=?').run(JSON.stringify(lessonState(l)),JSON.stringify({_practice_mode:mode}),env.HOUSEHOLD_ID,profile);
  return {env,request,insert,state};
 }
+test('growth hydrates only observed imported geometry in bounded batches, reuses it and isolates catalog generations',async()=>{
+ const binding=new D1(),env={DB:binding},lessons=Array.from({length:100},(_,n)=>book(1,n+1));
+ const insert=(hh,lesson)=>binding.db.prepare('INSERT INTO lessons(household_id,id,lesson_json) VALUES(?,?,?)').run(hh,lesson.id,JSON.stringify(lesson));
+ for(const lesson of lessons)insert('first',lesson);
+ const catalog=await loadCatalog(env,'first'),evidence=lessons.map(l=>({lesson_id:l.id}));
+ assert.equal(catalog.find(l=>l.id===lessons[0].id).stones,undefined);
+ binding.queries=[];
+ const hydrated=await growthCatalog(env,'first',catalog,evidence);
+ assert.equal(binding.queries.length,2);
+ assert.deepEqual(hydrated.find(l=>l.id===lessons[0].id).stones,lessons[0].stones);
+ assert.equal(hydrated.find(l=>l.id===lessons[0].id).objective,undefined,'never load answer keys or trees for growth');
+ binding.queries=[];assert.equal(await growthCatalog(env,'first',catalog,evidence),hydrated);assert.equal(binding.queries.length,0);
+ const other={...lessons[0],stones:[{x:1,y:1,color:2}]};insert('second',other);
+ const otherCatalog=await loadCatalog(env,'second'),otherGrowth=await growthCatalog(env,'second',otherCatalog,[evidence[0]]);
+ assert.deepEqual(otherGrowth.find(l=>l.id===other.id).stones,other.stones);
+ const changed={...lessons[0],stones:[{x:2,y:2,color:2}]};binding.db.prepare('UPDATE lessons SET lesson_json=? WHERE household_id=? AND id=?').run(JSON.stringify(changed),'first',changed.id);
+ const replacement=await loadCatalog(env,'first'),updated=await growthCatalog(env,'first',replacement,[evidence[0]]);
+ assert.deepEqual(updated.find(l=>l.id===changed.id).stones,changed.stones);
+ assert.equal(catalog.find(l=>l.id===changed.id).stones,undefined,'input directory is never mutated');
+});
+
+test('growth rejects mixed catalog generations while reading newly observed geometry',async()=>{
+ const binding=new D1(),env={DB:binding},a=book(1,1);
+ binding.db.prepare('INSERT INTO lessons(household_id,id,lesson_json) VALUES(?,?,?)').run('first',a.id,JSON.stringify(a));
+ const catalog=await loadCatalog(env,'first');
+ binding.db.prepare('UPDATE lessons SET lesson_json=? WHERE household_id=?').run(JSON.stringify({...a,title:'changed'}),'first');
+ await assert.rejects(growthCatalog(env,'first',catalog,[{lesson_id:a.id}]),error=>error.catalogChanged===true);
+});
 test('migration preserves every original row and builds exact public metadata without private answers',()=>{
  const d=new D1(false),a=book(2,264);d.db.prepare('INSERT INTO lessons(household_id,id,lesson_json) VALUES(?,?,?)').run('first',a.id,JSON.stringify(a));
  const before=d.db.prepare('SELECT * FROM lessons').all();d.db.exec(sql('0003_catalog_sync.sql'));assert.deepEqual(d.db.prepare('SELECT * FROM lessons').all(),before);
