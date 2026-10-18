@@ -106,7 +106,7 @@ async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!
   let id;try{id=navigationLessonId(ctx.state,a,ctx)}catch(error){fail(error.message)}
   const selected=id?await fullLesson(env,ctx.hh,ctx.catalog,id):null;ctx.lessonById=requested=>requested===id?selected:null;
  }
- let changed;try{changed=a.type==='review_move'?{state:clone(ctx.state),helped:[...ctx.helped],runs:clone(ctx.runs),event:null,note:null}:applyAction(ctx.state,a,ctx)}catch(e){fail(e.message)}const state=changed.state;if(a.type==='ai_move')state.engine_backend=ctx.aiBackend;
+ let changed;try{changed=a.type==='review_move'?{state:clone(ctx.state),helped:[...ctx.helped],runs:clone(ctx.runs),event:null,note:null}:applyAction(ctx.state,a,ctx)}catch(e){fail(e.message)}let state=changed.state,aiError=null;if(a.type==='ai_move')state.engine_backend=ctx.aiBackend;
  if(a.type==='review_move'||(a.type==='play'&&state.lesson_progress?.status==='unlisted')){
   let before;try{before=reviewPosition(state);before.revision=ctx.revision;}catch(e){fail(e.message)}
   let review=ruleReview(state)||authorReview(state,builtinLessons.find(l=>l.id===state.lesson.id));
@@ -114,6 +114,10 @@ async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!
   if(!review)review=deferredReview(before);
   setReview(state,review);state.assisted=true;if(!changed.helped.includes(state.lesson.id))changed.helped.push(state.lesson.id);
   if(['rules','author'].includes(review.source))changed.event={lesson_id:state.lesson.id,title:state.lesson.title,skill:state.lesson.skill,difficulty:state.lesson.difficulty,correct:review.source==='rules',assisted:true,move:clone(state.moves.at(-1)),summary:review.summary,created_at:now(),profile_id:ctx.profileId};
+ }
+ if(a.type==='play'&&a.reply===true&&computerTurn(state)&&engineConfiguration(env,state).available){
+  try{const aiMove=await bridge(env,'move',state),reply=applyAction(normalizeStatePlayout(clone(state)),{type:'ai_move'},{...ctx,aiMove,helped:changed.helped,runs:changed.runs});changed={...reply,event:changed.event,note:changed.note};state=changed.state;state.engine_backend=aiMove.engine_backend;}
+  catch(e){aiError='落子已保存。'+(e?.status&&e.message?e.message:'计算服务暂时未完成应手，请稍后重试。');}
  }
  let event=changed.event;if(event){const count=await env.DB.prepare('SELECT COUNT(*) AS count FROM attempts WHERE household_id=? AND profile_id=? AND lesson_id=?').bind(ctx.hh,ctx.profileId,event.lesson_id).first();event.attempt_no=count.count+1;}
  const ratings=['resign','confirm_result'].includes(a.type)?await resultChanges(env,ctx,state):[];const stateText=persistState(state);
@@ -124,7 +128,7 @@ async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!
  queries.push(env.DB.prepare(`INSERT OR IGNORE INTO evidence(household_id,profile_id,lesson_id,record_json,created_at) SELECT household_id,profile_id,lesson_id,record_json,created_at FROM attempts WHERE household_id=? AND profile_id=? AND lesson_id=? AND attempt_no=? AND ${guard()}`).bind(ctx.hh,ctx.profileId,event.lesson_id,event.attempt_no,ctx.hh,token));}
  if(changed.note)queries.push(env.DB.prepare(`INSERT INTO notes(household_id,profile_id,record_json,created_at) SELECT ?,?,?,? WHERE ${guard()}`).bind(ctx.hh,ctx.profileId,JSON.stringify(changed.note),changed.note.created_at,ctx.hh,token));
  for(const r of ratings){queries.push(env.DB.prepare(`INSERT INTO match_stats(household_id,profile_id,size,mode,played,wins,losses,draws) SELECT ?,?,?,?,1,?,?,? WHERE ${guard()} ON CONFLICT(household_id,profile_id,size,mode) DO UPDATE SET played=played+1,wins=wins+excluded.wins,losses=losses+excluded.losses,draws=draws+excluded.draws`).bind(ctx.hh,r.id,state.size,state.match.mode,r.wins,r.losses,r.draws,ctx.hh,token));if(r.rating!==undefined)queries.push(env.DB.prepare(`INSERT INTO ratings(household_id,profile_id,size,rating,games) SELECT ?,?,?,?,? WHERE ${guard()} ON CONFLICT(household_id,profile_id,size) DO UPDATE SET rating=excluded.rating,games=excluded.games`).bind(ctx.hh,r.id,state.size,r.rating,r.games,ctx.hh,token));}return queries;});
- if(!ok)return conflict(env,request);return json(await publicContext(env,await load(env,request)));
+ if(!ok)return conflict(env,request);return json({...await publicContext(env,await load(env,request)),...(aiError?{ai_error:aiError}:{})});
 }
 async function llmSettings(env){const row=await env.DB.prepare('SELECT * FROM llm_settings WHERE household_id=?').bind(household(env)).first();const settings=parse(row?.settings_json,{base_url:'',model:'',enabled:false});return {...settings,encrypted_key:row?.encrypted_key||null,has_api_key:!!row?.encrypted_key};}
 function safeSettings(s){return {base_url:s.base_url||'',model:s.model||'',enabled:!!s.enabled,has_api_key:!!s.encrypted_key};}

@@ -8,7 +8,7 @@ const code=name=>{const i=declarations.findIndex(m=>m[1]===name);return source.s
 const lesson=(number,chapter='甲章',book='book-a',extra={})=>({id:`${book}-${number}`,study_path:{id:book,title:book,rank:1,role:'main',chapter,chapter_rank:1,number},...extra});
 function element(){return {children:[],dataset:{},attributes:{},hidden:false,disabled:false,textContent:'',replaceChildren(...children){this.children=children;},append(...children){this.children.push(...children);},setAttribute(k,v){this.attributes[k]=v;},removeAttribute(k){delete this.attributes[k];}};}
 function client(items){
- const elements=new Map(),calls=[];const c=vm.createContext({lessons:items,state:{mode:'lesson',practice_mode:'recommended',lesson:items[0]},chapterDirectoryCache:null,chapterNavigationOpen:false,chapterNavigationKey:null,chapterGridItems:null,busy:false,busyAction:null,
+ const elements=new Map(),calls=[];const c=vm.createContext({lessons:items,state:{mode:'lesson',practice_mode:'recommended',lesson:items[0]},chapterDirectoryCache:null,chapterNavigationOpen:false,chapterNavigationKey:null,chapterGridItems:null,busy:false,busyAction:null,actionRequest:null,
  $:id=>{if(!elements.has(id))elements.set(id,element());return elements.get(id);},document:{createElement:element},textEl:(tag,text)=>({...element(),textContent:text}),act:(type,extra)=>calls.push({type,...extra})});
  vm.runInContext(['lessonPath','sequentialCollection','sequentialChapter','compareStudyLessons','courseGroups','supplementaryRepresentatives','chapterDirectory','bookChapters','currentChapterNavigation','chapterQuestionLabel','selectChapterQuestion','moveChapterQuestion','toggleChapterQuestions','renderChapterNavigation','renderChapterPicker','lessonFamily','canNavigatePractice'].map(code).join('\n'),c);
  return {c,calls,e:id=>c.$(id)};
@@ -25,6 +25,7 @@ test('manual navigation works in every practice mode during AI/review/explanatio
  assert.equal(calls.length,9);assert.ok(calls.every(x=>x.type==='lesson'&&x.id===b.id));
  c.state.demo_active=true;c.renderChapterNavigation();assert.equal(e('chapter-next').disabled,true);c.moveChapterQuestion(1);c.toggleChapterQuestions();assert.equal(c.chapterNavigationOpen,false);
  c.state.demo_active=false;c.busyAction='play';c.renderChapterNavigation();assert.equal(e('chapter-next').disabled,true);c.moveChapterQuestion(1);assert.equal(calls.length,9);
+ c.actionRequest={reply:true};c.renderChapterNavigation();assert.equal(e('chapter-next').disabled,false);c.moveChapterQuestion(1);assert.equal(calls.length,10);
 });
 test('grid shows actual question number and chapter position with active question, supports direct choice',()=>{
  const a=lesson(419),b=lesson(420),d=lesson(422);const {c,calls,e}=client([d,a,b]);c.state.lesson=b;c.renderChapterNavigation();

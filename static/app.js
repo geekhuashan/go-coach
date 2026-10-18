@@ -162,7 +162,7 @@ function setState(next,{inspectionAck=false,growthAction=null}={}){
  if(!state||reset||next.lesson_attempted){inspection=null;selectedPoints=[];selectedAnswer=null;$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent='';}
  if(!state||switched||state?.match?.id!==next.match?.id||state?.mode!==next.mode){selectedMode=next.match?.mode||'lesson';selectionPending=false;}if(switched||reset){$('llm-question').value='';llmError=null;}state=next;if(llmRequest&&(llmRequest.key!==explanationContext()||llmRequest.revision!==state.revision))cancelExplanation();render();globalThis.GoGrowth?.observe(next,{previous:previousGrowthState,actionType:growthAction});if(lessons.length&&(switched||autoDifficultyChanged))renderLessonPicker();scheduleComputer();
 }
-function canNavigatePractice(){return !busy||['ai_move','review_move'].includes(busyAction);}
+function canNavigatePractice(){return !busy||['ai_move','review_move'].includes(busyAction)||busyAction==='play'&&actionRequest?.reply;}
 function navigationAction(type){return ['lesson','next_lesson','practice_mode','retry','new','resume_match','switch_profile'].includes(type);}
 async function act(type,extra={}){
  if(!state)return;
@@ -175,20 +175,21 @@ async function act(type,extra={}){
   return;
  }
  if(type!=='feedback')cancelExplanation();
- const operation={controller:new AbortController(),profileId:state.profile?.id};actionRequest=operation;
- pendingMove=null;renderPending();busy=true;busyAction=type;renderActionStatus();renderPractice();if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');if(type==='ai_move')$('ai-move').textContent='陪练思考中…';
+ const operation={controller:new AbortController(),profileId:state.profile?.id,reply:type==='play',move:type==='play'?{x:extra.x,y:extra.y,color:state.to_play,revision:state.revision,profileId:state.profile?.id}:null};actionRequest=operation;
+ pendingMove=null;busy=true;busyAction=type;if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');render();
  try{let next;
  for(let attempt=0;attempt<2;attempt++){
-  try{next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra}),signal:operation.controller.signal,handleConflict:false,timeoutMs:type==='ai_move'?22000:type==='review_move'?30000:15000});break;}
+  try{next=await request('/api/action',{method:'POST',body:JSON.stringify({type,revision:state.revision,...extra,...(operation.reply?{reply:true}:{})}),signal:operation.controller.signal,handleConflict:false,timeoutMs:type==='ai_move'||operation.reply?22000:type==='review_move'?30000:15000});break;}
   catch(error){if(actionRequest!==operation||error.cancelled)return;if(error.status===409&&error.state?.profile?.id===operation.profileId){setState(error.state);if(navigationAction(type)&&attempt===0)continue;}throw error;}
  }
  if(actionRequest!==operation)return;setState(next,{inspectionAck:type==='inspect',growthAction:type});
  if(['lesson','next_lesson','resume_match','new','solution','retry'].includes(type))showView('board',{focus:true});
  if(['play','pass','undo','switch_profile','new','resume_match'].includes(type))aiFailedKey=null;
+ if(next.ai_error){aiFailedKey=computerKey();toast(next.ai_error);}
  if(['switch_profile','add_profile','retry','lesson','next_lesson','practice_mode','new','resume_match'].includes(type)){$('feedback').value=feedbackText(next.feedback);$('feedback-status').textContent=''}
  if(type==='feedback'){$('feedback-status').textContent=`已保存到${next.profile?.name||'当前学习者'}的记录。`;toast('想法已保存。')}
  if(type==='add_profile'){$('profile-name').value='';document.querySelector('.add-profile').open=false}
- }catch(error){if(actionRequest!==operation||error.cancelled)return;if(type==='ai_move')aiFailedKey=computerKey();toast(error.message);if(error.transient){connected(false);writeRecovery={epoch:authEpoch,revision:state?.revision,profileId:operation.profileId};await reconcilePendingWrite();schedulePoll()}}finally{if(actionRequest===operation){actionRequest=null;busy=false;busyAction=null;document.body.removeAttribute('aria-busy');render();scheduleComputer()}}
+ }catch(error){if(actionRequest!==operation||error.cancelled)return;operation.move=null;render();if(type==='ai_move')aiFailedKey=computerKey();toast(error.message);if(error.transient){connected(false);writeRecovery={epoch:authEpoch,revision:state?.revision,profileId:operation.profileId};await reconcilePendingWrite();schedulePoll()}}finally{if(actionRequest===operation){actionRequest=null;busy=false;busyAction=null;document.body.removeAttribute('aria-busy');render();scheduleComputer()}}
 }
 function textEl(tag,text,className=''){const node=document.createElement(tag);node.textContent=text;if(className)node.className=className;return node}
 function renderLearning(){
@@ -241,9 +242,11 @@ function renderMoveReview(assessment){
 }
 function renderActionStatus(){
  if(inspection||pendingInspectionHelp.has(inspectionHelpKey(state)))renderInspectionText();
- const reviewing=busy&&state?.mode==='lesson'&&busyAction==='review_move',submitting=busy&&['submit_selection','submit_answer'].includes(busyAction);
- $('board-action-status').hidden=!reviewing&&!submitting&&!writeRecovery;
- $('board-action-status').textContent=writeRecovery?'正在确认上次操作是否已保存…':reviewing?'正在重新复核…':submitting?'正在核对选择…':'';
+ const reviewing=busy&&state?.mode==='lesson'&&busyAction==='review_move',submitting=busy&&['submit_selection','submit_answer'].includes(busyAction),thinking=busy&&(busyAction==='ai_move'||busyAction==='play'&&actionRequest?.reply&&state.engine?.available&&(state.match?.mode==='human_ai'||state.mode==='lesson'));
+ const thinkingText=state.mode==='lesson'?'陪练思考中…':'电脑思考中…';
+ $('board-action-status').hidden=!reviewing&&!submitting&&!thinking&&!writeRecovery;
+ $('board-action-status').textContent=writeRecovery?'正在确认上次操作是否已保存…':thinking?thinkingText:reviewing?'正在重新复核…':submitting?'正在核对选择…':'';
+ if(thinking){$('ai-move').hidden=false;$('ai-move').disabled=true;$('ai-move').textContent=thinkingText;}
  $('review-move').disabled=busy;$('review-move').textContent=reviewing&&busyAction==='review_move'?'正在复核…':'重新复核';
  if(reviewing){$('inline-assessment').hidden=true;$('turn-pill').querySelector('span').textContent='正在复核…';}
 }
@@ -415,7 +418,8 @@ function renderBoard(){
  const focusKey=JSON.stringify([state.profile?.id,state.lesson?.id,size,state.initial_board]);
  if(focusKey!==boardFocusKey){boardFocusKey=focusKey;boardFocusFull=false;}
  const proposed=lessonBoardBounds(state),focused=!!proposed&&!boardFocusFull;
- const renderKey=JSON.stringify([focusKey,state.board,state.last_move,state.marks,inspection,pendingMove,selectedPoints,boardZoom,focused,proposed]);
+ const optimisticMove=actionRequest?.move?.revision===state.revision&&actionRequest.move.profileId===state.profile?.id?actionRequest.move:null;
+ const renderKey=JSON.stringify([focusKey,state.board,state.last_move,state.marks,inspection,pendingMove,optimisticMove,selectedPoints,boardZoom,focused,proposed]);
  if(renderKey===boardRenderKey&&root.childElementCount)return;
  boardRenderKey=renderKey;
  const {minX,maxX,minY,maxY}=focused?proposed:{minX:0,maxX:size-1,minY:0,maxY:size-1};
@@ -440,6 +444,7 @@ function renderBoard(){
   if(inspection?.stones?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:step*.46,fill:'none',stroke:'#58896d','stroke-width':3}));
   if(inspection?.liberties?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:Math.min(9,step*.2),fill:'#f4fbdb',stroke:'#597a42','stroke-width':2}));
   if(pendingMove?.x===x&&pendingMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.4,fill:state.to_play===1?'#253b34':'#fffdf7',opacity:.55,stroke:'#b7853c','stroke-width':2,'stroke-dasharray':'3 2'}));
+  if(!color&&optimisticMove?.x===x&&optimisticMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.435,fill:`url(#${optimisticMove.color===1?'blackStone':'whiteStone'})`,opacity:.65,stroke:'#b7853c','stroke-width':2,class:'optimistic-stone'}));
   if(selectedPoints.some(p=>p[0]===x&&p[1]===y))g.append(svg('path',{d:`M ${cx} ${cy-step*.27} L ${cx-step*.25} ${cy+step*.22} L ${cx+step*.25} ${cy+step*.22} Z`,fill:'none',stroke:'#bd6f26','stroke-width':Math.max(2,step*.07),'stroke-linejoin':'round'}));
   const mark=state.marks?.find(m=>m.x===x&&m.y===y);if(mark&&!(mark.label==='气'&&inspection)){g.append(svg('circle',{cx,cy,r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:cx,y:cy+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'));}
   const onClick=()=>{
