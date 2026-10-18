@@ -6,8 +6,8 @@
     "dev:cloud": "wrangler dev --port 8787",
     "deploy": "npm run build:patterns && wrangler deploy",
     "test:cloud": "node --test cloud/tests/*.test.mjs",
-    "db:local": "wrangler d1 migrations apply go-coach --local",
-    "db:remote": "wrangler d1 migrations apply go-coach --remote",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "db:remote": "wrangler d1 migrations apply DB --remote",
     "build:patterns": "esbuild cloud/match-patterns-worker.mjs --bundle --platform=browser --format=iife --target=safari15 --outfile=static/pattern-worker.js"
   },
   "devDependencies": {

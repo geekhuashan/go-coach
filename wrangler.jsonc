@@ -16,8 +16,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "go-coach",
-      "database_id": "fd7430db-1bb3-465d-b976-ede494134c74",
+      "database_name": "go-coach-wnam",
+      "database_id": "491a5e4a-6833-47c3-be5d-975a13d7ea83",
       "migrations_dir": "cloud/migrations"
     }
   ],
