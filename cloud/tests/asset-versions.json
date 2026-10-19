@@ -1,0 +1,26 @@
+{
+ "/app.js": {
+  "v": "20261015-growth",
+  "sha256": "3089af80a1582ae6c73e53a618cb645bbd1b9e371ffc04ec5d1ef056dfe562d1"
+ },
+ "/growth.css": {
+  "v": "20261015-growth",
+  "sha256": "b3d93008b008c945dc9297986bea538b274f4188af4bdccc4aa34d369a966b8c"
+ },
+ "/growth.js": {
+  "v": "20261015-growth",
+  "sha256": "6868ff68b8c3dd5eda355be2e538601498e1b99a1f1aed1b3522f535c298a29e"
+ },
+ "/match-patterns.js": {
+  "v": "20260913-manual",
+  "sha256": "c3c14836b613fd7bdc9411ecbdf5c78e1fec17d921690b2ba6130cbdd6f9bd48"
+ },
+ "/pattern-worker.js": {
+  "v": "20260912-review",
+  "sha256": "050d38c8d7e2cac9e62d602289cbc594f414f3db5d937bc48196ea8fa8627239"
+ },
+ "/style.css": {
+  "v": "20261015-growth",
+  "sha256": "994aa25a0c4cce45419de23dddcf0df8e3b319968c864422ca320307100000fa"
+ }
+}

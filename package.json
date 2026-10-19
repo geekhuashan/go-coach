@@ -8,7 +8,8 @@
     "test:cloud": "node --test cloud/tests/*.test.mjs",
     "db:local": "wrangler d1 migrations apply DB --local",
     "db:remote": "wrangler d1 migrations apply DB --remote",
-    "build:patterns": "esbuild cloud/match-patterns-worker.mjs --bundle --platform=browser --format=iife --target=safari15 --outfile=static/pattern-worker.js"
+    "build:patterns": "esbuild cloud/match-patterns-worker.mjs --bundle --platform=browser --format=iife --target=safari15 --outfile=static/pattern-worker.js",
+    "assets:versions": "node cloud/tests/asset-versions.mjs --write"
   },
   "devDependencies": {
     "wrangler": "4.129.0"
