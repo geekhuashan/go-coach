@@ -699,10 +699,10 @@ $('llm-test').onclick=async()=>{
 let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false,teachingVideosCheckedAt=0;
 const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形',hug:'抱吃',wedge:'挖吃'};
 Object.assign(videoTopicNames,{capture_race:'攻杀与对杀',eye_vs_no_eye:'有眼杀无眼',extend_liberties:'延气',squeeze:'滚打包收',golden_rooster:'金鸡独立',rat_steals_oil:'老鼠偷油',big_head_ghost:'大头鬼',under_the_stones:'倒脱靴'});
-Object.assign(videoTopicNames,{make_eyes:'做眼',destroy_eyes:'破眼',enlarge_eyes:'扩大眼位',vital_point:'占据要点',three_space_eyes:'三格眼位',four_space_eyes:'四格眼位',straight_bent_four:'直四曲四',five_six_space_eyes:'五格六格眼位',swell_kill:'胀死牛',loose_ladder:'宽征（缓征）',kaodan:'靠单',second_line:'吃二线子'});
+Object.assign(videoTopicNames,{make_eyes:'做眼',destroy_eyes:'破眼',enlarge_eyes:'扩大眼位',vital_point:'占据要点',three_space_eyes:'三格眼位',four_space_eyes:'四格眼位',straight_bent_four:'直四曲四',five_six_space_eyes:'五格六格眼位',swell_kill:'胀死牛',loose_ladder:'宽征（缓征）',kaodan:'靠单',second_line:'吃二线子',third_line:'吃三线子',make_net:'制造枷吃',make_snapback:'制造倒扑',counter_mistake:'反击错着'});
 // Every chapter of the three books is listed. An empty list marks a mixed chapter without a dedicated video.
 const chapterVideoConcepts={
- '问吃':['atari'],'制造问吃':['atari'],'枷吃':['net'],'制造枷吃':['net'],'逃子':['escape'],'杀棋':['liberties','atari'],'倒扑':['snapback'],'制造倒扑':['snapback'],'接不归':['connection_trap'],'倒扑和接不归':['snapback','connection_trap'],'滚打包收':['squeeze'],'吃一线子':['edge_chase'],'吃二线子':['second_line','edge_chase'],'吃三线子':[],'反击错着':[],'综合运用':[],
+ '问吃':['atari'],'制造问吃':['atari'],'枷吃':['net'],'制造枷吃':['make_net','net'],'逃子':['escape'],'杀棋':['liberties','atari'],'倒扑':['snapback'],'制造倒扑':['make_snapback','snapback'],'接不归':['connection_trap'],'倒扑和接不归':['snapback','connection_trap'],'滚打包收':['squeeze'],'吃一线子':['edge_chase'],'吃二线子':['second_line','edge_chase'],'吃三线子':['third_line'],'反击错着':['counter_mistake'],'综合运用':[],
  '二气杀二气':['capture_race'],'二气杀多气':['capture_race','extend_liberties'],'三气杀三气':['capture_race'],'有眼杀无眼':['eye_vs_no_eye'],'实战常形':['capture_race','life_shapes'],'金鸡独立':['golden_rooster'],'老鼠偷油':['rat_steals_oil'],'大头鬼':['big_head_ghost'],'倒脱靴':['under_the_stones'],'摆脱对杀':['capture_race'],'二气的对杀':['capture_race'],'延气对杀':['extend_liberties','capture_race'],'连接':['connection','connect'],'分断':['cutting','cut'],'靠单':['kaodan'],'宽征':['loose_ladder'],
  '真眼假眼':['eyes'],'做眼':['make_eyes'],'破眼':['destroy_eyes'],'判断真眼假眼（一至十）':['eyes'],'判断真眼假眼（十一至十二）':['eyes'],'判断真眼假眼（十三）':['eyes'],'做完整眼':['make_eyes','eyes'],'三格眼位':['three_space_eyes'],'四格眼位':['four_space_eyes'],'五格六格眼位':['five_six_space_eyes'],'直四曲四':['straight_bent_four','four_space_eyes'],'做眼综合运用':['make_eyes','eyes'],'胀死牛':['swell_kill'],'扩大眼位':['enlarge_eyes'],'占据要点':['vital_point'],'综合测试':['eyes','life_shapes'],'判断活棋死棋':['eyes','life_shapes'],
 };
@@ -759,17 +759,22 @@ function videoItem(video){
  if(playback){
   const title=textEl('strong',video.title,'video-title'),play=textEl('button','▶ 在 App 内播放','video-play-button');
   play.setAttribute('aria-label',`在 App 内播放：${video.title}`);play.setAttribute('aria-haspopup','dialog');play.setAttribute('aria-controls','video-player-dialog');play.onclick=()=>openTeachingVideo(video);
-  li.append(title,textEl('small',`${video.author||'教学视频'} · ${duration}`),play);
+  li.append(title,textEl('small',`${Array.isArray(video.problems)?`本书第 ${video.problems[0]}–${video.problems[1]} 题讲解 · `:''}${video.author||'教学视频'} · ${duration}`),play);
  }else{
   const link=textEl('a','到原作者页面观看 ↗','video-source-button');link.href=video.url;link.target='_blank';link.rel='noopener noreferrer';link.referrerPolicy='no-referrer';link.setAttribute('aria-label',`到原作者页面观看：${video.title}`);
   li.append(textEl('strong',video.title,'video-title'),textEl('small',`${video.author||'教学视频'} · ${duration}`),link);
  }
  return li;
 }
+// Explanations of specific book problems reveal answers, so they are shown only after an attempt, like the reference solution.
+function problemTeachingVideos(lesson,videos){
+ const path=lesson?.study_path,number=Number(path?.number);
+ return path?.role==='main'&&number>0?videos.filter(video=>Array.isArray(video.problems)&&video.book===path.id&&number>=video.problems[0]&&number<=video.problems[1]):[];
+}
 function relatedTeachingVideos(lesson,videos){
  const topics=[...videoTags(lesson?.concept),...videoTags(lesson?.concepts)],concepts=new Set((topics.length?topics:lesson?.skill==='tsumego'?['life_shapes','eyes']:[]).flatMap(concept=>chapterVideoConcepts[concept]||[concept]));
  // A known concept must match: book problems all share the tsumego skill, so the skill alone is only a tie-breaker.
- const ranked=videos.map(video=>{const matched=videoTags(video.concepts).filter(c=>concepts.has(c)).length;return {video,matched,score:matched*3+(videoTags(video.skills).includes(lesson?.skill)?1:0)};}).filter(item=>topics.length||concepts.size?item.matched>0:item.score>0).sort((a,b)=>b.score-a.score);
+ const ranked=videos.filter(video=>!video.problems).map(video=>{const matched=videoTags(video.concepts).filter(c=>concepts.has(c)).length;return {video,matched,score:matched*3+(videoTags(video.skills).includes(lesson?.skill)?1:0)};}).filter(item=>topics.length||concepts.size?item.matched>0:item.score>0).sort((a,b)=>b.score-a.score);
  const related=[],authors=new Set();
  while(ranked.length&&related.length<3){
   // Diversity only breaks relevance ties; a lower score never displaces a higher one.
@@ -779,22 +784,23 @@ function relatedTeachingVideos(lesson,videos){
  return related;
 }
 function renderTeachingVideos(){
- const lesson=state?.lesson,related=relatedTeachingVideos(lesson,teachingVideos);
- const topic=typeof lesson?.concept==='string'?(chapterVideoConcepts[lesson.concept]?lesson.concept:videoTopicNames[lesson.concept]):null,mixed=chapterVideoConcepts[topic]?.length===0;
+ const lesson=state?.lesson,answers=problemTeachingVideos(lesson,teachingVideos),shown=state?.lesson_attempted?answers:[],related=[...shown,...relatedTeachingVideos(lesson,teachingVideos).slice(0,Math.max(1,3-shown.length))];
+ const topic=typeof lesson?.concept==='string'?(chapterVideoConcepts[lesson.concept]?lesson.concept:videoTopicNames[lesson.concept]):null,mixed=chapterVideoConcepts[topic]?.length===0,waiting=answers.length&&!shown.length?'作答后这里会出现本题的讲解视频。':'';
  $('lesson-videos').querySelector('summary').textContent=topic?`${topic} · 视频讲解`:'中文视频讲解';
  $('lesson-video-list').replaceChildren(...related.map(videoItem));
- $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?'':mixed?'这一章是综合练习，没有专门对应的视频，可到题库的视频目录按主题查看。':'当前题目暂无匹配视频，可到题库查看基础视频目录。';
+ $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?waiting:waiting||(mixed?'这一章是综合练习，没有专门对应的视频，可到题库的视频目录按主题查看。':'当前题目暂无匹配视频，可到题库查看基础视频目录。');
  renderVideoLibrary();
 }
 function renderVideoLibrary(){
- const previous=$('video-topic').value,previousAuthor=$('video-author').value,topics=[...new Set(teachingVideos.flatMap(videoTopics))],authors=[...new Set(teachingVideos.map(video=>video.author||'教学视频'))];
+ // Per-problem explanations stay out of browsing; they appear beside their own problem after an attempt.
+ const library=teachingVideos.filter(video=>!video.problems),previous=$('video-topic').value,previousAuthor=$('video-author').value,topics=[...new Set(library.flatMap(videoTopics))],authors=[...new Set(library.map(video=>video.author||'教学视频'))];
  $('video-topic').replaceChildren(...['all',...topics].map(topic=>{const o=textEl('option',topic==='all'?'全部主题':videoTopicNames[topic]||topic);o.value=topic;return o}));
  $('video-topic').value=topics.includes(previous)?previous:'all';
  $('video-author').replaceChildren(...['all',...authors].map(author=>{const o=textEl('option',author==='all'?'全部作者':author);o.value=author;return o}));
  $('video-author').value=authors.includes(previousAuthor)?previousAuthor:'all';
- const selected=$('video-topic').value,author=$('video-author').value,videos=teachingVideos.filter(video=>(selected==='all'||videoTopics(video).includes(selected))&&(author==='all'||(video.author||'教学视频')===author));
+ const selected=$('video-topic').value,author=$('video-author').value,videos=library.filter(video=>(selected==='all'||videoTopics(video).includes(selected))&&(author==='all'||(video.author||'教学视频')===author)),perProblem=teachingVideos.length-library.length;
  $('video-library-list').replaceChildren(...videos.map(videoItem));
- $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?(videos.length?`${videos.length} 条中文视频`:'当前主题与作者组合暂无视频，可切换筛选。'):'正在载入视频目录…';
+ $('video-library-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，稍后刷新重试。':teachingVideosLoaded?(videos.length?`${videos.length} 条中文视频`:'当前主题与作者组合暂无视频，可切换筛选。')+(perProblem?`；另有 ${perProblem} 条书题逐题讲解，作答后在对应题目的视频讲解里出现。`:''):'正在载入视频目录…';
 }
 function loadTeachingVideos(refresh=false){
  if(refresh&&Date.now()-teachingVideosCheckedAt>60000)teachingVideosPromise=null;

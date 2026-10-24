@@ -1234,5 +1234,3609 @@
     "checked_at": "2026-10-24",
     "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
     "playback_url": "/api/videos/second-line.mp4"
+  },
+  {
+    "id": "ng-b2-001",
+    "title": "二气杀二气（1-6题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=1",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 146,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      1,
+      6
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-001.mp4"
+  },
+  {
+    "id": "ng-b2-007",
+    "title": "二气杀二气（7-12题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=2",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 258,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      7,
+      12
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-007.mp4"
+  },
+  {
+    "id": "ng-b2-013",
+    "title": "二气杀二气（13-18题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=3",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 177,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      13,
+      18
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-013.mp4"
+  },
+  {
+    "id": "ng-b2-019",
+    "title": "二气杀二气（19-24题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=4",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 150,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      19,
+      24
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-019.mp4"
+  },
+  {
+    "id": "ng-b2-025",
+    "title": "二气杀二气（25-30题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=5",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 104,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      25,
+      30
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-025.mp4"
+  },
+  {
+    "id": "ng-b2-031",
+    "title": "二气杀多气（31-36题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=6",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 207,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      31,
+      36
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-031.mp4"
+  },
+  {
+    "id": "ng-b2-037",
+    "title": "二气杀多气（37-42题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=7",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 207,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      37,
+      42
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-037.mp4"
+  },
+  {
+    "id": "ng-b2-043",
+    "title": "二气杀多气（43-48题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=8",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 217,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      43,
+      48
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-043.mp4"
+  },
+  {
+    "id": "ng-b2-049",
+    "title": "二气杀多气（49-54题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=9",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 324,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      49,
+      54
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-049.mp4"
+  },
+  {
+    "id": "ng-b2-055",
+    "title": "三气杀三气（55-60题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=10",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 213,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      55,
+      60
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-055.mp4"
+  },
+  {
+    "id": "ng-b2-061",
+    "title": "三气杀三气（61-66题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=11",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 209,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      61,
+      66
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-061.mp4"
+  },
+  {
+    "id": "ng-b2-067",
+    "title": "三气杀三气（67-72题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=12",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 229,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      67,
+      72
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-067.mp4"
+  },
+  {
+    "id": "ng-b2-079",
+    "title": "三气杀三气（79-84题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=13",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 127,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      79,
+      84
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-079.mp4"
+  },
+  {
+    "id": "ng-b2-085",
+    "title": "三气杀三气（85-90题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=14",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 99,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      85,
+      90
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-085.mp4"
+  },
+  {
+    "id": "ng-b2-091",
+    "title": "三气杀三气（91-96题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=15",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 111,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      91,
+      96
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-091.mp4"
+  },
+  {
+    "id": "ng-b2-097",
+    "title": "三气杀三气（97-102题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=16",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 136,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      97,
+      102
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-097.mp4"
+  },
+  {
+    "id": "ng-b2-103",
+    "title": "三气杀三气（103-108题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=17",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 246,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      103,
+      108
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-103.mp4"
+  },
+  {
+    "id": "ng-b2-109",
+    "title": "三气杀三气（109-114题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=18",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 206,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      109,
+      114
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-109.mp4"
+  },
+  {
+    "id": "ng-b2-115",
+    "title": "三气杀三气（115-120题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=19",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 94,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      115,
+      120
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-115.mp4"
+  },
+  {
+    "id": "ng-b2-121",
+    "title": "三气杀三气（121-126题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=20",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 283,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      121,
+      126
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-121.mp4"
+  },
+  {
+    "id": "ng-b2-127",
+    "title": "三气杀三气（127-132题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=21",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 185,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      127,
+      132
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-127.mp4"
+  },
+  {
+    "id": "ng-b2-133",
+    "title": "三气杀三气（133-138题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=22",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 275,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      133,
+      138
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-133.mp4"
+  },
+  {
+    "id": "ng-b2-139",
+    "title": "三气杀三气（139-144题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=23",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 202,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      139,
+      144
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-139.mp4"
+  },
+  {
+    "id": "ng-b2-145",
+    "title": "三气杀三气（145-150题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=24",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 146,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      145,
+      150
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-145.mp4"
+  },
+  {
+    "id": "ng-b2-151",
+    "title": "三气杀三气（151-156题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=25",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 256,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      151,
+      156
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-151.mp4"
+  },
+  {
+    "id": "ng-b2-157",
+    "title": "三气杀三气（157-162题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=26",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 133,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      157,
+      162
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-157.mp4"
+  },
+  {
+    "id": "ng-b2-163",
+    "title": "三气杀三气（163-168题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=27",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 141,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      163,
+      168
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-163.mp4"
+  },
+  {
+    "id": "ng-b2-169",
+    "title": "三气杀三气（169-174题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=28",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 260,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      169,
+      174
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-169.mp4"
+  },
+  {
+    "id": "ng-b2-175",
+    "title": "三气杀三气（175-180题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=29",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 312,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      175,
+      180
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-175.mp4"
+  },
+  {
+    "id": "ng-b2-181",
+    "title": "三气杀三气（181-186题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=30",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 218,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      181,
+      186
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-181.mp4"
+  },
+  {
+    "id": "ng-b2-187",
+    "title": "有眼杀无眼 （187-192题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=31",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 115,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      187,
+      192
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-187.mp4"
+  },
+  {
+    "id": "ng-b2-193",
+    "title": "有眼杀无眼 （193-198题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=32",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 105,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      193,
+      198
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-193.mp4"
+  },
+  {
+    "id": "ng-b2-199",
+    "title": "有眼杀无眼 （199-204题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=33",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 148,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      199,
+      204
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-199.mp4"
+  },
+  {
+    "id": "ng-b2-205",
+    "title": "有眼杀无眼 （205-210题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=34",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 162,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      205,
+      210
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-205.mp4"
+  },
+  {
+    "id": "ng-b2-211",
+    "title": "有眼杀无眼 （211-216题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=35",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 216,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      211,
+      216
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-211.mp4"
+  },
+  {
+    "id": "ng-b2-217",
+    "title": "有眼杀无眼 （217-222题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=36",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 155,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      217,
+      222
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-217.mp4"
+  },
+  {
+    "id": "ng-b2-223",
+    "title": "有眼杀无眼 （223-228题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=37",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 127,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      223,
+      228
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-223.mp4"
+  },
+  {
+    "id": "ng-b2-229",
+    "title": "有眼杀无眼 （229-234题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=38",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 207,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      229,
+      234
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-229.mp4"
+  },
+  {
+    "id": "ng-b2-235",
+    "title": "有眼杀无眼 （235-240题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=39",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 211,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      235,
+      240
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-235.mp4"
+  },
+  {
+    "id": "ng-b2-241",
+    "title": "有眼杀无眼 （241-246题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=40",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 231,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      241,
+      246
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-241.mp4"
+  },
+  {
+    "id": "ng-b2-247",
+    "title": "有眼杀无眼 （247-252题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=41",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 220,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      247,
+      252
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-247.mp4"
+  },
+  {
+    "id": "ng-b2-253",
+    "title": "实战常型（253-258题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=42",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 176,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      253,
+      258
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-253.mp4"
+  },
+  {
+    "id": "ng-b2-259",
+    "title": "实战常型 （259-264题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=43",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 175,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      259,
+      264
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-259.mp4"
+  },
+  {
+    "id": "ng-b2-265",
+    "title": "综合运用 （265-270题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=44",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 192,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      265,
+      270
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-265.mp4"
+  },
+  {
+    "id": "ng-b2-271",
+    "title": "综合运用  （271-276题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=45",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 231,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      271,
+      276
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-271.mp4"
+  },
+  {
+    "id": "ng-b2-277",
+    "title": "综合运用  （277-282题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=46",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 222,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      277,
+      282
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-277.mp4"
+  },
+  {
+    "id": "ng-b2-283",
+    "title": "综合运用  （283-288题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=47",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 180,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      283,
+      288
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-283.mp4"
+  },
+  {
+    "id": "ng-b2-289",
+    "title": "综合运用  （289-294题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=48",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 204,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      289,
+      294
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-289.mp4"
+  },
+  {
+    "id": "ng-b2-295",
+    "title": "综合运用  （295-300题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=49",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 155,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      295,
+      300
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-295.mp4"
+  },
+  {
+    "id": "ng-b2-301",
+    "title": "综合运用 （301-306题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=50",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 181,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      301,
+      306
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-301.mp4"
+  },
+  {
+    "id": "ng-b2-307",
+    "title": "综合运用 （307-312题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=51",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 229,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      307,
+      312
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-307.mp4"
+  },
+  {
+    "id": "ng-b2-313",
+    "title": "综合运用 （313-318题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=52",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 188,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      313,
+      318
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-313.mp4"
+  },
+  {
+    "id": "ng-b2-319",
+    "title": "滚打包收（319-324题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=53",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 144,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      319,
+      324
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-319.mp4"
+  },
+  {
+    "id": "ng-b2-325",
+    "title": "325-330滚打包收（319-324题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=54",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 129,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      325,
+      330
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-325.mp4"
+  },
+  {
+    "id": "ng-b2-331",
+    "title": "滚打包收（331-336题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=55",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 129,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      331,
+      336
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-331.mp4"
+  },
+  {
+    "id": "ng-b2-337",
+    "title": "滚打包收（337-342题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=56",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 101,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      337,
+      342
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-337.mp4"
+  },
+  {
+    "id": "ng-b2-343",
+    "title": "滚打包收（343-348题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=57",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 115,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      343,
+      348
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-343.mp4"
+  },
+  {
+    "id": "ng-b2-349",
+    "title": "滚打包收（349-354题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=58",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 92,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      349,
+      354
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-349.mp4"
+  },
+  {
+    "id": "ng-b2-355",
+    "title": "滚打包收（355-360题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=59",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 104,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      355,
+      360
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-355.mp4"
+  },
+  {
+    "id": "ng-b2-361",
+    "title": "滚打包收（361-366题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=60",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 134,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      361,
+      366
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-361.mp4"
+  },
+  {
+    "id": "ng-b2-367",
+    "title": "滚打包收（367-372题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=61",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 206,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      367,
+      372
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-367.mp4"
+  },
+  {
+    "id": "ng-b2-373",
+    "title": "滚打包收（373-378题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=62",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 112,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      373,
+      378
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-373.mp4"
+  },
+  {
+    "id": "ng-b2-379",
+    "title": "滚打包收（379-384题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=63",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 84,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      379,
+      384
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-379.mp4"
+  },
+  {
+    "id": "ng-b2-385",
+    "title": "滚打包收（385-390题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=64",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 131,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      385,
+      390
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-385.mp4"
+  },
+  {
+    "id": "ng-b2-391",
+    "title": "滚打包收（391-396题）",
+    "url": "https://www.bilibili.com/video/BV18r421n7tz/?p=65",
+    "author": "南瓜鸡蛋煲",
+    "duration_seconds": 209,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      391,
+      396
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/ng-b2-391.mp4"
+  },
+  {
+    "id": "xjj-b2-073",
+    "title": "手筋专项训练 10级-5级 三气杀三气 73,74,75,76",
+    "url": "https://www.bilibili.com/video/BV16y4y197VR/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 184,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      73,
+      76
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-073.mp4"
+  },
+  {
+    "id": "xjj-b2-077",
+    "title": "手筋专项训练 10级-5级 三气杀三气 77,78,79,80",
+    "url": "https://www.bilibili.com/video/BV1VR4y1h7ep/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 142,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      77,
+      80
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-077.mp4"
+  },
+  {
+    "id": "xjj-b2-397",
+    "title": "手筋专项训练 10级-5级 滚打包收397,398,399,400",
+    "url": "https://www.bilibili.com/video/BV1FM411x7XV/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 110,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      397,
+      400
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-397.mp4"
+  },
+  {
+    "id": "xjj-b2-401",
+    "title": "手筋专项训练 10级-5级 滚打包收401,402,403,404",
+    "url": "https://www.bilibili.com/video/BV1Vx4y1N7PP/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 135,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      401,
+      404
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-401.mp4"
+  },
+  {
+    "id": "xjj-b2-405",
+    "title": "手筋专项训练 10级-5级 滚打包收405,406,407,408",
+    "url": "https://www.bilibili.com/video/BV1Wo4y1B7a4/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 186,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      405,
+      408
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-405.mp4"
+  },
+  {
+    "id": "xjj-b2-409",
+    "title": "手筋专项训练 10级-5级 滚打包收409,410,411,412",
+    "url": "https://www.bilibili.com/video/BV1sL411y7Q3/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 123,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      409,
+      412
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-409.mp4"
+  },
+  {
+    "id": "xjj-b2-413",
+    "title": "手筋专项训练 10级-5级 滚打包收413,414,415,416",
+    "url": "https://www.bilibili.com/video/BV1SP411f7uR/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 137,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      413,
+      416
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-413.mp4"
+  },
+  {
+    "id": "xjj-b2-417",
+    "title": "手筋专项训练 10级-5级 滚打包收417,418,419,420",
+    "url": "https://www.bilibili.com/video/BV1TN411F7XC/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 139,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      417,
+      420
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-417.mp4"
+  },
+  {
+    "id": "xjj-b2-421",
+    "title": "手筋专项训练 10级-5级 滚打包收421,422,423,424",
+    "url": "https://www.bilibili.com/video/BV11o4y1B7BK/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 147,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      421,
+      424
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-421.mp4"
+  },
+  {
+    "id": "xjj-b2-425",
+    "title": "手筋专项训练 10级-5级 滚打包收425,426,427,428",
+    "url": "https://www.bilibili.com/video/BV1Uk4y1h7j8/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 170,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      425,
+      428
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-425.mp4"
+  },
+  {
+    "id": "xjj-b2-429",
+    "title": "手筋专项训练 10级-5级 金鸡独立429,430,431,432",
+    "url": "https://www.bilibili.com/video/BV1LX4y1f7gh/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 92,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      429,
+      432
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-429.mp4"
+  },
+  {
+    "id": "xjj-b2-433",
+    "title": "手筋专项训练 10级-5级 金鸡独立433,434,435,436",
+    "url": "https://www.bilibili.com/video/BV1UL411y7NS/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 115,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      433,
+      436
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-433.mp4"
+  },
+  {
+    "id": "xjj-b2-437",
+    "title": "手筋专项训练 10级-5级 金鸡独立437,438,439,440",
+    "url": "https://www.bilibili.com/video/BV1T24y1u7Ri/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 144,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      437,
+      440
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-437.mp4"
+  },
+  {
+    "id": "xjj-b2-441",
+    "title": "手筋专项训练 10级-5级 金鸡独立441,442,443,444",
+    "url": "https://www.bilibili.com/video/BV1c24y1u7Su/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 159,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      441,
+      444
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-441.mp4"
+  },
+  {
+    "id": "xjj-b2-445",
+    "title": "手筋专项训练 10级-5级 金鸡独立445,446,447,448",
+    "url": "https://www.bilibili.com/video/BV1kP411Z7BZ/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 155,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      445,
+      448
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-445.mp4"
+  },
+  {
+    "id": "xjj-b2-449",
+    "title": "手筋专项训练 10级-5级 金鸡独立449,450,451,452",
+    "url": "https://www.bilibili.com/video/BV1mL411o7wC/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 143,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      449,
+      452
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-449.mp4"
+  },
+  {
+    "id": "xjj-b2-453",
+    "title": "手筋专项训练 10级-5级 金鸡独立453,454,455,456",
+    "url": "https://www.bilibili.com/video/BV1bc411E7Fm/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 246,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      453,
+      456
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-453.mp4"
+  },
+  {
+    "id": "xjj-b2-457",
+    "title": "手筋专项训练 10级-5级 金鸡独立457,458,459,460",
+    "url": "https://www.bilibili.com/video/BV1kk4y1b7JS/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 185,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      457,
+      460
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-457.mp4"
+  },
+  {
+    "id": "xjj-b2-461",
+    "title": "手筋专项训练 10级-5级 金鸡独立461,462,463,464",
+    "url": "https://www.bilibili.com/video/BV1Gs4y1p7ka/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 128,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      461,
+      464
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-461.mp4"
+  },
+  {
+    "id": "xjj-b2-465",
+    "title": "手筋专项训练 10级-5级 金鸡独立465,466,467,468",
+    "url": "https://www.bilibili.com/video/BV14V4y197fe/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 135,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      465,
+      468
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-465.mp4"
+  },
+  {
+    "id": "xjj-b2-469",
+    "title": "手筋专项训练 10级-5级 金鸡独立469,470,471,472",
+    "url": "https://www.bilibili.com/video/BV1V94y1F7nS/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 129,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      469,
+      472
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-469.mp4"
+  },
+  {
+    "id": "xjj-b2-473",
+    "title": "手筋专项训练 10级-5级 金鸡独立473,474,475,476",
+    "url": "https://www.bilibili.com/video/BV1Wx4y1P7SM/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 93,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      473,
+      476
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-473.mp4"
+  },
+  {
+    "id": "xjj-b2-477",
+    "title": "手筋专项训练 10级-5级 金鸡独立477,478,479,480",
+    "url": "https://www.bilibili.com/video/BV1224y1E77w/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 140,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      477,
+      480
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-477.mp4"
+  },
+  {
+    "id": "xjj-b2-481",
+    "title": "手筋专项训练 10级-5级 老鼠偷油481,482,483,484",
+    "url": "https://www.bilibili.com/video/BV1ix4y1w7U9/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 124,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      481,
+      484
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-481.mp4"
+  },
+  {
+    "id": "xjj-b2-485",
+    "title": "手筋专项训练 10级-5级 老鼠偷油485,486,487,488",
+    "url": "https://www.bilibili.com/video/BV1f24y1E7Rw/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 133,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      485,
+      488
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-485.mp4"
+  },
+  {
+    "id": "xjj-b2-489",
+    "title": "手筋专项训练 10级-5级 老鼠偷油489,490,491,492",
+    "url": "https://www.bilibili.com/video/BV1Zo4y1W7LX/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 160,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      489,
+      492
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-489.mp4"
+  },
+  {
+    "id": "xjj-b2-493",
+    "title": "手筋专项训练 10级-5级 老鼠偷油493,494,495,496",
+    "url": "https://www.bilibili.com/video/BV1po4y1s7T8/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 157,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      493,
+      496
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-493.mp4"
+  },
+  {
+    "id": "xjj-b2-497",
+    "title": "手筋专项训练 10级-5级 老鼠偷油497,498,499,500",
+    "url": "https://www.bilibili.com/video/BV1eL41197sn/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 113,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      497,
+      500
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-497.mp4"
+  },
+  {
+    "id": "xjj-b2-501",
+    "title": "手筋专项训练 10级-5级 老鼠偷油501,502,503,504",
+    "url": "https://www.bilibili.com/video/BV1m24y1j7ch/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 156,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      501,
+      504
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-501.mp4"
+  },
+  {
+    "id": "xjj-b2-505",
+    "title": "手筋专项训练 10级-5级 大头鬼505,506,507,508",
+    "url": "https://www.bilibili.com/video/BV17L411D7s5/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 131,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      505,
+      508
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-505.mp4"
+  },
+  {
+    "id": "xjj-b2-509",
+    "title": "手筋专项训练 10级-5级 大头鬼 509,510,511,512",
+    "url": "https://www.bilibili.com/video/BV1gk4y147yK/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 136,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      509,
+      512
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-509.mp4"
+  },
+  {
+    "id": "xjj-b2-513",
+    "title": "手筋专项训练 10级-5级 大头鬼 513,514,515,516",
+    "url": "https://www.bilibili.com/video/BV1nh411G7Sk/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 114,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      513,
+      516
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-513.mp4"
+  },
+  {
+    "id": "xjj-b2-517",
+    "title": "手筋专项训练 10级-5级 大头鬼 517,518,519,520",
+    "url": "https://www.bilibili.com/video/BV1tN411K7oq/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 118,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      517,
+      520
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-517.mp4"
+  },
+  {
+    "id": "xjj-b2-521",
+    "title": "手筋专项训练 10级-5级 大头鬼 521,522,523,524",
+    "url": "https://www.bilibili.com/video/BV17Y4y1S7XB/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 163,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      521,
+      524
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-521.mp4"
+  },
+  {
+    "id": "xjj-b2-525",
+    "title": "手筋专项训练 10级-5级 大头鬼 525,526,527,528",
+    "url": "https://www.bilibili.com/video/BV1gm4y1r7Lo/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 114,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      525,
+      528
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-525.mp4"
+  },
+  {
+    "id": "xjj-b2-529",
+    "title": "手筋专项训练 10级-5级 大头鬼 529,530,531,532",
+    "url": "https://www.bilibili.com/video/BV1us4y1D7Va/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 144,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      529,
+      532
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-529.mp4"
+  },
+  {
+    "id": "xjj-b2-533",
+    "title": "手筋专项训练 10级-5级 大头鬼 533,534,535,536",
+    "url": "https://www.bilibili.com/video/BV1EL411X7CS/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 145,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      533,
+      536
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-533.mp4"
+  },
+  {
+    "id": "xjj-b2-537",
+    "title": "手筋专项训练 10级-5级 倒脱靴 537,538,539,540",
+    "url": "https://www.bilibili.com/video/BV1w84y1g74W/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 138,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      537,
+      540
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-537.mp4"
+  },
+  {
+    "id": "xjj-b2-541",
+    "title": "手筋专项训练 10级-5级 摆脱对杀 541,542,543,544",
+    "url": "https://www.bilibili.com/video/BV1c84y1g7Zq/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 94,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      541,
+      544
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-541.mp4"
+  },
+  {
+    "id": "xjj-b2-545",
+    "title": "手筋专项训练 10级-5级 摆脱对杀 545,546,547,548",
+    "url": "https://www.bilibili.com/video/BV1vV4y1D7i3/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 91,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      545,
+      548
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-545.mp4"
+  },
+  {
+    "id": "xjj-b2-549",
+    "title": "手筋专项训练 10级-5级 摆脱对杀 549,550,551,552",
+    "url": "https://www.bilibili.com/video/BV1uj411w78a/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 108,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      549,
+      552
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-549.mp4"
+  },
+  {
+    "id": "xjj-b2-553",
+    "title": "手筋专项训练 10级-5级 摆脱对杀 553,554,555,556",
+    "url": "https://www.bilibili.com/video/BV1As4y1n7gr/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 99,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      553,
+      556
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-553.mp4"
+  },
+  {
+    "id": "xjj-b2-557",
+    "title": "手筋专项训练 10级-5级 摆脱对杀 557,558,559,560",
+    "url": "https://www.bilibili.com/video/BV1EN411N7dZ/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 128,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      557,
+      560
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-557.mp4"
+  },
+  {
+    "id": "xjj-b2-561",
+    "title": "手筋专项训练 10级-5级 二气的对杀 561,562,563,564",
+    "url": "https://www.bilibili.com/video/BV1ik4y1i79C/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 93,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      561,
+      564
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-561.mp4"
+  },
+  {
+    "id": "xjj-b2-565",
+    "title": "手筋专项训练 10级-5级 延气对杀 565,566,567,568",
+    "url": "https://www.bilibili.com/video/BV1rT411q7Cq/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 112,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      565,
+      568
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-565.mp4"
+  },
+  {
+    "id": "xjj-b2-569",
+    "title": "手筋专项训练 10级-5级 延气对杀 569,570,571,572",
+    "url": "https://www.bilibili.com/video/BV1UL411X7Jj/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 90,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      569,
+      572
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-569.mp4"
+  },
+  {
+    "id": "xjj-b2-573",
+    "title": "手筋专项训练 10级-5级 延气对杀 573,574,575,576",
+    "url": "https://www.bilibili.com/video/BV1wL411D7Ri/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 104,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      573,
+      576
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-573.mp4"
+  },
+  {
+    "id": "xjj-b2-577",
+    "title": "手筋专项训练 10级-5级 延气对杀 577,578,579,580",
+    "url": "https://www.bilibili.com/video/BV1824y1j7PH/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 105,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      577,
+      580
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-577.mp4"
+  },
+  {
+    "id": "xjj-b2-581",
+    "title": "手筋专项训练 10级-5级 延气对杀 581,582,583,584",
+    "url": "https://www.bilibili.com/video/BV1ao4y1H7Df/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 112,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      581,
+      584
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-581.mp4"
+  },
+  {
+    "id": "xjj-b2-585",
+    "title": "手筋专项训练 10级-5级 延气对杀 585,586,587,588",
+    "url": "https://www.bilibili.com/video/BV1dX4y1r7bt/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 95,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      585,
+      588
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-585.mp4"
+  },
+  {
+    "id": "xjj-b2-589",
+    "title": "手筋专项训练 10级-5级 延气对杀 589,590,591,592",
+    "url": "https://www.bilibili.com/video/BV17V4y1D7EE/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 117,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      589,
+      592
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-589.mp4"
+  },
+  {
+    "id": "xjj-b2-593",
+    "title": "手筋专项训练 10级-5级 延气对杀 593,594,595,596",
+    "url": "https://www.bilibili.com/video/BV1ZN411A7RN/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 119,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      593,
+      596
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-593.mp4"
+  },
+  {
+    "id": "xjj-b2-597",
+    "title": "手筋专项训练 10级-5级 延气对杀 597,598,599,600",
+    "url": "https://www.bilibili.com/video/BV1SV4y1S7BL/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 125,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      597,
+      600
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-597.mp4"
+  },
+  {
+    "id": "xjj-b2-601",
+    "title": "手筋专项训练 10级-5级 延气对杀 601,602,603,604",
+    "url": "https://www.bilibili.com/video/BV1Ka4y1u7Y6/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 115,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      601,
+      604
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-601.mp4"
+  },
+  {
+    "id": "xjj-b2-605",
+    "title": "手筋专项训练 10级-5级 延气对杀 605,606,607,608",
+    "url": "https://www.bilibili.com/video/BV1JM411T7x1/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 140,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      605,
+      608
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-605.mp4"
+  },
+  {
+    "id": "xjj-b2-609",
+    "title": "手筋专项训练 10级-5级 延气对杀 609,610,611,612",
+    "url": "https://www.bilibili.com/video/BV1uo4y1p7xx/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 152,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      609,
+      612
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-609.mp4"
+  },
+  {
+    "id": "xjj-b2-613",
+    "title": "手筋专项训练 10级-5级 连接 613,614,615,616",
+    "url": "https://www.bilibili.com/video/BV1g24y157u2/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 92,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      613,
+      616
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-613.mp4"
+  },
+  {
+    "id": "xjj-b2-617",
+    "title": "手筋专项训练 10级-5级 连接 617,618,619,620",
+    "url": "https://www.bilibili.com/video/BV1oo4y1H7dQ/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 85,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      617,
+      620
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-617.mp4"
+  },
+  {
+    "id": "xjj-b2-621",
+    "title": "手筋专项训练 10级-5级 连接 621,622,623,624",
+    "url": "https://www.bilibili.com/video/BV1FX4y1C7oy/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 108,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      621,
+      624
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-621.mp4"
+  },
+  {
+    "id": "xjj-b2-625",
+    "title": "手筋专项训练 10级-5级 连接 625,626,627,628",
+    "url": "https://www.bilibili.com/video/BV1dg4y1g7Ro/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 112,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      625,
+      628
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-625.mp4"
+  },
+  {
+    "id": "xjj-b2-629",
+    "title": "手筋专项训练 10级-5级 连接 629,630,631,632",
+    "url": "https://www.bilibili.com/video/BV1kj411F7Cj/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 83,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      629,
+      632
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-629.mp4"
+  },
+  {
+    "id": "xjj-b2-633",
+    "title": "手筋专项训练 10级-5级 连接 633,634,635,636",
+    "url": "https://www.bilibili.com/video/BV1b84y1T7uU/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 117,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      633,
+      636
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-633.mp4"
+  },
+  {
+    "id": "xjj-b2-637",
+    "title": "手筋专项训练 10级-5级 连接 637,638,639,640",
+    "url": "https://www.bilibili.com/video/BV18v4y1H73a/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 96,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      637,
+      640
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-637.mp4"
+  },
+  {
+    "id": "xjj-b2-641",
+    "title": "手筋专项训练 10级-5级 连接 641,642,643,644",
+    "url": "https://www.bilibili.com/video/BV16h411M7qA/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 116,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      641,
+      644
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-641.mp4"
+  },
+  {
+    "id": "xjj-b2-645",
+    "title": "手筋专项训练 10级-5级 连接 645,646,647,648",
+    "url": "https://www.bilibili.com/video/BV18s4y1K798/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 137,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      645,
+      648
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-645.mp4"
+  },
+  {
+    "id": "xjj-b2-649",
+    "title": "手筋专项训练 10级-5级 连接 649,650,651,652",
+    "url": "https://www.bilibili.com/video/BV1984y1T7Y5/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 175,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      649,
+      652
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-649.mp4"
+  },
+  {
+    "id": "xjj-b2-653",
+    "title": "手筋专项训练 10级-5级 连接 653,654,655,656",
+    "url": "https://www.bilibili.com/video/BV1P24y1w71Z/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 154,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      653,
+      656
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-653.mp4"
+  },
+  {
+    "id": "xjj-b2-657",
+    "title": "手筋专项训练 10级-5级 连接 657,658,659,660",
+    "url": "https://www.bilibili.com/video/BV14s4y117V2/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 164,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      657,
+      660
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-657.mp4"
+  },
+  {
+    "id": "xjj-b2-661",
+    "title": "手筋专项训练 10级-5级 连接 661,662,663,664",
+    "url": "https://www.bilibili.com/video/BV1UN411w7hV/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 107,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      661,
+      664
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-661.mp4"
+  },
+  {
+    "id": "xjj-b2-665",
+    "title": "手筋专项训练 10级-5级 连接 665,666,667,668",
+    "url": "https://www.bilibili.com/video/BV1tk4y1e7Ya/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 80,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      665,
+      668
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-665.mp4"
+  },
+  {
+    "id": "xjj-b2-669",
+    "title": "手筋专项训练 10级-5级 分断 669,670,671,672",
+    "url": "https://www.bilibili.com/video/BV1VX4y1z78u/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 86,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      669,
+      672
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-669.mp4"
+  },
+  {
+    "id": "xjj-b2-673",
+    "title": "手筋专项训练 10级-5级 分断 673,674,675,676",
+    "url": "https://www.bilibili.com/video/BV1RP411U7dH/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 82,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      673,
+      676
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-673.mp4"
+  },
+  {
+    "id": "xjj-b2-677",
+    "title": "手筋专项训练 10级-5级 分断 677,678,679,680",
+    "url": "https://www.bilibili.com/video/BV1Pk4y1e7UR/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 130,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      677,
+      680
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-677.mp4"
+  },
+  {
+    "id": "xjj-b2-681",
+    "title": "手筋专项训练 10级-5级 分断 681,682,683,684",
+    "url": "https://www.bilibili.com/video/BV1Uv4y1H7G3/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 131,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      681,
+      684
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-681.mp4"
+  },
+  {
+    "id": "xjj-b2-685",
+    "title": "手筋专项训练 10级-5级 分断 685,686,687,688",
+    "url": "https://www.bilibili.com/video/BV1rc411n7oN/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 183,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      685,
+      688
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-685.mp4"
+  },
+  {
+    "id": "xjj-b2-689",
+    "title": "手筋专项训练 10级-5级 分断 689,690,691,692",
+    "url": "https://www.bilibili.com/video/BV1Yo4y187to/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 140,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      689,
+      692
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-689.mp4"
+  },
+  {
+    "id": "xjj-b2-693",
+    "title": "手筋专项训练 10级-5级 分断 693,694,695,696",
+    "url": "https://www.bilibili.com/video/BV1Av4y1n7Mk/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 130,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      693,
+      696
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-693.mp4"
+  },
+  {
+    "id": "xjj-b2-697",
+    "title": "手筋专项训练 10级-5级 靠单 697,698,699,700",
+    "url": "https://www.bilibili.com/video/BV1N24y1c7M1/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 139,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      697,
+      700
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-697.mp4"
+  },
+  {
+    "id": "xjj-b2-701",
+    "title": "手筋专项训练 10级-5级 靠单 701,702,703,704",
+    "url": "https://www.bilibili.com/video/BV1Ws4y127nv/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 109,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      701,
+      704
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-701.mp4"
+  },
+  {
+    "id": "xjj-b2-705",
+    "title": "手筋专项训练 10级-5级 靠单 705,706,707,708",
+    "url": "https://www.bilibili.com/video/BV1YM4y1y769/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 118,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      705,
+      708
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-705.mp4"
+  },
+  {
+    "id": "xjj-b2-709",
+    "title": "手筋专项训练 10级-5级 靠单 709,710,711,712",
+    "url": "https://www.bilibili.com/video/BV1EX4y167mW/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 126,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      709,
+      712
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-709.mp4"
+  },
+  {
+    "id": "xjj-b2-713",
+    "title": "手筋专项训练 10级-5级 靠单 713,714,715,716",
+    "url": "https://www.bilibili.com/video/BV1xv4y1n7Gn/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 150,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      713,
+      716
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-713.mp4"
+  },
+  {
+    "id": "xjj-b2-717",
+    "title": "手筋专项训练 10级-5级 宽征 717,718,719,720",
+    "url": "https://www.bilibili.com/video/BV1kg4y1j7vU/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 97,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      717,
+      720
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-717.mp4"
+  },
+  {
+    "id": "xjj-b2-721",
+    "title": "手筋专项训练 10级-5级 宽征 721,722,723,724",
+    "url": "https://www.bilibili.com/video/BV1r24y1c72i/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 101,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      721,
+      724
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-721.mp4"
+  },
+  {
+    "id": "xjj-b2-725",
+    "title": "手筋专项训练 10级-5级 宽征 725,726,727,728",
+    "url": "https://www.bilibili.com/video/BV1Bm4y127Hd/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 79,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      725,
+      728
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-725.mp4"
+  },
+  {
+    "id": "xjj-b2-729",
+    "title": "手筋专项训练 10级-5级 宽征 729,730,731,732",
+    "url": "https://www.bilibili.com/video/BV1Wm4y127uj/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 60,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      729,
+      732
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-729.mp4"
+  },
+  {
+    "id": "xjj-b2-733",
+    "title": "手筋专项训练 10级-5级 宽征 733,734,735,736",
+    "url": "https://www.bilibili.com/video/BV13c411J7cU/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 85,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      733,
+      736
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-733.mp4"
+  },
+  {
+    "id": "xjj-b2-737",
+    "title": "手筋专项训练 10级-5级 宽征 737,738,739,740",
+    "url": "https://www.bilibili.com/video/BV1xM4y1a7NH/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 106,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      737,
+      740
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-737.mp4"
+  },
+  {
+    "id": "xjj-b2-741",
+    "title": "手筋专项训练 10级-5级 宽征 741,742,743,744",
+    "url": "https://www.bilibili.com/video/BV1Hh4y1p72M/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 93,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      741,
+      744
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-741.mp4"
+  },
+  {
+    "id": "xjj-b2-745",
+    "title": "手筋专项训练 10级-5级 宽征 745,746,747,748",
+    "url": "https://www.bilibili.com/video/BV1WM4y1a7WL/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 90,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      745,
+      748
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-745.mp4"
+  },
+  {
+    "id": "xjj-b2-749",
+    "title": "手筋专项训练 10级-5级 宽征 749,750,751,752",
+    "url": "https://www.bilibili.com/video/BV1hv4y1E7cn/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 81,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      749,
+      752
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-749.mp4"
+  },
+  {
+    "id": "xjj-b2-753",
+    "title": "手筋专项训练 10级-5级 宽征 753,754,755,756",
+    "url": "https://www.bilibili.com/video/BV1xo4y1b7KT/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 101,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      753,
+      756
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-753.mp4"
+  },
+  {
+    "id": "xjj-b2-757",
+    "title": "手筋专项训练 10级-5级 宽征 757,758,759,760",
+    "url": "https://www.bilibili.com/video/BV1nX4y1m7JM/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 145,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      757,
+      760
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-757.mp4"
+  },
+  {
+    "id": "xjj-b2-761",
+    "title": "手筋专项训练 10级-5级 宽征 761,762,763,764",
+    "url": "https://www.bilibili.com/video/BV1ks4y1c7wu/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 85,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      761,
+      764
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-761.mp4"
+  },
+  {
+    "id": "xjj-b2-765",
+    "title": "手筋专项训练 10级-5级 宽征 765,766,767,768",
+    "url": "https://www.bilibili.com/video/BV1Mz4y1Y7W2/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 63,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "intermediate-tesuji",
+    "problems": [
+      765,
+      768
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-b2-765.mp4"
+  },
+  {
+    "id": "gong-b3-403",
+    "title": "《死活专项训练 入门到10》第403-408题（404-405-406-407）",
+    "url": "https://www.bilibili.com/video/BV1E54y1z7mT/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 378,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      403,
+      408
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-403.mp4"
+  },
+  {
+    "id": "gong-b3-409",
+    "title": "《死活专项训练 入门到10》第409-414题（410-411-412-413）",
+    "url": "https://www.bilibili.com/video/BV1NK411H7cX/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 359,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      409,
+      414
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-409.mp4"
+  },
+  {
+    "id": "gong-b3-415",
+    "title": "《死活专项训练 入门到10》第415-420题（416-417-418-419）",
+    "url": "https://www.bilibili.com/video/BV1cv411z7xa/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 219,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      415,
+      420
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-415.mp4"
+  },
+  {
+    "id": "gong-b3-421",
+    "title": "《死活专项训练 入门到10》第421-426题（422-423-424-425）",
+    "url": "https://www.bilibili.com/video/BV1rT4y1771Q/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 444,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      421,
+      426
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-421.mp4"
+  },
+  {
+    "id": "gong-b3-427",
+    "title": "《死活专项训练 入门到10》第427-432题（428-429-430-431）",
+    "url": "https://www.bilibili.com/video/BV1VK411H7qM/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 448,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      427,
+      432
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-427.mp4"
+  },
+  {
+    "id": "gong-b3-499",
+    "title": "《死活专项训练 入门到10》第499-504题（500-501-502-503）",
+    "url": "https://www.bilibili.com/video/BV1ii4y1E7dE/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 251,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      499,
+      504
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-499.mp4"
+  },
+  {
+    "id": "gong-b3-505",
+    "title": "《死活专项训练 入门到10》第505-510题（506-507-508-509）",
+    "url": "https://www.bilibili.com/video/BV1Jv411y7vL/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 299,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      505,
+      510
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-505.mp4"
+  },
+  {
+    "id": "gong-b3-511",
+    "title": "《死活专项训练 入门到10》第511-516题（512-513-514-515）",
+    "url": "https://www.bilibili.com/video/BV1vD4y1R7RR/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 292,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      511,
+      516
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-511.mp4"
+  },
+  {
+    "id": "gong-b3-517",
+    "title": "《死活专项训练 入门到10》第517-522题（518-519-520-521）",
+    "url": "https://www.bilibili.com/video/BV1x54y1172Q/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 258,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      517,
+      522
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-517.mp4"
+  },
+  {
+    "id": "gong-b3-523",
+    "title": "《死活专项训练 入门到10》第523-528题（524-525-526-527）",
+    "url": "https://www.bilibili.com/video/BV16D4y1R7MM/",
+    "author": "龚老师爱吃恐龙腿",
+    "duration_seconds": 231,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [],
+    "checked_at": "2026-10-24",
+    "book": "beginner-life",
+    "problems": [
+      523,
+      528
+    ],
+    "verification": "逐题讲解：标题题号与本书章节一致，抽查棋形与已导入题目逐子相符；未逐集完整观看",
+    "playback_url": "/api/videos/gong-b3-523.mp4"
+  },
+  {
+    "id": "wang-05",
+    "title": "围棋基础班《第5课：制造枷吃》",
+    "url": "https://www.bilibili.com/video/BV15w411w78t/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 236,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "make_net",
+      "net"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-05.mp4"
+  },
+  {
+    "id": "wang-06",
+    "title": "围棋基础班《第6课：制造倒扑》",
+    "url": "https://www.bilibili.com/video/BV1Bw411C7JZ/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 193,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "make_snapback",
+      "snapback"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-06.mp4"
+  },
+  {
+    "id": "wang-07",
+    "title": "围棋基础班《第7课：倒扑和接不归》",
+    "url": "https://www.bilibili.com/video/BV1cw411X7Ps/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 173,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "snapback",
+      "connection_trap"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-07.mp4"
+  },
+  {
+    "id": "wang-10",
+    "title": "围棋基础班《第10课：对杀》",
+    "url": "https://www.bilibili.com/video/BV1nQ4y1s7BQ/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 144,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-10.mp4"
+  },
+  {
+    "id": "wang-12",
+    "title": "围棋基础班《第12课：公气对杀》",
+    "url": "https://www.bilibili.com/video/BV14G41127RQ/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 220,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-12.mp4"
+  },
+  {
+    "id": "wang-13",
+    "title": "围棋基础班《第13课：做眼》",
+    "url": "https://www.bilibili.com/video/BV1mQ4y1s79k/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 230,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-13.mp4"
+  },
+  {
+    "id": "wang-14",
+    "title": "围棋基础班《第14课：破眼》",
+    "url": "https://www.bilibili.com/video/BV12G411y7qC/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 253,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-14.mp4"
+  },
+  {
+    "id": "wang-16",
+    "title": "围棋基础班《第16课：直四、方四》",
+    "url": "https://www.bilibili.com/video/BV1XB4y1o7Di/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 240,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "four_space_eyes",
+      "straight_bent_four"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-16.mp4"
+  },
+  {
+    "id": "wang-17",
+    "title": "围棋基础班《第17课：占据要点》",
+    "url": "https://www.bilibili.com/video/BV1HM411X718/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 237,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "vital_point"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-17.mp4"
+  },
+  {
+    "id": "wang-18",
+    "title": "围棋基础班《第18课：胀死牛》",
+    "url": "https://www.bilibili.com/video/BV1oM411Q7iF/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 180,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "swell_kill"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-18.mp4"
+  },
+  {
+    "id": "wang-19",
+    "title": "围棋基础班《第19课：扩大眼位》",
+    "url": "https://www.bilibili.com/video/BV1xC4y1378m/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 164,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "enlarge_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-19.mp4"
+  },
+  {
+    "id": "wang-20",
+    "title": "围棋基础班《第20课：缩小眼位》",
+    "url": "https://www.bilibili.com/video/BV1bM411R7Zs/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 206,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-20.mp4"
+  },
+  {
+    "id": "wang-26",
+    "title": "围棋基础班《第26课：反击错着》",
+    "url": "https://www.bilibili.com/video/BV1f84y1X7Zk/",
+    "author": "广州围棋王老师",
+    "duration_seconds": 259,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "counter_mistake"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/wang-26.mp4"
+  },
+  {
+    "id": "sha-05",
+    "title": "第5章 做眼",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=5",
+    "author": "围棋沙师弟",
+    "duration_seconds": 251,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-05.mp4"
+  },
+  {
+    "id": "sha-06",
+    "title": "第6章 破眼",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=6",
+    "author": "围棋沙师弟",
+    "duration_seconds": 186,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-06.mp4"
+  },
+  {
+    "id": "sha-08",
+    "title": "第8章 三空死活",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=8",
+    "author": "围棋沙师弟",
+    "duration_seconds": 126,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "three_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-08.mp4"
+  },
+  {
+    "id": "sha-16",
+    "title": "第16章 曲四死活",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=16",
+    "author": "围棋沙师弟",
+    "duration_seconds": 145,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "straight_bent_four",
+      "four_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-16.mp4"
+  },
+  {
+    "id": "sha-24",
+    "title": "第24章 吃二路子",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=24",
+    "author": "围棋沙师弟",
+    "duration_seconds": 102,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "second_line",
+      "edge_chase"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-24.mp4"
+  },
+  {
+    "id": "sha-25",
+    "title": "第25章 吃三路子",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=25",
+    "author": "围棋沙师弟",
+    "duration_seconds": 150,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "third_line"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-25.mp4"
+  },
+  {
+    "id": "sha-28",
+    "title": "第28章 胀死牛",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=28",
+    "author": "围棋沙师弟",
+    "duration_seconds": 105,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "swell_kill"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-28.mp4"
+  },
+  {
+    "id": "sha-35",
+    "title": "第35章 滚打包收",
+    "url": "https://www.bilibili.com/video/BV1fw411o7dB/?p=35",
+    "author": "围棋沙师弟",
+    "duration_seconds": 92,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "squeeze"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/sha-35.mp4"
+  },
+  {
+    "id": "chenchen-third-line",
+    "title": "【围棋吃子训练】吃三线子，挑战一下高难度～看看你能不能吃掉三线子",
+    "url": "https://www.bilibili.com/video/BV1qN411Y76h/",
+    "author": "晨晨老师讲围棋",
+    "duration_seconds": 110,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "third_line"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chenchen-third-line.mp4"
+  },
+  {
+    "id": "xjj-third-line",
+    "title": "三线子的吃法",
+    "url": "https://www.bilibili.com/video/BV1jw411d7sK/",
+    "author": "大魔法师小金金",
+    "duration_seconds": 326,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "third_line"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/xjj-third-line.mp4"
   }
 ]
