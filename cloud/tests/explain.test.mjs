@@ -60,6 +60,12 @@ test('the model rewrite may not add numbers, move captures or change script',()=
  assert.equal(checkWhy('黑1讓白棋只剩1口气被打吃，黑3提掉白棋1子。',source),'traditional');
  assert.equal(checkWhy('白棋1子只剩1口气被打吃，最后被提掉。',source),'labels');
  assert.equal(checkWhy('黑1打吃，黑3征吃白棋1子并提掉。',source),'term');
+ assert.equal(checkWhy('黑1一下，白棋1子只剩1口气，快被打吃了；黑3提掉白棋1子。',source),'drift');
+ assert.equal(checkWhy('黑1让白棋1子只剩1口气；黑3提掉白棋1子。',source),'dropped');
+ const eye='标“眼”的点在中间，中间的眼看四个斜角，最多只能让对方占一个；现在有1个斜角是白子，所以是真眼。';
+ assert.equal(checkWhy('标“眼”的点在中间，要看4个斜角，最多只能让对方占1个；现在有1个斜角是白子，所以是真眼。',eye),null);
+ assert.equal(checkWhy('标“眼”的点在中间，4个斜角对方没法占，现在有1个斜角是白子，所以是真眼。',eye),'drift');
+ assert.equal(ruleWhy({steps:[{move:{color:1},text:'黑1：白棋4子只剩1口气，被打吃了；黑1自己只剩1口气，是故意送给白棋吃的。'}],summary:['白棋4子只剩1口气，被打吃了，怎么逃都会被提掉'],demos:[]}),'黑1：白棋4子只剩1口气，被打吃了；黑1自己只剩1口气，是故意送给白棋吃的。白棋4子只剩1口气，被打吃了，怎么逃都会被提掉。');
  const e=explainLesson(ladder());assert.equal(ruleWhy(e),'黑1：白棋1子只剩1口气，被打吃了，怎么逃都会被提掉。');
 });
 

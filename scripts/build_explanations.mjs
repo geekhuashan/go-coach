@@ -10,10 +10,12 @@
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {existsSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {explainLesson,EXPLAIN_VERSION} from '../cloud/explain.mjs';
 import {ruleWhy,prompt,checkWhy} from './explanation-model.mjs';
 
-const ROOT=new URL('..',import.meta.url).pathname,OUT=ROOT+'.local/explanations/';
+// fileURLToPath, not URL.pathname: the repository path has spaces and CJK characters.
+const ROOT=fileURLToPath(new URL('..',import.meta.url)),OUT=ROOT+'.local/explanations/';
 const args=process.argv.slice(2),flag=n=>args.includes(n),option=(n,d)=>{const i=args.indexOf(n);return i>=0?args[i+1]:d;};
 const DB='go-coach-wnam',HOUSEHOLD='home';
 const MODEL=option('--model','minimax-code/MiniMax-M3.1-Flash'),ENDPOINT=option('--endpoint','http://127.0.0.1:3425/v1/chat/completions');
