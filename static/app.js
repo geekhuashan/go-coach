@@ -735,8 +735,11 @@ const chapterVideoConcepts={
 };
 function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
 function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
+// The base stays a quoted path: a gateway that mounts the app under a prefix (xixi's /go/) rewrites
+// it together with the catalog's playback_url, so both keep matching.
 function teachingPlaybackUrl(video){
- try{const url=new URL(video.playback_url,location.origin);return video.playback_url&&url.origin===location.origin&&/^\/api\/videos\/[A-Za-z0-9_-]+\.mp4$/.test(url.pathname)&&!url.search&&!url.hash?url.pathname:null;}catch{return null;}
+ const base='/api/videos/';
+ try{const url=new URL(video.playback_url,location.origin);return video.playback_url&&url.origin===location.origin&&url.pathname.startsWith(base)&&/^[A-Za-z0-9_-]+\.mp4$/.test(url.pathname.slice(base.length))&&!url.search&&!url.hash?url.pathname:null;}catch{return null;}
 }
 function stopTeachingPlayback(){
  teachingPlaybackEpoch++;teachingPlaybackRequest?.abort();teachingPlaybackRequest=null;teachingPlayback=null;

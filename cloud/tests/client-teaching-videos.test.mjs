@@ -53,3 +53,14 @@ test('per-problem explanations match only their own book and problem, never by c
  assert.deepEqual(Array.from(c.problemTeachingVideos({study_path:{id:'intermediate-tesuji',role:'supplement',number:5}},videos)),[]);
  for(const [chapter] of Object.values(chapters).flat())for(const id of related({concept:chapter,skill:'tsumego'}))assert.ok(!videos.find(v=>v.id===id).problems,`${chapter} 按概念推荐了逐题讲解 ${id}`);
 });
+
+test('videos play in the app both standalone and behind a gateway that prefixes quoted root paths',()=>{
+ // The same rewrite xixi's /go/ gateway applies to the app's scripts and catalog.
+ const prefix=text=>text.replace(/(["'`])(\/(?!\/)[^"'`\r\n]*?)\1/g,(m,q,path)=>`${q}/go${path}${q}`);
+ for(const [script,catalog] of [[code('teachingPlaybackUrl'),videos],[prefix(code('teachingPlaybackUrl')),JSON.parse(prefix(JSON.stringify(videos)))]]){
+  const v=vm.createContext({URL,location:{origin:'https://family.example'}});vm.runInContext(script,v);
+  assert.equal(catalog.filter(video=>v.teachingPlaybackUrl(video)).length,catalog.length);
+  assert.equal(v.teachingPlaybackUrl({playback_url:'https://other.example/api/videos/x.mp4'}),null);
+  assert.equal(v.teachingPlaybackUrl({playback_url:catalog[0].playback_url.replace('.mp4','.mp4?x=1')}),null);
+ }
+});
