@@ -14,14 +14,16 @@ function move(s,x,y,color=s.to_play){if(s.ended)throw new Error('本局已结束
 }
 export function sequenceNode(s){let node=s.lesson.tree;for(const m of s.moves){node=node.children?.find(c=>c.move[0]===m.x&&c.move[1]===m.y);if(!node)return null;}return node;}
 export function captureGoalComplete(s){const objective=s.lesson?.objective,targets=objective?.targets||[],captured=targets.map(([x,y])=>[s.board,...(s.history||[]).map(h=>h.board)].some(board=>board[y][x]!==3-s.initial_player));return !!targets.length&&(objective.kind==='capture'?captured.every(Boolean):objective.kind==='capture_any'?captured.some(Boolean):false);}
-function sequencePlay(s,x,y){let node=sequenceNode(s);if(!node)throw new Error('当前变化未收录，请重试。');let child=node.children?.find(c=>c.move[0]===x&&c.move[1]===y);move(s,x,y);let summary,explanation,correct=null,status;
+function sequencePlay(s,x,y,ex){let node=sequenceNode(s);if(!node)throw new Error('当前变化未收录，请重试。');let child=node.children?.find(c=>c.move[0]===x&&c.move[1]===y);move(s,x,y);let summary,explanation,correct=null,status;
  if(captureGoalComplete(s)){s.lesson_attempted=true;status='solved';correct=true;summary='目标已提掉，这手完成了题目。';explanation='已按棋盘规则核对实际提子结果，不要求落子与参考答案完全相同。';}
  else if(!child){s.lesson_attempted=true;s.lesson_playout=true;status='unlisted';summary='这手走出了参考变化，等待复核。';explanation='复核后 KataGo 会按当前局面应手，你仍可以继续下。';s.assisted=true;}
  else {explanation=child.explanation||'';if(child.children?.length){const replies=child.children,reply=replies[((s._branch_seed||0)+Math.floor(s.moves.length/2))%replies.length];move(s,...reply.move);explanation+=' '+(reply.explanation||'');child=reply;}const solved=!child.children?.length;s.lesson_attempted=solved;correct=solved?true:null;status=solved?'solved':'playing';summary=solved?(s.lesson.objective?.kind==='authored_solution'?'已完成作者收录的正确变化。':'这条吃子变化完成，目标已提掉。'):'对手已应手，请继续计算下一手。';}
  s.assessment={correct,summary,explanation:explanation.trim(),marks:[],skill:s.lesson.skill,difficulty:s.lesson.difficulty};s.lesson_progress={status,ply:s.moves.length,message:summary};s.message=summary+' '+explanation;
+ if(correct===true&&ex?.why){const line=ex.steps.filter(f=>f.move),own=s.moves.length===line.length&&s.moves.every((m,i)=>m.x===line[i].move.x&&m.y===line[i].move.y);s.assessment.why=ex.why;s.assessment.why_title=own?'为什么对':'书上正解的思路';}
 }
-function submitSelection(s,points){if(s.mode!=='lesson'||s.lesson?.objective?.kind!=='select_stones'||s.demo_active)throw new Error('当前不是选择棋子题。');if(s.lesson_attempted)throw new Error('本题已作答，请重练或选择下一题。');if(!Array.isArray(points)||!points.length||points.length>s.size*s.size)throw new Error('请至少选择一颗棋子。');const selected=[];for(const p of points){if(!Array.isArray(p)||p.length!==2||p.some(v=>!Number.isInteger(v)||v<0||v>=s.size))throw new Error('选择坐标无效。');selected.push([...p]);}const ids=selected.map(p=>p.join(','));if(new Set(ids).size!==ids.length)throw new Error('不能重复选择同一颗棋子。');const targets=s.lesson.objective.targets.map(p=>p.join(',')),correct=ids.length===targets.length&&ids.every(id=>targets.includes(id));const summary=correct?'选择正确，所有目标白子都找到了。':'这次有遗漏或选多了，再对照每块白棋的气。',explanation=correct?'这些白棋正是题目要求标记的目标。':'本次只标出你已选择的位置；重练后可以重新判断。',answerMarks=selected.map(([x,y])=>({x,y,label:correct?'△':'已选'}));s.lesson_attempted=true;s.assessment={correct,summary,explanation,marks:answerMarks,skill:s.lesson.skill,difficulty:s.lesson.difficulty};s.marks=[...clone(s.lesson.marks||[]),...clone(answerMarks)];s.lesson_progress={status:correct?'solved':'failed',ply:0,message:summary};s.message=summary+' '+explanation;}
-function submitAnswer(s,answer){
+function submitSelection(s,points,ex){if(s.mode!=='lesson'||s.lesson?.objective?.kind!=='select_stones'||s.demo_active)throw new Error('当前不是选择棋子题。');if(s.lesson_attempted)throw new Error('本题已作答，请重练或选择下一题。');if(!Array.isArray(points)||!points.length||points.length>s.size*s.size)throw new Error('请至少选择一颗棋子。');const selected=[];for(const p of points){if(!Array.isArray(p)||p.length!==2||p.some(v=>!Number.isInteger(v)||v<0||v>=s.size))throw new Error('选择坐标无效。');selected.push([...p]);}const ids=selected.map(p=>p.join(','));if(new Set(ids).size!==ids.length)throw new Error('不能重复选择同一颗棋子。');const targets=s.lesson.objective.targets.map(p=>p.join(',')),correct=ids.length===targets.length&&ids.every(id=>targets.includes(id));const summary=correct?'选择正确，所有目标白子都找到了。':'这次有遗漏或选多了，再对照每块白棋的气。',explanation=correct?'这些白棋正是题目要求标记的目标。':'本次只标出你已选择的位置；重练后可以重新判断。',answerMarks=selected.map(([x,y])=>({x,y,label:correct?'△':'已选'}));s.lesson_attempted=true;s.assessment={correct,summary,explanation,marks:answerMarks,skill:s.lesson.skill,difficulty:s.lesson.difficulty};s.marks=[...clone(s.lesson.marks||[]),...clone(answerMarks)];s.lesson_progress={status:correct?'solved':'failed',ply:0,message:summary};s.message=summary+' '+explanation;
+ if(correct&&ex?.steps?.[0]?.text){s.assessment.why=ex.steps[0].text;s.assessment.why_title='为什么对';s.marks.push(...clone(ex.steps[0].marks.filter(m=>m.label==='气')));}}
+function submitAnswer(s,answer,ex){
  if(s.mode!=='lesson'||s.lesson?.objective?.kind!=='choose_answer'||s.demo_active)throw new Error('当前不是判断题。');
  if(s.lesson_attempted)throw new Error('本题已作答，请重练或选择下一题。');
  if(typeof answer!=='string'||!s.lesson.choices.some(choice=>choice.id===answer))throw new Error('请选择题目提供的一个选项。');
@@ -29,6 +31,7 @@ function submitAnswer(s,answer){
  const explanation=correct?'已按这道题核对过的参考答案确认。':'可以重练后重新判断，或主动查看参考解法。';
  s.lesson_attempted=true;s.assessment={correct,summary,explanation,marks:[],selected_answer:answer,skill:s.lesson.skill,difficulty:s.lesson.difficulty};
  s.lesson_progress={status:correct?'solved':'failed',ply:0,message:summary};s.message=summary+' '+explanation;
+ if(correct&&ex?.why){s.assessment.why=ex.why;s.assessment.why_title='为什么对';s.assessment.marks=clone(ex.steps[0]?.marks||[]);s.marks=clone(s.assessment.marks);}
 }
 function undoOne(s){if(!s.history.length)throw new Error('没有可以撤回的落子。');const previous=s.history.pop();if(previous.lesson_progress===undefined)delete s.lesson_progress;Object.assign(s,previous);normalizeLessonPlayout(s);s.moves=s.moves.slice(0,s.move_number);delete s.inspection;}
 export function createMatch(profiles,profileId,a){const byId=new Map(profiles.map(p=>[p.id,p]));const human=id=>{if(!byId.has(id))throw new Error('找不到对局参与者。');return {type:'human',profile_id:id,name:byId.get(id).name}};const mode=a.match_mode||'two_player';if(!['two_player','human_ai'].includes(mode))throw new Error('请选择人机或双人对弈。');const match={id:crypto.randomUUID().replaceAll('-',''),mode};
@@ -51,7 +54,7 @@ export function applyAction(state,a,ctx){let s=clone(state);normalizeLessonPlayo
   if(s.demo_active)throw new Error('请先返回原局面。');if(s.mode==='lesson'&&s.lesson_attempted&&!s.lesson_playout)throw new Error('本轮练习已结束，请重试或下一题。');
   if(type==='ai_move'){if(!computerTurn(s))throw new Error('当前没有轮到电脑。');if(ctx.aiMove?.pass)pass(s);else if(ctx.aiMove)move(s,ctx.aiMove.x,ctx.aiMove.y);else throw new Error('电脑没有返回落点。');if(s.lesson_playout){s.lesson_progress={status:s.ended?'ended':'exploring',ply:s.moves.length,message:s.ended?'双方已停一手，本次续弈结束。':'KataGo 已应手，请继续下一手。'};s.message=s.lesson_progress.message;}}
   else if(s.lesson_playout){const before=clone(s.board),result=move(s,a.x,a.y);s.assessment=ruleFeedback(before,s.board,a.x,a.y,3-s.to_play,result.captured);s.last_human_assessment=clone(s.assessment);s.marks=clone(s.assessment.marks||[]);s.lesson_progress={status:'exploring',ply:s.moves.length,message:'已保留这手，KataGo 正在根据当前局面应对。'};s.message=s.assessment.summary+' '+s.assessment.explanation;}
-  else if(s.lesson?.objective?.kind==='choose_answer')throw new Error('请用选项按钮提交判断，不要在棋盘上落子。');else if(s.lesson?.objective?.kind==='select_stones')throw new Error('请点选白子并提交答案，不要在棋盘上落子。');else if(s.lesson?.sequence)sequencePlay(s,a.x,a.y);else move(s,a.x,a.y);
+  else if(s.lesson?.objective?.kind==='choose_answer')throw new Error('请用选项按钮提交判断，不要在棋盘上落子。');else if(s.lesson?.objective?.kind==='select_stones')throw new Error('请点选白子并提交答案，不要在棋盘上落子。');else if(s.lesson?.sequence)sequencePlay(s,a.x,a.y,ctx.explanation);else move(s,a.x,a.y);
   if(type==='play'&&s.mode==='free')s.last_human_assessment=clone(s.assessment);
  }
  else if(type==='pass')pass(s);
@@ -69,25 +72,37 @@ export function applyAction(state,a,ctx){let s=clone(state);normalizeLessonPlayo
  else if(type==='resume_match'){if(!ctx.resumeState)throw new Error('找不到这位学习者参与的对局。');s=clone(ctx.resumeState);s.feedback=[];}
  else if(type==='hint'){if(s.mode==='lesson'&&!s.lesson_attempted){s.assisted=true;helped.add(lessonId);}s.message=s.lesson?.hint||'先数整块棋的气。';}
  else if(type==='inspect'){if(!Number.isInteger(a.x)||!Number.isInteger(a.y)||a.x<0||a.y<0||a.x>=s.size||a.y>=s.size)throw new Error('坐标无效。');const g=group(s.board,a.x,a.y);s.inspection={stones:g.stones.map(([x,y])=>({x,y})),liberties:g.liberties.map(([x,y])=>({x,y})),color:s.board[a.y][a.x]};s.marks=g.liberties.map(([x,y])=>({x,y,label:'气'}));if(g.stones.length&&s.mode==='lesson'&&!s.lesson_attempted){s.assisted=true;helped.add(lessonId);}s.message=g.stones.length?`这块棋有${g.stones.length}颗棋子、${g.liberties.length}口气。`:'这里是空点，请选一颗棋子。';}
- else if(type==='submit_selection')submitSelection(s,a.points);
- else if(type==='submit_answer')submitAnswer(s,a.answer);
+ else if(type==='submit_selection')submitSelection(s,a.points,ctx.explanation);
+ else if(type==='submit_answer')submitAnswer(s,a.answer,ctx.explanation);
  else if(type==='feedback'){const text=String(a.text||'').trim();if(!text||text.length>4000)throw new Error('想法需为1至4000字。');note={text,move_number:s.move_number,created_at:new Date().toISOString(),profile_id:ctx.profileId,lesson_id:s.lesson?.id||null};s.message='想法已保存。';}
  else if(type==='annotate'){if(!Array.isArray(a.marks)||a.marks.length>361)throw new Error('标记格式无效。');s.marks=a.marks.map(m=>{if(!Number.isInteger(m.x)||!Number.isInteger(m.y)||m.x<0||m.y<0||m.x>=s.size||m.y>=s.size)throw new Error('标记坐标无效。');return {x:m.x,y:m.y,label:String(m.label||'').slice(0,20)}});s.message=String(a.message||'').slice(0,4000);}
  else if(type==='setup'){s=blank(a.size||9);s.mode='lesson';if(!Array.isArray(a.stones)||a.stones.length>s.size*s.size)throw new Error('摆子格式无效。');for(const p of a.stones){if(!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<0||p.y<0||p.x>=s.size||p.y>=s.size||![1,2].includes(p.color)||s.board[p.y][p.x])throw new Error('摆子坐标或颜色无效。');s.board[p.y][p.x]=p.color;}for(const p of a.stones)if(!group(s.board,p.x,p.y).liberties.length)throw new Error('初始棋块必须有气。');s.to_play=s.initial_player=a.to_play||1;if(![1,2].includes(s.to_play))throw new Error('执棋颜色无效。');s.initial_board=clone(s.board);s.lesson={id:'custom',title:String(a.title||'老师的练习题').slice(0,200),prompt:String(a.prompt||'请观察局面，再下一手。').slice(0,2000),hint:'先数整块棋的气。',stones:clone(a.stones),size:s.size};s.message=s.lesson.prompt;}
  else if(type==='demo'){if(s.demo_active||!Array.isArray(a.moves)||!a.moves.length||a.moves.length>100)throw new Error('请提供1至100手演示，且先退出已有演示。');const checked=clone(s);checked.demo_active=true;for(const m of a.moves)move(checked,m.x,m.y,m.color||checked.to_play);s._demo_backup=clone(s);s._demo_moves=clone(a.moves);s.demo_active=true;s.demo_step=0;s.demo_total=a.moves.length;if(lessonId)helped.add(lessonId);demoNext(s);}
  else if(type==='solution'){
-  if(s.demo_active||(!s.lesson?.sequence&&s.lesson?.objective?.kind!=='choose_answer'))throw new Error('请在支持参考解法的练习原局面查看。');
-  if(s.lesson.objective?.kind==='choose_answer'){
-   helped.add(lessonId);s.assisted=true;s._demo_backup=clone(s);s.demo_active=true;s.demo_step=s.demo_total=1;
-   const choice=s.lesson.choices.find(item=>item.id===s.lesson.objective.answer);s.demo_answer=clone(choice);s.message='参考答案：'+choice.label+'。返回原题后可以重新判断。';
+  const kind=s.lesson?.objective?.kind,ex=ctx.explanation||null;
+  if(s.demo_active||!s.lesson||(!s.lesson.sequence&&kind!=='choose_answer'&&!(kind==='select_stones'&&ex?.steps?.length)))throw new Error('请在支持参考解法的练习原局面查看。');
+  const extra=a.demo===undefined?null:Number.isInteger(a.demo)?ex?.demos?.[a.demo]:null;if(a.demo!==undefined&&!extra)throw new Error('这段讲解演示暂时没有。');
+  // Looking at the explanation of a problem already solved on one's own is review, not help.
+  if(!(s.lesson_attempted&&s.assessment?.correct===true&&!s.assisted)){helped.add(lessonId);s.assisted=true;}
+  const backup=clone(s);
+  if(extra){s=lessonState(s.lesson);s.assisted=backup.assisted;s.demo_active=true;if(extra.from==='after')for(const f of ex.steps)if(f.move)move(s,f.move.x,f.move.y,f.move.color);startDemo(s,backup,explainedFrames(extra.frames));}
+  else if(kind==='choose_answer'||kind==='select_stones'){
+   s._demo_backup=backup;s.demo_active=true;s.demo_step=s.demo_total=1;s.demo_explained=!!ex;
+   if(kind==='choose_answer'){const choice=s.lesson.choices.find(item=>item.id===s.lesson.objective.answer);s.demo_answer=clone(choice);s.message='参考答案：'+choice.label+'。'+(ex?.steps?.[0]?.text?' '+ex.steps[0].text:'返回原题后可以重新判断。');}
+   else s.message='参考答案：'+ex.steps[0].text;
+   s.marks=clone(ex?.steps?.[0]?.marks||[]);
   }else{
   function path(node,state,moves=[]){if(!node.children?.length)return moves.length&&node.correct!==false?moves:null;for(const child of node.children){try{const next=clone(state);next.demo_active=true;move(next,...child.move);const result=path(child,next,[...moves,{x:child.move[0],y:child.move[1]}]);if(result)return result;}catch{}}return null;}
-  const initial=lessonState(s.lesson),moves=path(s.lesson.tree,initial);if(!moves)throw new Error('这道题暂时没有可演示的合法参考解法。');helped.add(lessonId);s.assisted=true;const backup=clone(s);s=initial;s.assisted=true;s._demo_backup=backup;s._demo_moves=moves;s.demo_active=true;s.demo_step=0;s.demo_total=moves.length;demoNext(s);}
+  const initial=lessonState(s.lesson),moves=path(s.lesson.tree,initial);if(!moves)throw new Error('这道题暂时没有可演示的合法参考解法。');
+  // Narrated frames replace the bare moves only when they replay exactly the same line.
+  const line=ex?.steps?.filter(f=>f.move)||[],narrated=line.length===moves.length&&line.length===ex.steps.length&&line.every((f,i)=>f.move.x===moves[i].x&&f.move.y===moves[i].y);
+  s=initial;s.assisted=backup.assisted;startDemo(s,backup,narrated?explainedFrames(ex.steps):moves);}
  }
  else if(type==='demo_next')demoNext(s);
  else if(type==='restore_demo'){if(!s._demo_backup)throw new Error('当前没有演示。');s=clone(s._demo_backup);s.message='已返回原局面。';}
  else if(['resign','propose_result','confirm_result'].includes(type)){finishMatch(s,a,ctx.profileId);}
  else throw new Error('未知操作。');
+ if(ctx.explanation&&s.lesson&&s.lesson_attempted&&!s.demo_active&&!s.lesson_explain)s.lesson_explain={demos:ctx.explanation.demos.map(d=>d.title)};
  if(s.lesson_progress?.status==='unlisted'&&lessonId)helped.add(lessonId);
  if(s.lesson&&helped.has(s.lesson.id))s.assisted=true;
  if(['play','submit_selection','submit_answer'].includes(type)&&s.lesson&&s.lesson.id!=='custom'&&!wasLessonPlayout&&typeof s.assessment?.correct==='boolean')event={lesson_id:s.lesson.id,title:s.lesson.title,skill:s.lesson.skill,difficulty:s.lesson.difficulty,correct:s.assessment.correct,assisted:!!s.assisted,move:type==='play'?clone(s.moves.at(-1)):null,summary:s.assessment.summary,created_at:new Date().toISOString(),profile_id:ctx.profileId};
@@ -95,7 +110,12 @@ export function applyAction(state,a,ctx){let s=clone(state);normalizeLessonPlayo
  return {state:s,helped:[...helped],runs,event,note};
 }
 function pass(s){if((s.mode==='lesson'&&!s.lesson_playout)||s.demo_active||s.ended)throw new Error('当前局面不能停一手。');if(s.match)delete s.match.result_proposal;s.history.push(snap(s));s.moves.push({color:s.to_play,pass:true});s.to_play=3-s.to_play;s.move_number++;s.last_move=null;s.passes++;s.ended=s.passes>=2;s.message=s.ended?(s.lesson_playout?'双方连续停一手，本次续弈结束。':'双方连续停一手，本局结束，尚未确认胜负。'):'已停一手，轮到对方。';}
-function demoNext(s){if(!s.demo_active||s.demo_step>=s.demo_total)throw new Error('没有下一手演示。');const m=s._demo_moves[s.demo_step];move(s,m.x,m.y,m.color||s.to_play);s.demo_step++;s.message=`演示第${s.demo_step}/${s.demo_total}手，可返回原局面。`;}
+// Demo frames are bare moves, or explanation frames that also carry text and board marks
+// (a frame without a move only shows its text).
+function startDemo(s,backup,frames){s._demo_backup=backup;s._demo_moves=frames;s.demo_active=true;s.demo_step=0;s.demo_total=frames.length;s.demo_explained=typeof frames[0]?.text==='string';demoNext(s);}
+const explainedFrames=frames=>frames.map(f=>({...(f.move?{x:f.move.x,y:f.move.y,color:f.move.color}:{}),text:f.text,marks:f.marks||[]}));
+function demoNext(s){if(!s.demo_active||s.demo_step>=s.demo_total)throw new Error('没有下一手演示。');const m=s._demo_moves[s.demo_step];if(Number.isInteger(m.x))move(s,m.x,m.y,m.color||s.to_play);s.demo_step++;
+ if(typeof m.text==='string'){s.message=m.text;s.marks=clone(m.marks);}else s.message=`演示第${s.demo_step}/${s.demo_total}手，可返回原局面。`;}
 function finishMatch(s,a,profileId){if(s.mode!=='free'||!s.match||s.demo_active)throw new Error('请在对局原局面登记结果。');if(s.match.result)throw new Error('这盘棋已有确认结果。');const side=s.match.black.profile_id===profileId?'black':s.match.white.profile_id===profileId?'white':null;if(!side)throw new Error('当前学习者不是对局参与者。');
  if(a.type==='resign'){s.match.result={winner:side==='black'?'white':'black',reason:'resign',confirmed_by:[profileId],confirmed_at:new Date().toISOString()};s.ended=true;}
  else{if(s.match.mode!=='two_player')throw new Error('人机对弈仅记录明确认输，不由模型猜测胜负。');if(a.type==='propose_result'){if(!['black','white','draw'].includes(a.winner))throw new Error('结果需为黑胜、白胜或和棋。');s.match.result_proposal={winner:a.winner,confirmed_by:[profileId]};}

@@ -1,7 +1,7 @@
 {
  "/app.js": {
-  "v": "20261024-answers",
-  "sha256": "45e2908178fedc3163552e06ed6e55e39b45d13a54de755ca68a06d8fc8863b5"
+  "v": "20261024-explain",
+  "sha256": "b37f080af106f5110deea43c084f52fe704464a062c669327366d9bc038138ad"
  },
  "/growth.css": {
   "v": "20261015-growth",
@@ -20,7 +20,7 @@
   "sha256": "050d38c8d7e2cac9e62d602289cbc594f414f3db5d937bc48196ea8fa8627239"
  },
  "/style.css": {
-  "v": "20261015-growth",
-  "sha256": "994aa25a0c4cce45419de23dddcf0df8e3b319968c864422ca320307100000fa"
+  "v": "20261024-explain",
+  "sha256": "5e7e2f6981db0f5b9f468538ce1e506d5596e63eedf4f7d7a0a37cada4485177"
  }
 }

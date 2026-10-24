@@ -161,3 +161,10 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 .chapter-question-grid button{min-width:0;min-height:44px;padding:6px;font-size:13px;background:#f3f4ed;color:#28594c;border:1px solid #d6ddd1;border-radius:8px}
 .chapter-question-grid button[aria-current="true"]{background:#28594c;color:#fff;border-color:#28594c;font-weight:700}
 .chapter-navigation button:focus-visible{outline:3px solid #b28b43;outline-offset:2px}
+
+/* Rule-checked explanation under the board: large enough for a young reader. */
+.lesson-why{margin-top:10px;padding:12px 14px;border:1px solid #c9d8c0;border-radius:10px;background:#f6faf1;color:#2f5a3e}
+.lesson-why>strong{display:block;font-size:13px;margin-bottom:4px;color:#4d7356}
+.lesson-why p{margin:0;font-size:15px;line-height:1.85;white-space:pre-line;overflow-wrap:anywhere}
+.lesson-why-demos{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.lesson-why-demos:empty{display:none}
+.lesson-why-demos button{min-height:44px;font-size:14px}

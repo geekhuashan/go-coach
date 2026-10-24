@@ -6,6 +6,7 @@ import {clone} from './rules.mjs';
 import {learning,recommend,publicLesson,validateLesson,practice,availableLesson} from './curriculum.mjs';
 import {lessonState,applyAction,navigationLessonId,computerTurn,normalizeLessonPlayout,publicState,sgf} from './game.mjs';
 import {studyPath} from './study-path.mjs';
+import {EXPLAIN_VERSION} from './explain.mjs';
 import {digest,equal,cookies,authenticated,makeSession,sessionCookie,profileCookie,encrypt,decrypt} from './auth.mjs';
 const enc=new TextEncoder(),MAX_STATE_BYTES=1500000;
 const now=()=>new Date().toISOString();
@@ -98,6 +99,8 @@ async function resultChanges(env,ctx,state){if(!state.match?.result||ctx.state.m
  if(match.mode==='two_player'){for(const c of changes)c.previous=await env.DB.prepare('SELECT rating,games FROM ratings WHERE household_id=? AND profile_id=? AND size=?').bind(ctx.hh,c.id,state.size).first()||{rating:1000,games:0};for(const c of changes){const other=changes.find(x=>x.id!==c.id),expected=1/(1+10**((other.previous.rating-c.previous.rating)/400));c.rating=c.previous.rating+24*((c.wins?1:c.draws?0.5:0)-expected);c.games=c.previous.games+1;}}
  return changes;
 }
+// Explanations contain answers, so one is read only for the lesson being answered or explained.
+async function lessonExplanation(env,hh,s){const id=s.mode==='lesson'&&s.lesson?.id;if(!id||id==='custom')return null;try{const row=await env.DB.prepare('SELECT explanation_json FROM lesson_explanations WHERE household_id=? AND lesson_id=? AND version=?').bind(hh,id,EXPLAIN_VERSION).first();return parse(row?.explanation_json)||null;}catch{return null}}
 async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!ctx.profiles.some(p=>p.id===a.profile_id))fail('找不到这位学习者。');return json(await publicContext(env,await load(env,request,a.profile_id)),200,{'Set-Cookie':profileCookie(a.profile_id)});}
  if(a.type==='add_profile'){const name=String(a.name||'').trim();if(!name||name.length>30||ctx.profiles.length>=20||ctx.profiles.some(p=>p.name===name))fail('称呼需要1至30字且不能重复，最多20人。');const id='learner-'+crypto.randomUUID().slice(0,12);const ok=await commit(env,ctx,token=>[env.DB.prepare(`INSERT INTO profiles(household_id,id,name,state_json) SELECT ?,?,?,? WHERE ${guard()}`).bind(ctx.hh,id,name,JSON.stringify(lessonState(builtinLessons.find(l=>l.id==='escape-1-1')||builtinLessons[0])),ctx.hh,token)]);if(!ok)return conflict(env,request);return json(await publicContext(env,await load(env,request,id)),200,{'Set-Cookie':profileCookie(id)});}
  if(a.type==='ai_move'){if(!computerTurn(ctx.state))fail('当前没有轮到电脑。');ctx.aiMove=await bridge(env,'move',ctx.state);ctx.aiBackend=ctx.aiMove.engine_backend;}
@@ -106,6 +109,7 @@ async function actionRoute(env,request,a,ctx){if(a.type==='switch_profile'){if(!
   let id;try{id=navigationLessonId(ctx.state,a,ctx)}catch(error){fail(error.message)}
   const selected=id?await fullLesson(env,ctx.hh,ctx.catalog,id):null;ctx.lessonById=requested=>requested===id?selected:null;
  }
+ if(['play','submit_answer','submit_selection','solution'].includes(a.type))ctx.explanation=await lessonExplanation(env,ctx.hh,ctx.state);
  let changed;try{changed=a.type==='review_move'?{state:clone(ctx.state),helped:[...ctx.helped],runs:clone(ctx.runs),event:null,note:null}:applyAction(ctx.state,a,ctx)}catch(e){fail(e.message)}let state=changed.state,aiError=null;if(a.type==='ai_move')state.engine_backend=ctx.aiBackend;
  if(a.type==='review_move'||(a.type==='play'&&state.lesson_progress?.status==='unlisted')){
   let before;try{before=reviewPosition(state);before.revision=ctx.revision;}catch(e){fail(e.message)}
