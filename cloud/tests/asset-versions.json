@@ -1,7 +1,7 @@
 {
  "/app.js": {
-  "v": "20261024-explain",
-  "sha256": "b37f080af106f5110deea43c084f52fe704464a062c669327366d9bc038138ad"
+  "v": "20261024-layout",
+  "sha256": "5e6b16d5ba6b2fe011d0df7a7a65e5db459beac2dcef991e1d4c797501ba1bda"
  },
  "/growth.css": {
   "v": "20261015-growth",
@@ -20,7 +20,7 @@
   "sha256": "050d38c8d7e2cac9e62d602289cbc594f414f3db5d937bc48196ea8fa8627239"
  },
  "/style.css": {
-  "v": "20261024-explain",
-  "sha256": "5e7e2f6981db0f5b9f468538ce1e506d5596e63eedf4f7d7a0a37cada4485177"
+  "v": "20261024-layout",
+  "sha256": "44b708223c59445a049184936249d206d1a0a56f05d0494521a8bc39cd377f70"
  }
 }

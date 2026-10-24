@@ -18,7 +18,7 @@ test('every authored tactical branch validates and can be solved without exposin
   const l=validateLesson(original,{trustedAuthored:true});let s=lessonState(l),context=ctx();let completed=false;
   for(let i=0;i<31&&!s.lesson_attempted;i++){const n=sequenceNode(s).children[0];const result=action(s,{type:'play',x:n.move[0],y:n.move[1]},context);s=result.state;if(result.event){assert.equal(result.event.correct,true);completed=true;}}
   assert.equal(completed,true,l.id);assert.equal(s.lesson_progress.status,'solved');assert.equal(publicState(s).lesson.tree,undefined);assert.equal(publicState(s).lesson.objective,undefined);
-  if(l.objective.kind==='authored_solution')assert.match(s.assessment.summary,/作者/);
+  if(l.objective.kind==='authored_solution')assert.match(s.assessment.summary,/参考答案/);
  }
 });
 test('unlisted legal moves do not grade as wrong and abandoning a sequence records help',()=>{
@@ -118,7 +118,7 @@ test('private book answers require verified provenance, replay legally and hide 
  const illegal=structuredClone(value);illegal.tree.children[0].move=[0,0];assert.throws(()=>validateLesson(illegal));
  const unmarked=structuredClone(value);delete unmarked.tree.children[0].author_verdict;assert.throws(()=>validateLesson(unmarked));
  const initial=lessonState(clean);assert.equal(publicState(initial).lesson.tree,undefined);assert.equal(publicState(initial).lesson.objective,undefined);
- const result=action(initial,{type:'play',x:1,y:0},ctx({catalog:[clean]}));assert.equal(result.state.lesson_progress.status,'solved');assert.equal(result.event.correct,true);assert.match(result.state.assessment.summary,/作者/);assert.equal(publicState(result.state).lesson.tree,undefined);
+ const result=action(initial,{type:'play',x:1,y:0},ctx({catalog:[clean]}));assert.equal(result.state.lesson_progress.status,'solved');assert.equal(result.event.correct,true);assert.match(result.state.assessment.summary,/参考答案/);assert.equal(publicState(result.state).lesson.tree,undefined);
 });
 
 test('private book stone-selection problems hide targets and grade exact sets without moves',()=>{
