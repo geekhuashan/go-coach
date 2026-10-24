@@ -107,6 +107,15 @@ test('LLM test uses manual redirects and rejects a 302 without forwarding its ke
  const calls=[];t.mock.method(globalThis,'fetch',async(url,init)=>{calls.push({url:String(url),authorization:init.headers.Authorization});assert.equal(init.redirect,'manual');assert.equal(JSON.stringify(JSON.parse(init.body)).includes('board'),false);return new Response(null,{status:302,headers:{Location:'https://untrusted.example/collect'}});});
  const result=await request('/api/llm/test','POST',{});assert.equal(result.status,503);assert.deepEqual(calls,[{url:'https://model.example/v1/chat/completions',authorization:'Bearer EXAMPLE_ONLY'}]);assert.ok(!JSON.stringify(result.body).includes('EXAMPLE_ONLY'));
 });
+test('MiniMax M3.1 gets low thinking effort with room to think, and the teacher sees the problem',async t=>{
+ const {request}=await session();let s=(await request('/api/state')).body;const saved=await request('/api/llm/settings','POST',{revision:s.revision,base_url:'https://model.example/v1',model:'MiniMax-M3.1-Flash',api_key:'EXAMPLE_ONLY',enabled:true});assert.equal(saved.status,200);
+ const bodies=[];t.mock.method(globalThis,'fetch',async(url,init)=>{bodies.push(JSON.parse(init.body));return new Response(JSON.stringify({choices:[{message:{content:'<think>先想一想</think>连接成功。',reasoning_content:'先想一想'}}]}));});
+ assert.equal((await request('/api/llm/test','POST',{})).status,200);
+ assert.equal(bodies[0].reasoning_effort,'low');assert.equal(bodies[0].reasoning_split,true);assert.equal(bodies[0].max_tokens,undefined);assert.ok(bodies[0].max_completion_tokens>2000);
+ s=(await request('/api/state')).body;s=(await request('/api/action','POST',{type:'lesson',id:'escape-1-1',revision:s.revision})).body;
+ const explained=await request('/api/llm/explain','POST',{revision:s.revision,expected_profile_id:'parent',trigger:'manual',question:''});assert.equal(explained.status,200,JSON.stringify(explained.body));assert.equal(explained.body.text,'连接成功。');
+ const payload=JSON.parse(bodies[1].messages[1].content);assert.equal(payload.lesson.prompt,lessons.find(l=>l.id==='escape-1-1').prompt);assert.equal(payload.checked_explanation,undefined,'no answer before the problem is tried');
+});
 test('practice preference persists per profile, assisted completion clears review and sequential advances',async()=>{
  const {request}=await session();let s=(await request('/api/state')).body;
  const act=async a=>{const r=await request('/api/action','POST',{...a,revision:s.revision});assert.equal(r.status,200,JSON.stringify(r.body));s=r.body;return s;};

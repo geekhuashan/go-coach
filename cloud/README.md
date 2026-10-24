@@ -30,7 +30,9 @@ D1 binding 为 `DB`，静态 binding 为 `ASSETS`。迁移按 `migrations/` 顺�
 
 首次走出参考答案时，未请求 KataGo 复核的状态记为 `deferred`，保留落子并进入续弈，不计对错；只有显式复核确实失败才记为 `unavailable`。规则确认提子或作者明确反驳仍直接采用对应证据。
 
-LLM 经用户在设置中显式启用后使用所填 OpenAI 兼容 HTTPS 服务。密钥用 SESSION_SECRET 派生的 AES-GCM 密钥加密存于 D1，读取设置不返回密钥。更换服务地址清除旧密钥，连接测试不发送棋盘。语言模型只讲解，不决定落子。
+LLM 经用户在设置中显式启用后使用所填 OpenAI 兼容 HTTPS 服务。密钥用 SESSION_SECRET 派生的 AES-GCM 密钥加密存于 D1，读取设置不返回密钥。更换服务地址清除旧密钥，连接测试不发送棋盘。语言模型只讲解，不决定落子。讲解时会附上题目；作答后再附上本题按规则核对过的讲解，作答前不附，以免提前透露答案。
+
+家里用 MiniMax 开放平台：地址 `https://api.minimaxi.com/v1`，模型 `MiniMax-M3.1-Flash`，密钥由本人在设置页填写。M3.1-Flash 无法关闭思考，默认用最高强度，而且思考消耗的 token 也算在上限里。所以模型名以 `MiniMax-` 开头时，请求会带 `reasoning_split`，把上限放宽 2048；M3.1 还会把思考强度设为 `low`。其他服务仍按 `max_tokens` 计。
 
 ## 保存和评级
 
