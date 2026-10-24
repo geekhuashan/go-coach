@@ -699,7 +699,13 @@ $('llm-test').onclick=async()=>{
 let teachingVideos=[],teachingVideosPromise=null,teachingVideosFailed=false,teachingVideosLoaded=false,teachingVideosCheckedAt=0;
 const videoTopicNames={liberties:'气与提子',capture:'吃子技巧',escape:'逃子',atari:'打吃',connect:'连接',connection:'连接',cut:'分断',cutting:'分断',eyes:'眼与做活',life_death:'死活',tsumego:'死活',ladder:'征子',net:'枷吃',snapback:'倒扑',ko:'劫',rules:'基本规则',opening:'布局',endgame:'官子',double_atari:'双打吃',gate:'关门吃',connection_trap:'接不归',edge_chase:'边线追吃',life_shapes:'基本死活形',hug:'抱吃',wedge:'挖吃'};
 Object.assign(videoTopicNames,{capture_race:'攻杀与对杀',eye_vs_no_eye:'有眼杀无眼',extend_liberties:'延气',squeeze:'滚打包收',golden_rooster:'金鸡独立',rat_steals_oil:'老鼠偷油',big_head_ghost:'大头鬼',under_the_stones:'倒脱靴'});
-const chapterVideoConcepts={'二气杀二气':['capture_race'],'二气杀多气':['capture_race','extend_liberties'],'三气杀三气':['capture_race'],'有眼杀无眼':['eye_vs_no_eye'],'实战常形':['capture_race','life_shapes'],'滚打包收':['squeeze'],'金鸡独立':['golden_rooster'],'老鼠偷油':['rat_steals_oil'],'大头鬼':['big_head_ghost'],'倒脱靴':['under_the_stones']};
+Object.assign(videoTopicNames,{make_eyes:'做眼',destroy_eyes:'破眼',enlarge_eyes:'扩大眼位',vital_point:'占据要点',three_space_eyes:'三格眼位',four_space_eyes:'四格眼位',straight_bent_four:'直四曲四',five_six_space_eyes:'五格六格眼位',swell_kill:'胀死牛',loose_ladder:'宽征（缓征）',kaodan:'靠单',second_line:'吃二线子'});
+// Every chapter of the three books is listed. An empty list marks a mixed chapter without a dedicated video.
+const chapterVideoConcepts={
+ '问吃':['atari'],'制造问吃':['atari'],'枷吃':['net'],'制造枷吃':['net'],'逃子':['escape'],'杀棋':['liberties','atari'],'倒扑':['snapback'],'制造倒扑':['snapback'],'接不归':['connection_trap'],'倒扑和接不归':['snapback','connection_trap'],'滚打包收':['squeeze'],'吃一线子':['edge_chase'],'吃二线子':['second_line','edge_chase'],'吃三线子':[],'反击错着':[],'综合运用':[],
+ '二气杀二气':['capture_race'],'二气杀多气':['capture_race','extend_liberties'],'三气杀三气':['capture_race'],'有眼杀无眼':['eye_vs_no_eye'],'实战常形':['capture_race','life_shapes'],'金鸡独立':['golden_rooster'],'老鼠偷油':['rat_steals_oil'],'大头鬼':['big_head_ghost'],'倒脱靴':['under_the_stones'],'摆脱对杀':['capture_race'],'二气的对杀':['capture_race'],'延气对杀':['extend_liberties','capture_race'],'连接':['connection','connect'],'分断':['cutting','cut'],'靠单':['kaodan'],'宽征':['loose_ladder'],
+ '真眼假眼':['eyes'],'做眼':['make_eyes'],'破眼':['destroy_eyes'],'判断真眼假眼（一至十）':['eyes'],'判断真眼假眼（十一至十二）':['eyes'],'判断真眼假眼（十三）':['eyes'],'做完整眼':['make_eyes','eyes'],'三格眼位':['three_space_eyes'],'四格眼位':['four_space_eyes'],'五格六格眼位':['five_six_space_eyes'],'直四曲四':['straight_bent_four','four_space_eyes'],'做眼综合运用':['make_eyes','eyes'],'胀死牛':['swell_kill'],'扩大眼位':['enlarge_eyes'],'占据要点':['vital_point'],'综合测试':['eyes','life_shapes'],'判断活棋死棋':['eyes','life_shapes'],
+};
 function videoTags(value){return Array.isArray(value)?value.filter(v=>typeof v==='string'):typeof value==='string'?[value]:[];}
 function videoTopics(video){const concepts=videoTags(video.concepts);return concepts.length?concepts:videoTags(video.skills);}
 function teachingPlaybackUrl(video){
@@ -760,19 +766,24 @@ function videoItem(video){
  }
  return li;
 }
-function renderTeachingVideos(){
- const lesson=state?.lesson,topics=[...videoTags(lesson?.concept),...videoTags(lesson?.concepts)],concepts=new Set((topics.length?topics:lesson?.skill==='tsumego'?['life_shapes','eyes']:[]).flatMap(concept=>chapterVideoConcepts[concept]||[concept]));
- const ranked=teachingVideos.map(video=>({video,score:videoTags(video.concepts).reduce((sum,c)=>sum+(concepts.has(c)?3:0),0)+(videoTags(video.skills).includes(lesson?.skill)?1:0)})).filter(item=>item.score>0).sort((a,b)=>b.score-a.score);
+function relatedTeachingVideos(lesson,videos){
+ const topics=[...videoTags(lesson?.concept),...videoTags(lesson?.concepts)],concepts=new Set((topics.length?topics:lesson?.skill==='tsumego'?['life_shapes','eyes']:[]).flatMap(concept=>chapterVideoConcepts[concept]||[concept]));
+ // A known concept must match: book problems all share the tsumego skill, so the skill alone is only a tie-breaker.
+ const ranked=videos.map(video=>{const matched=videoTags(video.concepts).filter(c=>concepts.has(c)).length;return {video,matched,score:matched*3+(videoTags(video.skills).includes(lesson?.skill)?1:0)};}).filter(item=>topics.length||concepts.size?item.matched>0:item.score>0).sort((a,b)=>b.score-a.score);
  const related=[],authors=new Set();
  while(ranked.length&&related.length<3){
   // Diversity only breaks relevance ties; a lower score never displaces a higher one.
   const next=ranked.findIndex(item=>item.score===ranked[0].score&&!authors.has(item.video.author||'教学视频'));
   const {video}=ranked.splice(next<0?0:next,1)[0];related.push(video);authors.add(video.author||'教学视频');
  }
- const topic=typeof lesson?.concept==='string'?(chapterVideoConcepts[lesson.concept]?lesson.concept:videoTopicNames[lesson.concept]):null;
+ return related;
+}
+function renderTeachingVideos(){
+ const lesson=state?.lesson,related=relatedTeachingVideos(lesson,teachingVideos);
+ const topic=typeof lesson?.concept==='string'?(chapterVideoConcepts[lesson.concept]?lesson.concept:videoTopicNames[lesson.concept]):null,mixed=chapterVideoConcepts[topic]?.length===0;
  $('lesson-videos').querySelector('summary').textContent=topic?`${topic} · 视频讲解`:'中文视频讲解';
  $('lesson-video-list').replaceChildren(...related.map(videoItem));
- $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?'': '当前题目暂无匹配视频，可到题库查看基础视频目录。';
+ $('lesson-video-status').textContent=teachingVideosFailed?'视频目录暂时无法加载，棋盘练习可继续。':!teachingVideosLoaded?'正在载入视频目录…':!lesson?'可以到题库的“基础视频目录”按主题观看。':related.length?'':mixed?'这一章是综合练习，没有专门对应的视频，可到题库的视频目录按主题查看。':'当前题目暂无匹配视频，可到题库查看基础视频目录。';
  renderVideoLibrary();
 }
 function renderVideoLibrary(){

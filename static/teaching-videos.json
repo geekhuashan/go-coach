@@ -418,7 +418,8 @@
       "life_death"
     ],
     "concepts": [
-      "eyes"
+      "eyes",
+      "make_eyes"
     ],
     "checked_at": "2026-09-07",
     "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
@@ -435,7 +436,8 @@
       "life_death"
     ],
     "concepts": [
-      "life_shapes"
+      "life_shapes",
+      "three_space_eyes"
     ],
     "checked_at": "2026-09-07",
     "verification": "原作者投稿、分集标题与时长已核对；未逐集观看",
@@ -794,5 +796,443 @@
     "checked_at": "2026-09-12",
     "verification": "原作者公开分集、标题、作者与时长已核对；未逐集完整观看",
     "playback_url": "/api/videos/chen-74.mp4"
+  },
+  {
+    "id": "gu-48",
+    "title": "围棋初级教学48:做眼技巧：长",
+    "url": "https://www.bilibili.com/video/BV1Zh411L7bK/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 283,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-48.mp4"
+  },
+  {
+    "id": "gu-49",
+    "title": "围棋初级教学49:做眼技巧：跳",
+    "url": "https://www.bilibili.com/video/BV1xc411T7Tv/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 279,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-49.mp4"
+  },
+  {
+    "id": "gu-50",
+    "title": "围棋初级教学50:做眼技巧：虎",
+    "url": "https://www.bilibili.com/video/BV1wc411M71M/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 224,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-50.mp4"
+  },
+  {
+    "id": "eye-space",
+    "title": "围棋入门 啥是眼位？",
+    "url": "https://www.bilibili.com/video/BV19kX3YtEwZ/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 170,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "make_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/eye-space.mp4"
+  },
+  {
+    "id": "vital-point",
+    "title": "围棋入门 占据要点",
+    "url": "https://www.bilibili.com/video/BV12hXhYqEzP/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 245,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "vital_point"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/vital-point.mp4"
+  },
+  {
+    "id": "gu-52",
+    "title": "围棋初级教学52:破眼技巧：扑",
+    "url": "https://www.bilibili.com/video/BV1go4y1c7wC/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 288,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-52.mp4"
+  },
+  {
+    "id": "gu-55",
+    "title": "围棋初级教学55:破眼技巧：点",
+    "url": "https://www.bilibili.com/video/BV1Ug4y157np/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 246,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes",
+      "vital_point"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-55.mp4"
+  },
+  {
+    "id": "gu-56",
+    "title": "围棋初级教学56:用缩小眼位破眼",
+    "url": "https://www.bilibili.com/video/BV1hz4y1a7zE/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 300,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-56.mp4"
+  },
+  {
+    "id": "shrink-eye-space",
+    "title": "围棋入门 杀棋基本思路 缩小眼位",
+    "url": "https://www.bilibili.com/video/BV18NQZYjENU/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 644,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "destroy_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/shrink-eye-space.mp4"
+  },
+  {
+    "id": "enlarge-eye-space",
+    "title": "活棋思路·扩大眼位",
+    "url": "https://www.bilibili.com/video/BV1TqZRYJETN/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 263,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "enlarge_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/enlarge-eye-space.mp4"
+  },
+  {
+    "id": "gu-61",
+    "title": "围棋初级教学61:实战死活技巧：扩眼活棋",
+    "url": "https://www.bilibili.com/video/BV1Eo4y1w7E6/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 266,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "enlarge_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-61.mp4"
+  },
+  {
+    "id": "gu-41",
+    "title": "围棋初级教学41:三目基本死活图形",
+    "url": "https://www.bilibili.com/video/BV1Gm4y117Pf/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 299,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "three_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-41.mp4"
+  },
+  {
+    "id": "gu-42",
+    "title": "围棋初级教学42:四目基本死活图形",
+    "url": "https://www.bilibili.com/video/BV1oo4y147jW/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 267,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "four_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-42.mp4"
+  },
+  {
+    "id": "chen-33",
+    "title": "直四",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=33",
+    "author": "棋士陈林涛",
+    "duration_seconds": 223,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "four_space_eyes",
+      "straight_bent_four"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-33.mp4"
+  },
+  {
+    "id": "chen-34",
+    "title": "弯四",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=34",
+    "author": "棋士陈林涛",
+    "duration_seconds": 224,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "four_space_eyes",
+      "straight_bent_four"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-34.mp4"
+  },
+  {
+    "id": "gu-43",
+    "title": "围棋初级教学43:五目基本死活图形",
+    "url": "https://www.bilibili.com/video/BV1Vk4y1n7mk/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 233,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "five_six_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-43.mp4"
+  },
+  {
+    "id": "gu-44",
+    "title": "围棋初级教学44:六目基本死活图形",
+    "url": "https://www.bilibili.com/video/BV1eX4y1m7ad/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 254,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "five_six_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-44.mp4"
+  },
+  {
+    "id": "chen-36",
+    "title": "刀把五和梅花五",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=36",
+    "author": "棋士陈林涛",
+    "duration_seconds": 184,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "five_six_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-36.mp4"
+  },
+  {
+    "id": "chen-37",
+    "title": "葡萄六和板六",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=37",
+    "author": "棋士陈林涛",
+    "duration_seconds": 280,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "five_six_space_eyes"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-37.mp4"
+  },
+  {
+    "id": "chen-64",
+    "title": "3.胀死牛",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=64",
+    "author": "棋士陈林涛",
+    "duration_seconds": 377,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "swell_kill"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-64.mp4"
+  },
+  {
+    "id": "gu-63",
+    "title": "围棋初级教学63:对杀基础",
+    "url": "https://www.bilibili.com/video/BV1Hh411w7qP/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 206,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-63.mp4"
+  },
+  {
+    "id": "race-basics",
+    "title": "围棋入门 对杀1 外气和公气",
+    "url": "https://www.bilibili.com/video/BV1tALvzAE6a/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 140,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/race-basics.mp4"
+  },
+  {
+    "id": "gu-66",
+    "title": "围棋初级教学66:对杀技巧：有眼杀瞎",
+    "url": "https://www.bilibili.com/video/BV1y24y1P7D8/",
+    "author": "非著名围棋老师顾老师",
+    "duration_seconds": 286,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "eye_vs_no_eye",
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/gu-66.mp4"
+  },
+  {
+    "id": "race-extend-liberties",
+    "title": "围棋入门 对杀13 延气方法",
+    "url": "https://www.bilibili.com/video/BV1WgjXz5EJR/",
+    "author": "重庆市围棋协会",
+    "duration_seconds": 263,
+    "skills": [
+      "tsumego"
+    ],
+    "concepts": [
+      "extend_liberties",
+      "capture_race"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/race-extend-liberties.mp4"
+  },
+  {
+    "id": "chen-68",
+    "title": "7.缓征",
+    "url": "https://www.bilibili.com/video/BV1sGNkeYEbV/?p=68",
+    "author": "棋士陈林涛",
+    "duration_seconds": 463,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "loose_ladder"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/chen-68.mp4"
+  },
+  {
+    "id": "kaodan",
+    "title": "围棋吃子手筋-靠单",
+    "url": "https://www.bilibili.com/video/BV1xy4y1q7kA/",
+    "author": "围棋思想家",
+    "duration_seconds": 467,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "kaodan"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/kaodan.mp4"
+  },
+  {
+    "id": "second-line",
+    "title": "二线吃子",
+    "url": "https://www.bilibili.com/video/BV1Af4y1i76L/",
+    "author": "围棋段老师",
+    "duration_seconds": 99,
+    "skills": [
+      "capture"
+    ],
+    "concepts": [
+      "second_line",
+      "edge_chase"
+    ],
+    "checked_at": "2026-10-24",
+    "verification": "页面元数据、作者与原创标识已核对；抽帧确认棋盘内容与标题一致；未逐集完整观看",
+    "playback_url": "/api/videos/second-line.mp4"
   }
 ]
