@@ -65,7 +65,7 @@ Cloudflare 容器镜像由 `deploy/cloudflare/Dockerfile` 构建，构建目录�
 
 `deploy/go-coach-engine.service` 和 `deploy/go-coach-tunnel.service` 用 systemd 运行 VPS 后备通道。Linux 官方 Eigen AVX2 二进制是 AppImage，先用 `--appimage-extract` 解包，再运行 `squashfs-root/AppRun`，使非特权服务不依赖 FUSE 挂载。VPS 服务启用 systemd 开机启动；服务重启验证与整机重启验证应分开记录。
 
-fnOS 深度通道已于 2026-11-07 停用：Worker 不再读取 `ENGINE_PRIMARY_*`，fnOS 上的两个容器已停止，`compose-fnos.yaml` 和对应配置从仓库删除（见 Git 历史）。
+fnOS 深度通道已于 2026-11-07 停用：Worker 不再读取 `ENGINE_PRIMARY_*`，这两个 secret 已于 2026-11-08 删除，fnOS 上的两个容器已停止，`compose-fnos.yaml` 和对应配置从仓库删除（见 Git 历史）。
 
 ## 当前计算模型的来源
 
