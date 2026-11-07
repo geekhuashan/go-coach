@@ -24,6 +24,19 @@
   "vars": {
     "HOUSEHOLD_ID": "home"
   },
+  "containers": [
+    {
+      "class_name": "KataGoContainer",
+      "image": "./deploy/cloudflare/Dockerfile",
+      "image_build_context": ".",
+      "instance_type": { "vcpu": 2, "memory_mib": 6144, "disk_mb": 4000 },
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "ENGINE", "class_name": "KataGoContainer" }]
+  },
+  "migrations": [{ "tag": "v1-katago-container", "new_sqlite_classes": ["KataGoContainer"] }],
   "r2_buckets": [
     {
       "binding": "VIDEOS",

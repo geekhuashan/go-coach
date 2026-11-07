@@ -60,14 +60,25 @@ class EngineBridgeHTTPTest(unittest.TestCase):
         finally:
             connection.close()
 
+    def test_warm_is_authenticated_and_never_runs_a_board_request(self):
+        with patch.object(engine_bridge.engine, 'warm', return_value={'ok': True, 'ready': True, 'busy': False}) as warm:
+            self.assertEqual(self.request('/warm', auth=False)[0], 401)
+            warm.assert_not_called()
+            self.assertEqual(self.request('/warm'), (200, {'ok': True, 'ready': True, 'busy': False}))
+            warm.assert_called_once_with()
+        with patch.object(engine_bridge.engine, 'warm', side_effect=RuntimeError('model missing')):
+            self.assertEqual(self.request('/warm'), (503, {'error': 'Local engine temporarily unavailable'}))
+        self.analyze.assert_not_called()
+        self.move.assert_not_called()
+
     def test_health_is_authenticated_and_does_not_start_engine(self):
         self.assertEqual(self.request('/health', method='GET', auth=False)[0], 401)
         with patch.object(engine_bridge.engine, 'info', return_value={'available': True, 'busy': False}):
             self.assertEqual(self.request('/health', method='GET'),
-                             (200, {'ok': True, 'available': True, 'busy': False}))
-        with patch.object(engine_bridge.engine, 'info', return_value={'available': True, 'busy': True}):
+                             (200, {'ok': True, 'available': True, 'busy': False, 'ready': False}))
+        with patch.object(engine_bridge.engine, 'info', return_value={'available': True, 'busy': True, 'ready': True}):
             self.assertEqual(self.request('/health', method='GET'),
-                             (200, {'ok': True, 'available': True, 'busy': True}))
+                             (200, {'ok': True, 'available': True, 'busy': True, 'ready': True}))
         with patch.object(engine_bridge.engine, 'info', return_value={'available': False, 'busy': False}):
             self.assertEqual(self.request('/health', method='GET')[0], 503)
         self.assertEqual(self.request('/other', method='GET')[0], 404)
@@ -161,6 +172,19 @@ class EngineBridgeHTTPTest(unittest.TestCase):
                 self.assertNotIn(private_detail, json.dumps(result))
                 self.assertNotIn(self.token, json.dumps(result))
 
+
+
+class EngineWarmTests(unittest.TestCase):
+    def test_warm_loads_the_model_with_one_visit_and_skips_when_ready(self):
+        engine = engine_bridge.engine
+        with patch.object(engine, '_ready', return_value=False), \
+                patch.object(engine, '_run_query', return_value={'moveInfos': []}) as run:
+            self.assertEqual(engine.warm(), {'ok': True, 'ready': True, 'busy': False})
+            query = run.call_args.args[0]
+            self.assertEqual((query['maxVisits'], query['boardXSize'], query['moves']), (1, 9, []))
+        with patch.object(engine, '_ready', return_value=True), patch.object(engine, '_run_query') as run:
+            self.assertEqual(engine.warm()['ready'], True)
+            run.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

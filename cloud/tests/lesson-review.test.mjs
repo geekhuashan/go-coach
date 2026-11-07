@@ -7,7 +7,7 @@ import {reviewPosition,engineReview,authorReview,ruleReview,setReview} from '../
 const catalog=JSON.parse(readFileSync(new URL('../builtin-lessons.json',import.meta.url)));
 const context={helped:[],runs:{},profileId:'parent'};
 function sample(color=1){const s=blank(9);s.board[0][8]=1;s.board[8][8]=2;s.to_play=color;s.revision=7;s.review={candidate:{x:0,y:0},reference:{x:1,y:0}};return s;}
-function result(s){const item=move=>({move,rootInfo:{scoreLead:10,visits:64},moves:[{move,pv:[move,'A8']}],ownership:Array(81).fill(0)});return {revision:s.revision,perspective:'black',candidate:item('A9'),reference:item('B9'),engine_backend:'fnos'};}
+function result(s){const item=move=>({move,rootInfo:{scoreLead:10,visits:64},moves:[{move,pv:[move,'A8']}],ownership:Array(81).fill(0)});return {revision:s.revision,perspective:'black',candidate:item('A9'),reference:item('B9'),engine_backend:'cloudflare'};}
 test('KataGo comparison works for both colors without awarding lesson completion',()=>{
  for(const color of [1,2]){const s=sample(color),r=result(s),sign=color===1?1:-1;r.reference.rootInfo.scoreLead=10+5*sign;r.reference.ownership[8]=sign;r.candidate.ownership[8]=-sign;
   const review=engineReview(s,r);assert.equal(review.verdict,'mistake');assert.equal(review.pv[0].color,color);assert.equal(review.pv[1].color,3-color);assert.equal(review.evidence.score_loss,5);

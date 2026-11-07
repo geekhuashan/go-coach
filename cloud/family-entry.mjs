@@ -1,6 +1,7 @@
 import {WorkerEntrypoint} from 'cloudflare:workers';
 import worker from './worker.mjs';
 import {makeSession} from './auth.mjs';
+export {KataGoContainer} from './engine-container.mjs';
 
 // Only a configured service binding can reach this entry point. The caller
 // verifies its own family session first; no public request header grants access.

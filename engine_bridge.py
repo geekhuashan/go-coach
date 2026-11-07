@@ -3,6 +3,7 @@
 import argparse
 import hmac
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import engine
@@ -52,11 +53,16 @@ def handler(token):
             if self.path != '/health':
                 return self.reply(404, {'error': 'Not found'})
             info = engine.info();available = info['available']
-            return self.reply(200 if available else 503, {'ok': available, 'available': available, 'busy': bool(info.get('busy'))})
+            return self.reply(200 if available else 503, {'ok': available, 'available': available, 'busy': bool(info.get('busy')), 'ready': bool(info.get('ready'))})
 
         def do_POST(self):
             if not hmac.compare_digest(self.headers.get('Authorization', ''), 'Bearer ' + token):
                 return self.reply(401, {'error': 'Unauthorized'})
+            if self.path == '/warm':
+                try:
+                    return self.reply(200, engine.warm())
+                except Exception:
+                    return self.reply(503, {'error': 'Local engine temporarily unavailable'})
             if self.path not in ('/analyze', '/move', '/review'):
                 return self.reply(404, {'error': 'Not found'})
             try:
@@ -79,14 +85,18 @@ def handler(token):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--token-file', type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument('--token-file', type=Path)
+    source.add_argument('--token-env', help='environment variable holding the token (container use)')
     parser.add_argument('--port', type=int, default=8770)
+    parser.add_argument('--host', default='127.0.0.1',
+                        help='keep loopback unless an isolated container network is the only way in')
     args = parser.parse_args()
-    token = args.token_file.read_text().strip()
+    token = args.token_file.read_text().strip() if args.token_file else os.environ.get(args.token_env, '').strip()
     if len(token) < 32:
         parser.error('Token must contain at least 32 characters')
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), handler(token))
-    print(f'KataGo bridge listening on loopback port {args.port}', flush=True)
+    server = ThreadingHTTPServer((args.host, args.port), handler(token))
+    print(f'KataGo bridge listening on {args.host}:{args.port}', flush=True)
     try:
         server.serve_forever()
     finally:

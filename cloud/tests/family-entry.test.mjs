@@ -9,7 +9,7 @@ import {authenticated,cookies,makeSession} from '../auth.mjs';
 const SOURCE=readFileSync(new URL('../family-entry.mjs',import.meta.url),'utf8');
 function entry(env,backend=worker){
   const context={Request,Response,Headers,makeSession,worker:backend,WorkerEntrypoint:class {constructor(){this.env=env;this.ctx={};}}};
-  runInNewContext(SOURCE.replace(/^import .*;\n/gm,'').replace('export class FamilyGo','class FamilyGo').replace('export default worker;','globalThis.defaultWorker=worker;globalThis.NamedEntry=FamilyGo;'),context);
+  runInNewContext(SOURCE.replace(/^import .*;\n/gm,'').replace(/^export \{.*\} from .*;\n/gm,'').replace('export class FamilyGo','class FamilyGo').replace('export default worker;','globalThis.defaultWorker=worker;globalThis.NamedEntry=FamilyGo;'),context);
   assert.equal(context.defaultWorker,backend);
   return new context.NamedEntry();
 }

@@ -36,7 +36,11 @@ def info():
     return {"available": bool(binary and model and Path(model).is_file()),
             "name": "KataGo · 本地陪练", "status": _status,
             "note": "棋力较强，可暂停、悔棋；不是校准的入门段位。", "error": _last_error,
-            "busy": _lock.locked()}
+            "busy": _lock.locked(), "ready": _ready()}
+
+
+def _ready():
+    return _process is not None and _process.poll() is None and _status == "已就绪"
 
 
 def close():
@@ -166,6 +170,21 @@ def analyze(state):
         result = _run_query(query, timeout=8)
         return {"revision":state["revision"], "engine":"KataGo", "perspective":"black",
                 "rootInfo":result.get("rootInfo",{}), "moves":result["moveInfos"][:8]}
+    finally:
+        _lock.release()
+
+
+def warm(timeout=90):
+    """Load the model with a one-visit query so the next real move starts warm."""
+    if not _lock.acquire(timeout=2):
+        return {"ok": True, "ready": _ready(), "busy": True}
+    try:
+        if not _ready():
+            query = analysis_query({'size': 9, 'board': [[0] * 9 for _ in range(9)], 'to_play': 1},
+                                   'warm-' + uuid.uuid4().hex)
+            query['maxVisits'] = 1
+            _run_query(query, timeout=timeout)
+        return {"ok": True, "ready": True, "busy": False}
     finally:
         _lock.release()
 

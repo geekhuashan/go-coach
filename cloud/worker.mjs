@@ -61,36 +61,45 @@ async function commit(env,ctx,build){const token=crypto.randomUUID(),expectedCat
 
 async function conflict(env,request){return json({error:'棋盘已在另一设备更新，请查看最新局面后重试。',state:await publicContext(env,await load(env,request))},409);}
 function timeoutBudget(value,fallback,maximum){const numeric=Number(value);return Number.isFinite(numeric)&&numeric>0?Math.min(maximum,Math.max(1,Math.floor(numeric))):fallback;}
-function engineConfiguration(env,state){const primary=!!(env.ENGINE_PRIMARY_URL&&env.ENGINE_PRIMARY_TOKEN),fallback=!!(env.ENGINE_URL&&env.ENGINE_TOKEN);const last=['fnos','vps'].includes(state.engine_backend)?state.engine_backend:null;return {available:primary||fallback,primary_configured:primary,fallback_configured:fallback,backend:last,last_backend:last,name:'KataGo · 计算服务',status:last?`最近一次AI应手来自${last==='fnos'?'fnOS深度通道':'VPS快速通道'}`:primary||fallback?'已配置计算服务，尚无成功应手记录':'未连接计算服务',note:'实战应手和显式复核优先使用低延迟VPS，故障时改用fnOS；局面分析优先fnOS。上次成功来源不代表此刻在线。',error:''};}
+function engineBackends(env){
+ const cloudflare=env.ENGINE?{label:'Cloudflare',backend:'cloudflare',stub:()=>env.ENGINE.get(env.ENGINE.idFromName('katago'))}:null;
+ const vps=env.ENGINE_URL&&env.ENGINE_TOKEN?{url:env.ENGINE_URL,token:env.ENGINE_TOKEN,label:'VPS',backend:'vps'}:null;
+ return {cloudflare,vps};
+}
+function engineConfiguration(env,state){const {cloudflare,vps}=engineBackends(env);const last=['cloudflare','vps'].includes(state.engine_backend)?state.engine_backend:null;return {available:!!(cloudflare||vps),cloudflare_configured:!!cloudflare,vps_configured:!!vps,backend:last,last_backend:last,name:'KataGo · 计算服务',status:last?`最近一次AI应手来自${last==='cloudflare'?'Cloudflare计算服务':'VPS后备通道'}`:cloudflare||vps?'已配置计算服务，尚无成功应手记录':'未连接计算服务',note:'Cloudflare计算服务闲置10分钟后休眠；休眠时这一手先由VPS应手，同时唤醒Cloudflare。上次成功来源不代表此刻在线。',error:''};}
 function backendError(label,message,retryable){return Object.assign(new Error(label+'计算服务'+message),{retryable,status:502});}
 function backendURL(config,path){let target;try{target=new URL(path,config.url.replace(/\/$/,'')+'/')}catch{fail(config.label+'计算服务地址无效。',503)}if(target.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(target.hostname))fail('引擎连接必须使用HTTPS。',503);if(target.username||target.password)fail('计算服务地址不能包含明文凭据。',503);return target;}
-async function backendRequest(config,path,payload,timeout,health=false){
- const target=backendURL(config,path);let response;
- try{response=await fetch(target,{method:health?'GET':'POST',headers:{Authorization:'Bearer '+config.token,...(health?{}:{'Content-Type':'application/json'})},...(health?{}:{body:JSON.stringify({state:payload})}),signal:AbortSignal.timeout(timeout),redirect:'manual'});}catch{throw backendError(config.label,'暂时无法连接或已超时。',true)}
+function withDeadline(promise,ms){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new DOMException('Timed out','TimeoutError')),ms)})]).finally(()=>clearTimeout(timer));}
+async function backendRequest(config,path,payload,timeout,warmOnly=false){
+ let response;
+ try{
+  if(config.stub)response=await withDeadline(config.stub().fetch(new Request('https://engine/'+path,{method:'POST',headers:{'Content-Type':'application/json','x-engine-budget-ms':String(timeout),...(warmOnly?{'x-engine-warm-only':'1'}:{})},body:JSON.stringify({state:payload})})),timeout+500);
+  else{const target=backendURL(config,path);response=await fetch(target,{method:'POST',headers:{Authorization:'Bearer '+config.token,'Content-Type':'application/json'},body:JSON.stringify({state:payload}),signal:AbortSignal.timeout(timeout),redirect:'manual'});}
+ }catch(e){if(e?.status)throw e;throw backendError(config.label,'暂时无法连接或已超时。',true)}
  if(response.status>=300&&response.status<400)throw backendError(config.label,'要求跳转，已停止且未转发凭据。',false);
  if(!response.ok){if(response.status>=400&&response.status<500)throw backendError(config.label,`拒绝请求（HTTP ${response.status}），请检查服务配置；未自动改用另一服务。`,false);throw backendError(config.label,`暂时不可用（HTTP ${response.status}）。`,true);}
  let result;try{result=await response.json()}catch{throw backendError(config.label,'返回了无效数据。',true)}
  if(!result||typeof result!=='object'||Array.isArray(result))throw backendError(config.label,'返回了无效数据。',true);
- if(health){if(result.ok!==true||result.available===false||result.engine?.available===false)throw backendError(config.label,'健康探测未通过。',true);if(result.busy===true)throw backendError(config.label,'正忙。',true);}
- else if(path==='move'){if(result.pass!==true&&(!Number.isInteger(result.x)||!Number.isInteger(result.y)||result.x<0||result.y<0||result.x>=payload.size||result.y>=payload.size))throw backendError(config.label,'未返回有效落点。',true);}
+ if(path==='move'){if(result.pass!==true&&(!Number.isInteger(result.x)||!Number.isInteger(result.y)||result.x<0||result.y<0||result.x>=payload.size||result.y>=payload.size))throw backendError(config.label,'未返回有效落点。',true);}
  else if(path==='review'){if(result.revision!==payload.revision||result.perspective!=='black'||!result.candidate||!result.reference||![result.candidate,result.reference].every(r=>r.rootInfo&&Array.isArray(r.moves)&&Array.isArray(r.ownership)))throw backendError(config.label,'返回的复核版本或格式不正确。',true);}
  else if(!Array.isArray(result.moves)||result.revision!==payload.revision)throw backendError(config.label,'返回的分析版本或格式不正确。',true);
  return result;
 }
+// Cloudflare first, VPS as backup. During play a sleeping container answers
+// "warming" at once, so that move goes to the VPS while the model loads.
 export async function bridge(env,path,state){
- const primary=env.ENGINE_PRIMARY_URL&&env.ENGINE_PRIMARY_TOKEN?{url:env.ENGINE_PRIMARY_URL,token:env.ENGINE_PRIMARY_TOKEN,label:'fnOS',backend:'fnos'}:null;
- const fallback=env.ENGINE_URL&&env.ENGINE_TOKEN?{url:env.ENGINE_URL,token:env.ENGINE_TOKEN,label:'VPS',backend:'vps'}:null;
- if(!primary&&!fallback)fail('计算服务尚未连接，仍可练题和双人对弈。',503);
+ const {cloudflare,vps}=engineBackends(env);
+ if(!cloudflare&&!vps)fail('计算服务尚未连接，仍可练题和双人对弈。',503);
  const payload={};for(const name of ['size','board','initial_board','moves','to_play','initial_player','revision'])payload[name]=state[name];
  if(path==='review')payload.review=state.review;
- if(path==='move'||path==='review'){
-  const reviewing=path==='review';
-  const ordered=fallback?[fallback,primary].filter(Boolean):[primary].filter(Boolean);
-  for(const config of ordered){const budget=config.backend==='vps'?timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,reviewing?8000:6000,8000):timeoutBudget(env.ENGINE_PRIMARY_TIMEOUT_MS,reviewing?10000:8000,10000);try{const result=await backendRequest(config,path,payload,budget);return {...result,engine_backend:config.backend};}catch(e){if(e.retryable!==true)throw e;}}
-  fail(primary&&fallback?`两个KataGo通道均未完成${reviewing?'复核':'应手'}，请稍后重试。`:primary?'fnOS计算服务暂时不可用。':'VPS计算服务暂时不可用。',503);
- }
- if(primary){try{await backendRequest(primary,'health',null,1500,true);const result=await backendRequest(primary,path,payload,timeoutBudget(env.ENGINE_PRIMARY_TIMEOUT_MS,15000,15000));return {...result,engine_backend:'fnos'};}catch(e){if(e.retryable!==true)throw e;if(!fallback)fail('fnOS主力暂不可用，尚未配置VPS后备；练题和双人对弈仍可用。',503);}}
- try{const result=await backendRequest(fallback,path,payload,timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,15000,15000));return {...result,engine_backend:'vps'};}catch(e){if(e.retryable===false)throw e;fail(primary?'fnOS主力与VPS后备均未完成计算，请稍后重试；练题和双人对弈仍可用。':'VPS计算服务暂时不可用，请稍后重试；练题和双人对弈仍可用。',503);}
+ const playing=path==='move'||path==='review',reviewing=path==='review';
+ const attempts=[
+  cloudflare&&{config:cloudflare,warmOnly:playing,budget:playing?timeoutBudget(env.ENGINE_CONTAINER_TIMEOUT_MS,reviewing?10000:8000,10000):timeoutBudget(env.ENGINE_CONTAINER_TIMEOUT_MS,15000,15000)},
+  vps&&{config:vps,warmOnly:false,budget:playing?timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,reviewing?8000:6000,8000):timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,15000,15000)},
+ ].filter(Boolean);
+ for(const attempt of attempts){try{const result=await backendRequest(attempt.config,path,payload,attempt.budget,attempt.warmOnly);return {...result,engine_backend:attempt.config.backend};}catch(e){if(e.retryable!==true)throw e;}}
+ const work=reviewing?'复核':path==='move'?'应手':'分析';
+ fail(attempts.length>1?`两个KataGo通道均未完成${work}，请稍后重试；练题和双人对弈仍可用。`:`${attempts[0].config.label}计算服务暂时未完成${work}，请稍后重试；练题和双人对弈仍可用。`,503);
 }
 
 function persistState(s){const saved=clone(s);saved.feedback=[];delete saved.revision;return sizeCheck(saved);}

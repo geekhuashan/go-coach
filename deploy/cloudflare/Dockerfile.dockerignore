@@ -1,0 +1,6 @@
+*
+!engine.py
+!engine_bridge.py
+!deploy/cloudflare/analysis.cfg
+!.local/cloudflare-engine/squashfs-root
+!.local/cloudflare-engine/model-b18.bin.gz

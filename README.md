@@ -6,7 +6,7 @@
 
 ## 家庭云端与手机
 
-家庭云端入口：[go.huashan.app](https://go.huashan.app)，需要家庭密码。云端版本采用 Cloudflare Workers + D1，支持家庭登录、每台设备独立选择学习者、PWA 添加到主屏幕与触屏确认落子。学习记录存入 D1；Mac 处理书题后只上传已核对结构，原照片留本地。云端实战应手优先使用低延迟 VPS b10，局面分析和显式复核优先使用 fnOS b18，两条通道故障时可相互回退；Mac 关机不影响云端使用。部署、数据迁移和计算服务说明见 [云端部署说明](docs/CLOUD.md)。
+家庭云端入口：[go.huashan.app](https://go.huashan.app)，需要家庭密码。云端版本采用 Cloudflare Workers + D1，支持家庭登录、每台设备独立选择学习者、PWA 添加到主屏幕与触屏确认落子。学习记录存入 D1；Mac 处理书题后只上传已核对结构，原照片留本地。KataGo 主力跑在 Cloudflare Containers（b18，闲置 10 分钟休眠；休眠时那一手由 VPS 应手，同时唤醒），RackNerd VPS b10 作后备；Mac 关机不影响云端使用。部署、数据迁移和计算服务说明见 [云端部署说明](docs/CLOUD.md)。
 
 新增 GoGameGuru 题库保留原作者署名与 CC BY-NC-SA 4.0 数据许可；原始 420 题逐题回放校验，417 题激活，基础变式精简后合计 567 道可选题。来源、数量与未激活原因见 [第三方数据说明](docs/THIRD_PARTY_DATA.md)。
 

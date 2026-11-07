@@ -662,8 +662,8 @@ function renderMatch(){
   if(playout){$('coach-eyebrow').textContent='练习续弈 · KataGo 根据当前局面应手';if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'陪练暂时没有完成应手，可点击按钮重试。':'现在轮到 KataGo，它落子后你可以继续下。';}
  }
  const backend=state.engine_backend||state.match?.engine_backend;
-  $('engine-source').hidden=state.match?.mode!=='human_ai'||!['fnos','vps'].includes(backend);$('engine-source').textContent=backend==='fnos'?'最近一次 AI 落子：fnOS 深度通道':backend==='vps'?'最近一次 AI 落子：VPS 快速通道':'';
- if(cloudMode){const engine=state.engine||{},configured=[];if(engine.primary_configured||engine.fnos_configured)configured.push('fnOS 深度通道已配置');if(engine.fallback_configured||engine.vps_configured)configured.push('VPS 快速通道已配置');$('engine-note').textContent=(configured.length?configured.join(' · ')+'。可用性以实际应手为准。':engine.available?'KataGo 计算服务已配置，可用性以实际应手为准。':'计算服务尚未配置。')+' 做题与双人对弈仍可使用。';}
+  $('engine-source').hidden=state.match?.mode!=='human_ai'||!['cloudflare','vps'].includes(backend);$('engine-source').textContent=backend==='cloudflare'?'最近一次 AI 落子：Cloudflare 计算服务':backend==='vps'?'最近一次 AI 落子：VPS 后备通道':'';
+ if(cloudMode){const engine=state.engine||{},configured=[];if(engine.cloudflare_configured)configured.push('Cloudflare 计算服务已配置');if(engine.vps_configured)configured.push('VPS 后备通道已配置');$('engine-note').textContent=(configured.length?configured.join(' · ')+'。可用性以实际应手为准。':engine.available?'KataGo 计算服务已配置，可用性以实际应手为准。':'计算服务尚未配置。')+' 做题与双人对弈仍可使用。';}
  else $('engine-note').textContent=state.engine?.available?`KataGo · ${state.engine.status||'已配置'}。人机模式自动应手，双人模式不调用引擎。${state.engine.error?' 引擎提示：'+state.engine.error:''}`:'陪练引擎尚未配置 · 仍可做题与双人对弈。';
  $('matches-title').textContent=`${state.profile?.name||'我'}的对局`;
  const matches=(state.recent_matches||[]).slice(0,5);
