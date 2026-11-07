@@ -32,7 +32,7 @@ D1 按学习者、对局、作答、掌握证据、想法和讲解分别保存�
 
 ## KataGo 服务
 
-KataGo 主力跑在 Cloudflare Containers：`cloud/engine-container.mjs` 的 Durable Object `KataGoContainer`（绑定 `ENGINE`）按需启动一个容器（2 vCPU、6 GiB 内存，b18 模型）。容器没有公网端口、不能主动连外网，只有这个 Durable Object 能访问；桥接令牌由它第一次启动时随机生成、存在自己的存储里，启动容器时作为环境变量传进去，不需要另设 secret。最后一次请求后闲置 10 分钟自动停机，CPU 按实际用量计费（需要 Workers 付费版）。RackNerd VPS 上的 b10 通道（`ENGINE_URL`、`ENGINE_TOKEN`）作后备。
+KataGo 主力跑在 Cloudflare Containers：`cloud/engine-container.mjs` 的 Durable Object `KataGoContainer`（绑定 `ENGINE`）按需启动一个容器（2 vCPU、6 GiB 内存，b10 模型，与 VPS 同一文件）。容器没有公网端口、不能主动连外网，只有这个 Durable Object 能访问；桥接令牌由它第一次启动时随机生成、存在自己的存储里，启动容器时作为环境变量传进去，不需要另设 secret。最后一次请求后闲置 10 分钟自动停机，CPU 按实际用量计费（需要 Workers 付费版）。RackNerd VPS 上的 b10 通道（`ENGINE_URL`、`ENGINE_TOKEN`）作后备。
 
 - 实战 `/move` 和显式 `/review` 先问 Cloudflare，但不等冷启动：容器在休眠或模型还没载入时立即回答“预热中”，这一手改由 VPS 应手，同时在后台载入模型，下一手起由 Cloudflare 应手。容器预算 `/move` 默认 8 秒、`/review` 默认 10 秒，上限 10 秒（`ENGINE_CONTAINER_TIMEOUT_MS`）；VPS `/move` 默认 6 秒、`/review` 默认 8 秒，上限 8 秒（`ENGINE_FALLBACK_TIMEOUT_MS`）。两段相加在网页 22 秒的应手等待之内。成对比较的 128 visits／每点 3 秒预算、最少 24 visits 证据门槛不变，结果注明实际后端；模型意见仍不计对错或通关。
 - `/analyze` 允许等 Cloudflare 冷启动，最多 15 秒；失败或正忙再试 VPS，最多 15 秒。
@@ -61,7 +61,7 @@ python3 engine_bridge.py --port 8874 --token-file /absolute/private/engine-token
 
 ## 可复现的计算服务配置
 
-Cloudflare 容器镜像由 `deploy/cloudflare/Dockerfile` 构建，构建目录是仓库根；`Dockerfile.dockerignore` 只放进桥接代码、`deploy/cloudflare/analysis.cfg` 和 `.local/cloudflare-engine/` 里的 KataGo 与模型（这两样不进 Git）。部署前把官方 AppImage 解包出的 `squashfs-root/` 和 b18 模型放进 `.local/cloudflare-engine/`，按下文核对 SHA-256，启动本机 Docker（OrbStack），再 `npx wrangler deploy`：wrangler 会构建 linux/amd64 镜像并推到 Cloudflare 的镜像仓库。用隔离目录发布时，这个目录也要一起复制过去。首次部署后容器要几分钟才能就绪，期间由 VPS 应手。
+Cloudflare 容器镜像由 `deploy/cloudflare/Dockerfile` 构建，构建目录是仓库根；`Dockerfile.dockerignore` 只放进桥接代码、`deploy/cloudflare/analysis.cfg` 和 `.local/cloudflare-engine/` 里的 KataGo 与模型（这两样不进 Git）。部署前把官方 AppImage 解包出的 `squashfs-root/` 和 b10 模型放进 `.local/cloudflare-engine/`，按下文核对 SHA-256，启动本机 Docker（OrbStack），再 `npx wrangler deploy`：wrangler 会构建 linux/amd64 镜像并推到 Cloudflare 的镜像仓库。用隔离目录发布时，这个目录也要一起复制过去。首次部署后容器要几分钟才能就绪，期间由 VPS 应手。
 
 `deploy/go-coach-engine.service` 和 `deploy/go-coach-tunnel.service` 用 systemd 运行 VPS 后备通道。Linux 官方 Eigen AVX2 二进制是 AppImage，先用 `--appimage-extract` 解包，再运行 `squashfs-root/AppRun`，使非特权服务不依赖 FUSE 挂载。VPS 服务启用 systemd 开机启动；服务重启验证与整机重启验证应分开记录。
 
@@ -69,8 +69,7 @@ fnOS 深度通道已于 2026-11-07 停用：Worker 不再读取 `ENGINE_PRIMARY_
 
 ## 当前计算模型的来源
 
-- Cloudflare 主力（原 fnOS 深度通道的同一文件）：`kata1-b18c384nbt-s9996604416-d4316597426.bin.gz`，SHA-256 `9d7a6afed8ff5b74894727e156f04f0cd36060a24824892008fbb6e0cba51f1d`。模型来自已有 KataGo 安装，来源项目为 [KataGo Training](https://katagotraining.org/)。
-- VPS 后备通道：`g170e-b10c128-s1141046784-d204142634.bin.gz`，SHA-256 `1a8e05a4ea3fca20dab79410cbb566c760767fcdd2fa0b701cfe259a84cc8b04`，取自 [Pachi 保存的 KataGo 模型发布](https://github.com/pasky/pachi/releases/tag/katago_models)。该哈希用于校验本次下载与传输一致，不冒称发布方签名。
+- Cloudflare 主力与 VPS 后备通道（同一文件）：`g170e-b10c128-s1141046784-d204142634.bin.gz`，SHA-256 `1a8e05a4ea3fca20dab79410cbb566c760767fcdd2fa0b701cfe259a84cc8b04`，取自 [Pachi 保存的 KataGo 模型发布](https://github.com/pasky/pachi/releases/tag/katago_models)。该哈希用于校验本次下载与传输一致，不冒称发布方签名。
 - 两端使用 [KataGo v1.18.1 官方 Eigen AVX2 发布](https://github.com/lightvector/KataGo/releases/tag/v1.18.1)，压缩包 SHA-256 `33e79780dbe3bf6ee859e16f64952cdfc90f7210c8f71ad978ffcba85ad20d79`，已比对 GitHub 资产摘要。
 
-参数选择有搜索时间上限：b18 在 CPU 上常先到 3 秒而未到 64 visits。性能测试不是棋力标定；模型不标成业余或职业段位。b10 比 b18 弱，页面显示实际来源，站内评级不把两种 AI 混成同一已校准对手。
+原 fnOS 通道用的 b18（`kata1-b18c384nbt-s9996604416-d4316597426.bin.gz`）在 Cloudflare 2 vCPU 上实测 3 秒只搜 10–13 步，复核每点 9–14 步，低于 24 步证据门槛，所以 Cloudflare 也用 b10。两端同一模型，对手强度一致。性能测试不是棋力标定；模型不标成业余或职业段位。
