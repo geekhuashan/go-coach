@@ -12,8 +12,8 @@ function load(){
 }
 const KataGoContainer=load();
 
-function fakeContainer({healthy=true}={}){
- const c={running:false,ready:false,starts:[],timeouts:[],requests:[],
+function fakeContainer({healthy=true,drops=0}={}){
+ const c={running:false,ready:false,starts:[],timeouts:[],requests:[],drops,
   start(options){if(c.running)throw new Error('already running');c.running=true;c.starts.push(options);},
   async setInactivityTimeout(ms){c.timeouts.push(ms);},
   getTcpPort(port){assert.equal(port,8080);return {fetch:async(url,init)=>{
@@ -21,6 +21,7 @@ function fakeContainer({healthy=true}={}){
    if(!healthy)throw new TypeError('connection refused');
    if(path==='/health')return new Response(JSON.stringify({ok:true,available:true,busy:false,ready:c.ready}));
    if(path==='/warm'){c.ready=true;return new Response(JSON.stringify({ok:true,ready:true}));}
+   if(c.drops>0){c.drops--;throw new TypeError('connection reset');}
    c.ready=true;return new Response(JSON.stringify({x:2,y:3}),{headers:{'Content-Type':'application/json'}});
   }};}};
  return c;
@@ -60,6 +61,14 @@ test('an engine that never comes up fails within the budget',async()=>{
  const container=fakeContainer({healthy:false}),{object}=make(container);const started=Date.now();
  const response=await object.fetch(post('/analyze',{'x-engine-budget-ms':'300'}));
  assert.equal(response.status,503);assert.ok(Date.now()-started<2000);
+});
+test('a dropped connection is retried once, a second drop is reported',async()=>{
+ const once=fakeContainer({drops:1});once.running=true;once.ready=true;
+ const ok=await make(once).object.fetch(post('/move',{'x-engine-warm-only':'1'}));assert.equal(ok.status,200);
+ assert.equal(once.requests.filter(r=>r.path==='/move').length,2);
+ const twice=fakeContainer({drops:2});twice.running=true;twice.ready=true;
+ const failed=await make(twice).object.fetch(post('/move',{'x-engine-warm-only':'1'}));assert.equal(failed.status,503);
+ assert.equal(twice.requests.filter(r=>r.path==='/move').length,2);
 });
 test('only POST to the three engine paths is accepted',async()=>{
  const container=fakeContainer(),{object}=make(container);

@@ -4,12 +4,12 @@ FROM python:3.12-slim-bookworm@sha256:2ed6491b93cd49272ee6de2b5a38440c3448360322
 RUN useradd --uid 1000 --no-create-home --shell /usr/sbin/nologin engine
 WORKDIR /app
 COPY .local/cloudflare-engine/squashfs-root /app/squashfs-root
-COPY .local/cloudflare-engine/model-b18.bin.gz /app/model-b18.bin.gz
+COPY .local/cloudflare-engine/model-b10.bin.gz /app/model-b10.bin.gz
 COPY engine.py engine_bridge.py /app/
 COPY deploy/cloudflare/analysis.cfg /app/analysis.cfg
 RUN mkdir /app/.local && chown engine /app/.local
 ENV GO_COACH_KATAGO=/app/squashfs-root/AppRun \
-    GO_COACH_MODEL=/app/model-b18.bin.gz \
+    GO_COACH_MODEL=/app/model-b10.bin.gz \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 USER engine

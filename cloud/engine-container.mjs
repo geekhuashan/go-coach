@@ -1,11 +1,12 @@
 import {DurableObject} from 'cloudflare:workers';
 
-// One KataGo container on Cloudflare. The Worker reaches it only through this
+// One KataGo (b10) container on Cloudflare. The Worker reaches it only through this
 // Durable Object; the container has no public port and no outbound internet.
 export const ENGINE_PORT = 8080;
 export const ENGINE_IDLE_MS = 10 * 60_000;
 const WARM_ONLY_PROBE_MS = 1500;
 const MAX_BUDGET_MS = 15_000;
+const QUICK_FAILURE_MS = 1500;
 const PATHS = new Set(['/move', '/review', '/analyze']);
 
 const reply = (body, status) => new Response(JSON.stringify(body), {status, headers: {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'}});
@@ -77,11 +78,17 @@ export class KataGoContainer extends DurableObject {
       return reply({error: 'Engine is warming up'}, 503);
     }
     const body = await request.text();
-    try {
-      const response = await this.call(path, {method: 'POST', headers: {'Content-Type': 'application/json'}, body}, token, deadline - Date.now());
-      return new Response(response.body, {status: response.status, headers: {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'}});
-    } catch {
-      return reply({error: 'Engine timed out'}, 503);
+    // A dropped connection fails within milliseconds; KataGo only computes, so one
+    // immediate retry is safe. A slow failure means the engine itself ran out of time.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const started = Date.now();
+      try {
+        const response = await this.call(path, {method: 'POST', headers: {'Content-Type': 'application/json'}, body}, token, deadline - Date.now());
+        return new Response(response.body, {status: response.status, headers: {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store'}});
+      } catch {
+        if (Date.now() - started > QUICK_FAILURE_MS || deadline - Date.now() < 1000) break;
+      }
     }
+    return reply({error: 'Engine timed out'}, 503);
   }
 }
