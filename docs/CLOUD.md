@@ -12,6 +12,8 @@
 4. KataGo 用 `wrangler.jsonc` 里的 `containers` 和 `ENGINE` 绑定，需要 Workers 付费版，镜像准备见“可复现的计算服务配置”。VPS 后备另设 secrets `ENGINE_URL`、`ENGINE_TOKEN`：URL 是 HTTPS 服务地址，Token 与 VPS 桥接服务的私有令牌文件相同。
 5. `npm run deploy`，验证未登录 API 返回 401，登录后可以读写自己的家庭数据。
 
+已有生产站点更新时，从隔离发布目录构建，并记录来源文件清单、SHA-256 和线上版本。旧临时发布目录可能早于主仓库已上线功能，不能仅凭目录名或 Git HEAD 判断它是完整基线；要核对现网静态资源及最近验证记录，并保留横屏布局、异步换题、棋型回看、视频目录和题型兼容。发布前运行该目录的 Cloud 测试及已导入题型回放；发布后回读静态资源，并核对 D1 题库、棋盘、练习记录和 XP 不变。书题原件和题库中间数据不复制进发布树。
+
 本地云端开发：私有 `.dev.vars` 中设置同名 secrets，运行 `npm run db:local` 和 `npm run dev:cloud`。该文件已被 Git 忽略。实际部署前应在隔离数据上验收，避免向家庭生产库写测试成绩。
 
 ## 数据与登录
@@ -73,3 +75,12 @@ fnOS 深度通道已于 2026-11-07 停用：Worker 不再读取 `ENGINE_PRIMARY_
 - 两端使用 [KataGo v1.18.1 官方 Eigen AVX2 发布](https://github.com/lightvector/KataGo/releases/tag/v1.18.1)，压缩包 SHA-256 `33e79780dbe3bf6ee859e16f64952cdfc90f7210c8f71ad978ffcba85ad20d79`，已比对 GitHub 资产摘要。
 
 原 fnOS 通道用的 b18（`kata1-b18c384nbt-s9996604416-d4316597426.bin.gz`）在 Cloudflare 2 vCPU 上实测 3 秒只搜 10–13 步，复核每点 9–14 步，低于 24 步证据门槛，所以 Cloudflare 也用 b10。两端同一模型，对手强度一致。性能测试不是棋力标定；模型不标成业余或职业段位。
+
+
+## 题库版本与轻量同步
+
+`0003_catalog_sync.sql`新增派生题库摘要/版本和讲解版本，原lessons及成绩行不重写。触发器覆盖题目INSERT/UPDATE/DELETE、同长度改题、跨家庭迁移及讲解/辅助记录变化。无变化的GET /api/sync只读版本，返回家族revision、实际profile、题库与讲解版本；旧schema回退完整读取，缺表不伪装无变化。完整题目按ID加载，活动棋盘仍使用保存时的题目快照。
+
+先执行并核验增量迁移，再发布新版；若回滚应用，保留新增派生表/触发器即可，不恢复覆盖用户成绩。通过d1 execute --file手动执行迁移后，应仅在实际成功并回读后登记d1_migrations，避免未来重复回填。
+
+AI讲解POST必须明确trigger=manual；旧缓存页面的自动请求在读取棋盘/调用模型前拒绝。前端后台仅轻同步，失败退避；未确认的写操作先对账，不自动重发。私有API仍不缓存到Service Worker。
