@@ -198,9 +198,9 @@ function renderLearning(){
  $('learning-title').textContent=`${profile.name}的学习进度`;$('learning-stage').textContent=(learning.stage||'等待第一次练习').replace('（不对应段位）','');
  $('learning-count').textContent=learning.attempts_count?`已记录 ${learning.attempts_count} 次作答 · 独立答对 ${learning.independent_correct||0} 次`:'先做几道小题，慢慢了解适合你的练习。';
  $('skills').replaceChildren(...(learning.skills||[]).map(s=>{const row=textEl('div','','skill-row');const top=textEl('div','','skill-row-heading');top.append(textEl('strong',s.name),textEl('span',s.stage||'待评估'));row.append(top,textEl('small',s.independent_attempts?`独立作答 ${s.independent_attempts} 次 · 答对 ${s.correct||0} 次`:'独立作答样本不足，继续练习看看'));return row}));
- $('recommendation-title').textContent=recommendation?.title||'从基础题开始';
+ if($('recommendation-title'))$('recommendation-title').textContent=recommendation?.title||'从基础题开始';
  const skillName=(learning.skills||[]).find(s=>s.id===recommendation?.skill)?.name||recommendation?.skill||'';
- $('recommendation-reason').textContent=recommendation?`${skillName} · 难度 ${recommendation.difficulty}\n${recommendation.reason}`:'做一道题后，推荐会随你的练习记录调整。';
+ if($('recommendation-reason'))$('recommendation-reason').textContent=recommendation?`${skillName} · 难度 ${recommendation.difficulty}\n${recommendation.reason}`:'做一道题后，推荐会随你的练习记录调整。';
  $('history-title').textContent=`${profile.name}的最近练习`;
  const attempts=(state.recent_attempts||[]).slice(0,10);
  $('attempts').replaceChildren(...(attempts.length?attempts.map(a=>{const li=textEl('li');const date=new Date(a.created_at);const when=Number.isNaN(date.getTime())?'':date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});li.append(textEl('strong',a.title),textEl('span',`${a.correct?'答对了':'再练一练'} · ${a.assisted?'提示后作答':a.attempt_no>1?'再次尝试':'独立作答'}`,a.correct?'history-success':'history-retry'),textEl('small',`${when} · 难度 ${a.difficulty}`));return li}):[textEl('li','第一道题完成后，记录会出现在这里。','empty-history')]));
