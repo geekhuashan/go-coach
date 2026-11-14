@@ -1,7 +1,7 @@
 {
  "/app.js": {
-  "v": "20261114-sound4",
-  "sha256": "db3d6caf15d8112c2eca24b70f3ccbd2f1159226f4614898739b6a2d34513b5d"
+  "v": "20261114-menu1",
+  "sha256": "7ce68396c23ec6dfd2cf2602b05ce8cb8a8e52d17c1a19bfc0e13fb2dae97d0d"
  },
  "/growth.css": {
   "v": "20261015-growth",
@@ -20,7 +20,7 @@
   "sha256": "050d38c8d7e2cac9e62d602289cbc594f414f3db5d937bc48196ea8fa8627239"
  },
  "/style.css": {
-  "v": "20261114-sandbox",
-  "sha256": "049f7cd760f8e2026f08da19bc156811b0c3ff964fe92b99f7614a819024b000"
+  "v": "20261114-menu1",
+  "sha256": "5aeb58522578acbcda6e4b26c79b0f9170ecf68e821324280e2073677ca53eea"
  }
 }

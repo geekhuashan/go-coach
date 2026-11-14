@@ -396,14 +396,16 @@ function renderPractice(){
  $('practice-mode').value=mode;$('practice-mode').disabled=!canNavigatePractice()||state.demo_active;
  const sequential=mode==='sequential',review=mode==='review',empty=(review&&p.review_count===0)||(sequential&&p.remaining===0)||(p.path_title==='三书主线'&&p.main_path_complete===true)||(!review&&p.study_path&&p.next_id===null);
  $('practice-progress').textContent=sequential?`已通过 ${p.completed||0} / ${p.total||lessons.length} 关${p.current_index?' · 当前第 '+p.current_index+' 关':''}`:review?`待复习 ${p.review_count||0} 题`:'按教材主线和你的学习记录安排';
- $('next-practice-eyebrow').textContent=sequential?'顺序练习':review?'错题复习':'适合你的下一题';
- if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent=(p.book_title?[p.book_title,p.chapter].filter(Boolean).join(' · ')+(p.path_title==='自选拓展'?'。继续当前选做题集，不影响教材成绩。':'。按原书题号继续，完成后进入下一本教材。'):'按手筋入门到10级、手筋10级到5级、死活入门到10级的顺序练习。基础巩固和 Go Game Guru 可在题库选做。')+'看过解答再做对也能过关，但不增加独立答题积分。';}
- if(p.path_title==='三书主线'&&p.main_path_complete&&mode!=='review'){$('recommendation-title').textContent='三本教材已完成';$('recommendation-reason').textContent='可以从题库自选配套巩固或最后的 Go Game Guru 拓展题。';}
- if(p.path_title==='自选拓展'&&p.next_id===null&&mode!=='review'){$('recommendation-title').textContent='这套拓展题已完成';$('recommendation-reason').textContent='可以回到题库选择教材或配套巩固。';}
- if(review){$('recommendation-title').textContent=empty?'暂时没有待复习题':'再练一次，弄懂它';$('recommendation-reason').textContent=empty?'可以切换智能推荐，或去题库挑题。':'重练还没做对的题；未收录的变化也留在这里，做对后移出。';}
- $('next-lesson').textContent=sequential?'继续练习 →':review?'开始复习 →':'开始推荐练习 →';
+ if($('next-practice-eyebrow'))$('next-practice-eyebrow').textContent=sequential?'顺序练习':review?'错题复习':'适合你的下一题';
+ if($('recommendation-title')&&$('recommendation-reason')){
+  if(sequential){$('recommendation-title').textContent=p.remaining===0?'这一轮已全部通过':`继续第 ${p.next_index||1} 关`;$('recommendation-reason').textContent=(p.book_title?[p.book_title,p.chapter].filter(Boolean).join(' · ')+(p.path_title==='自选拓展'?'。继续当前选做题集，不影响教材成绩。':'。按原书题号继续，完成后进入下一本教材。'):'按手筋入门到10级、手筋10级到5级、死活入门到10级的顺序练习。基础巩固和 Go Game Guru 可在题库选做。')+'看过解答再做对也能过关，但不增加独立答题积分。';}
+  if(p.path_title==='三书主线'&&p.main_path_complete&&mode!=='review'){$('recommendation-title').textContent='三本教材已完成';$('recommendation-reason').textContent='可以从题库自选配套巩固或最后的 Go Game Guru 拓展题。';}
+  if(p.path_title==='自选拓展'&&p.next_id===null&&mode!=='review'){$('recommendation-title').textContent='这套拓展题已完成';$('recommendation-reason').textContent='可以回到题库选择教材或配套巩固。';}
+  if(review){$('recommendation-title').textContent=empty?'暂时没有待复习题':'再练一次，弄懂它';$('recommendation-reason').textContent=empty?'可以切换智能推荐，或去题库挑题。':'重练还没做对的题；未收录的变化也留在这里，做对后移出。';}
+ }
+ if($('next-lesson')){$('next-lesson').textContent=sequential?'继续练习 →':review?'开始复习 →':'开始推荐练习 →';$('next-lesson').disabled=!canNavigatePractice()||empty||state.demo_active;}
  $('next-result').textContent=sequential?'下一题 →':review?'复习下一题 →':'练下一题 →';
- $('next-lesson').disabled=!canNavigatePractice()||empty||state.demo_active;$('next-result').disabled=!canNavigatePractice()||empty;
+ $('next-result').disabled=!canNavigatePractice()||empty;
 }
 function lessonFamily(l){return l.base_id||l.family_id||(l.variant!==undefined?l.id.replace(/-\d+$/,''):l.id)}
 function sourceText(source){if(typeof source==='string')return source;if(!source)return '内置练习';return [source.title||source.book||source.name,source.page?'第 '+source.page+' 页':'',source.problem||source.problem_number||source.number?'题号 '+(source.problem||source.problem_number||source.number):'',source.kind==='licensed'&&source.author?'作者：'+source.author:'',source.kind==='licensed'?'':source.note].filter(Boolean).join(' · ')||'内置练习'}
@@ -610,7 +612,7 @@ $('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').on
 $('review-move').onclick=()=>act('review_move');
 $('practice-mode').onchange=()=>{if(!canNavigatePractice()||!state||state.demo_active){if(state)renderPractice();return;}act('practice_mode',{mode:$('practice-mode').value});};
 $('chapter-previous').onclick=()=>moveChapterQuestion(-1);$('chapter-next').onclick=()=>moveChapterQuestion(1);$('chapter-question-toggle').onclick=toggleChapterQuestions;
-$('next-result').onclick=()=>act('next_lesson');$('next-lesson').onclick=()=>act('next_lesson');
+$('next-result').onclick=()=>act('next_lesson');if($('next-lesson'))$('next-lesson').onclick=()=>act('next_lesson');
 $('profile-form').onsubmit=e=>{e.preventDefault();const name=$('profile-name').value.trim();if(name)act('add_profile',{name})};
 $('lesson-import-form').onsubmit=async e=>{
  e.preventDefault();if(busy||!state)return;const file=$('lesson-file').files[0];if(!file)return;
@@ -639,7 +641,7 @@ function startMatch(useCurrent=false){
 function renderMatch(){
  $('review-match-patterns').hidden=!state.match?.id||state.demo_active;
  $('pattern-return').hidden=!patternReturn||patternReturn.profileId!==state.profile?.id||state.mode!=='lesson';
- $('next-practice').hidden=state.mode!=='lesson'||!!state.lesson_attempted;
+ if($('next-practice'))$('next-practice').hidden=state.mode!=='lesson'||!!state.lesson_attempted;
  const match=state.match,profiles=state.profiles||[];
  for(const [id,mode] of [['mode-lesson','lesson'],['mode-human-ai','human_ai'],['mode-two-player','two_player']]){$(id).classList.toggle('selected',selectedMode===mode);$(id).setAttribute('aria-pressed',String(selectedMode===mode))}
  $('practice-controls').hidden=selectedMode!=='lesson';
@@ -973,32 +975,60 @@ function renderBoardChrome(){
 const SOUND_STORAGE='go-coach-sound';
 let audioContext=null;
 function soundEnabled(){try{return localStorage.getItem(SOUND_STORAGE)!=='off'}catch{return true}}
-function unlockAudio(){if(audioContext||!soundEnabled())return;const Context=globalThis.AudioContext||globalThis.webkitAudioContext;if(!Context)return;try{audioContext=new Context();}catch{audioContext=null}}
-function tone(frequency,start,duration,{type='sine',volume=.22}={}){
+function unlockAudio(){
+ if(!soundEnabled())return null;
+ const Context=globalThis.AudioContext||globalThis.webkitAudioContext;if(!Context)return null;
+ if(!audioContext){try{audioContext=new Context();}catch{audioContext=null;return null;}}
+ if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+ return audioContext;
+}
+function tone(frequency,start,duration,{type='sine',volume=.26,slideTo=null}={}){
  const ctx=audioContext;if(!ctx)return;const osc=ctx.createOscillator(),gain=ctx.createGain(),t=ctx.currentTime+start;
- osc.type=type;osc.frequency.setValueAtTime(frequency,t);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(volume,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
+ osc.type=type;osc.frequency.setValueAtTime(frequency,t);
+ if(slideTo)osc.frequency.exponentialRampToValueAtTime(slideTo,t+duration);
+ gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(volume,t+.015);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
  osc.connect(gain).connect(ctx.destination);osc.start(t);osc.stop(t+duration+.05);
 }
+function triggerSound(kind){
+ if(kind==='right'){
+  tone(523.25,0,.13,{type:'triangle',volume:.24});
+  tone(659.25,.09,.13,{type:'triangle',volume:.25});
+  tone(783.99,.18,.15,{type:'triangle',volume:.26});
+  tone(1046.5,.27,.42,{type:'sine',volume:.30});
+  tone(1567.98,.30,.32,{type:'sine',volume:.11});
+ }else if(kind==='wrong'){
+  tone(330,0,.18,{type:'triangle',volume:.26,slideTo:294});
+  tone(220,.17,.36,{type:'triangle',volume:.28,slideTo:196});
+  tone(165,.17,.32,{type:'sine',volume:.14});
+ }else if(kind==='step'){
+  tone(784,0,.10,{type:'sine',volume:.15});
+  tone(1046.5,.07,.14,{type:'sine',volume:.16});
+ }else if(kind==='stone'){
+  tone(900,0,.045,{type:'triangle',volume:.10,slideTo:320});
+ }
+}
 function playSound(kind){
- if(!soundEnabled())return;unlockAudio();const ctx=audioContext;if(!ctx)return;if(ctx.state==='suspended')ctx.resume().catch(()=>{});
- if(kind==='right'){tone(659,0,.18);tone(784,.11,.18);tone(1047,.22,.38,{volume:.25});}
- else if(kind==='wrong'){tone(330,0,.22,{type:'triangle',volume:.25});tone(247,.18,.4,{type:'triangle',volume:.25});}
- else if(kind==='step'){tone(880,0,.12,{volume:.12});}
- else if(kind==='stone'){tone(1400,0,.05,{type:'square',volume:.05});}
+ if(!soundEnabled())return;
+ const ctx=unlockAudio();if(!ctx)return;
+ if(ctx.state==='suspended'){ctx.resume().then(()=>triggerSound(kind)).catch(()=>{});return;}
+ triggerSound(kind);
 }
 // Plays only for the learner's own answer, never for polling or other devices.
 function playResultSound(previous,next,action){
- if(!previous||!next||next.mode!=='lesson'||!['play','submit_answer','submit_selection'].includes(action))return;
+ if(!previous||!next||!['play','submit_answer','submit_selection'].includes(action))return;
+ if(next.mode!=='lesson'){if(action==='play'&&next.revision!==previous.revision)playSound('stone');return;}
  if(previous.profile?.id!==next.profile?.id||previous.lesson?.id!==next.lesson?.id)return;
  const before=previous.lesson_progress?.status,after=next.lesson_progress?.status,correct=next.assessment?.correct;
  if(after==='solved'&&before!=='solved')return playSound('right');
  if(['failed','unlisted'].includes(after)&&before!==after)return playSound('wrong');
- if(next.revision===previous.revision||previous.lesson_playout)return;
+ if(next.revision===previous.revision||previous.lesson_playout){if(action==='play'&&next.revision!==previous.revision)playSound('stone');return;}
  // A one-move problem: the first answer decides; a multi-move one chimes softly on each right step.
  if(!previous.lesson_attempted&&next.lesson_attempted&&!next.lesson?.sequence){if(correct===true)return playSound('right');if(correct===false)return playSound('wrong');}
+ if(correct===false)return playSound('wrong');
  if(after==='playing'&&correct===true)return playSound('step');
+ if(action==='play')playSound('stone');
 }
-document.addEventListener('pointerdown',unlockAudio,{once:true,capture:true});
+document.addEventListener('pointerdown',unlockAudio,{capture:true,passive:true});
 
 // ---- Free board (自己摆棋): try both colours on a copy of the problem, saves nothing. ----
 let sandbox=null;
@@ -1036,3 +1066,5 @@ $('sandbox-reset').onclick=()=>startSandbox(true);
 $('sandbox-exit').onclick=()=>{sandbox=null;inspection=null;render();};
 $('sound-enabled').checked=soundEnabled();
 $('sound-enabled').onchange=e=>{try{localStorage.setItem(SOUND_STORAGE,e.target.checked?'on':'off')}catch{}if(e.target.checked){unlockAudio();playSound('right');}};
+if($('sound-test-right'))$('sound-test-right').onclick=()=>{unlockAudio();playSound('right');};
+if($('sound-test-wrong'))$('sound-test-wrong').onclick=()=>{unlockAudio();playSound('wrong');};
