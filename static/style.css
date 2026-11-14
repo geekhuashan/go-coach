@@ -212,3 +212,4 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 .lesson-why-demos button{min-height:44px;padding:8px 14px;font-size:14px;color:var(--green)}
 .lesson-why.playing{border-color:#9fbf98;background:#f1f7ea}
 .lesson-why-controls{display:flex;gap:8px;margin-top:12px}.lesson-why-controls button{flex:1;min-height:46px;font-size:15px}
+.sandbox-bar{margin:12px 0;padding:12px 14px;border:2px dashed var(--gold);border-radius:14px;background:#fffaf0}.sandbox-bar p{margin:0 0 6px}#sandbox-turn{font-weight:700;color:var(--ink)}.sandbox-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sandbox-actions button{min-height:44px;flex:1 1 auto}.sandbox-active .board-shell{outline:3px dashed var(--gold);outline-offset:4px;border-radius:12px}

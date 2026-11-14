@@ -241,7 +241,41 @@ def review(state):
         _lock.release()
 
 
+def local_region(state):
+    """Return validated empty points a problem reply must stay within, or None."""
+    region = state.get('region')
+    if region is None:
+        return None
+    size = state['size']
+    if not isinstance(region, list) or not 0 < len(region) <= size * size:
+        raise ValueError('局部范围无效。')
+    points = []
+    for point in region:
+        if not isinstance(point, dict) or set(point) != {'x', 'y'}:
+            raise ValueError('局部范围只允许 x、y 坐标。')
+        name = coordinate(point['x'], point['y'], size)
+        if state['board'][point['y']][point['x']] == 0 and name not in points:
+            points.append(name)
+    return points or None
+
+
 def choose_move(state):
+    region = local_region(state)
+    if region:
+        # Problems are local fights: an empty board elsewhere must not lure the reply away.
+        if not _lock.acquire(timeout=2):
+            raise RuntimeError("当前 KataGo 正在计算另一手，请稍后重试。")
+        try:
+            query = analysis_query(state, uuid.uuid4().hex)
+            query.update(maxVisits=160, allowMoves=[{'player': 'B' if state['to_play'] == 1 else 'W',
+                                                     'moves': region, 'untilDepth': 1}])
+            moves = _run_query(query, timeout=8)["moveInfos"]
+        finally:
+            _lock.release()
+        if not moves:
+            raise RuntimeError("引擎没有返回合法候选点。")
+        best = min(moves, key=lambda m: m.get("order", 999))
+        return parse_move(best["move"], state["size"])
     result = analyze(state)
     if not result["moves"]:
         raise RuntimeError("引擎没有返回合法候选点。")

@@ -73,6 +73,7 @@ def handler(token):
                 payload = json.loads(self.rfile.read(length))
                 state = validate_state(payload.get('state'))
                 if self.path == '/review': engine.review_points(state)
+                if self.path == '/move': engine.local_region(state)
             except (ValueError, TypeError, AttributeError, OSError):
                 return self.reply(400, {'error': 'Invalid request'})
             try:

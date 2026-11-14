@@ -147,6 +147,8 @@ function lockSession(){authEpoch++;authenticated=false;resetSessionRecovery();re
 function schedulePoll(){clearTimeout(pollTimer);const epoch=authEpoch;if(authenticated&&!document.hidden)pollTimer=setTimeout(async()=>{if(epoch!==authEpoch||document.hidden)return;if(!busy)await lightSync();if(epoch===authEpoch)schedulePoll()},Math.max(12000,syncRetryAt-Date.now()));}
 function setState(next,{inspectionAck=false,growthAction=null}={}){
  const previousGrowthState=state;
+ if(typeof playResultSound==='function')playResultSound(state,next,growthAction);
+ if(typeof sandbox!=='undefined'&&sandbox&&(next.profile?.id!==sandbox.profileId||next.lesson?.id!==sandbox.lessonId||next.mode!==sandbox.mode))sandbox=null;
  const sameInspectionView=!!state&&inspectionViewKey(state)===inspectionViewKey(next);
  if(!sameInspectionView)inspection=null;
  if(inspectionAck&&sameInspectionView)next={...next,marks:state.marks,message:state.message};
@@ -489,12 +491,13 @@ function lessonBoardBounds(s){
  return {minX,maxX,minY,maxY};
 }
 function renderBoard(){
- const root=$('board'),size=state.size||9;
- const focusKey=JSON.stringify([state.profile?.id,state.lesson?.id,size,state.initial_board]);
+ const view=typeof boardView==='function'?boardView():state;
+ const root=$('board'),size=view.size||9;
+ const focusKey=JSON.stringify([view.profile?.id,view.lesson?.id,size,view.initial_board]);
  if(focusKey!==boardFocusKey){boardFocusKey=focusKey;boardFocusFull=false;}
- const proposed=lessonBoardBounds(state),focused=!!proposed&&!boardFocusFull;
- const optimisticMove=actionRequest?.move?.revision===state.revision&&actionRequest.move.profileId===state.profile?.id?actionRequest.move:null;
- const renderKey=JSON.stringify([focusKey,state.board,state.last_move,state.marks,inspection,pendingMove,optimisticMove,selectedPoints,boardZoom,focused,proposed]);
+ const proposed=lessonBoardBounds(view),focused=!!proposed&&!boardFocusFull;
+ const optimisticMove=actionRequest?.move?.revision===view.revision&&actionRequest.move.profileId===view.profile?.id?actionRequest.move:null;
+ const renderKey=JSON.stringify([typeof sandbox!=='undefined'&&!!sandbox,view.to_play,focusKey,view.board,view.last_move,view.marks,inspection,pendingMove,optimisticMove,selectedPoints,boardZoom,focused,proposed]);
  if(renderKey===boardRenderKey&&root.childElementCount)return;
  boardRenderKey=renderKey;
  const {minX,maxX,minY,maxY}=focused?proposed:{minX:0,maxX:size-1,minY:0,maxY:size-1};
@@ -513,26 +516,27 @@ function renderBoard(){
  if(focused){for(const [show,x1,y1,x2,y2]of[[minX>0,left,top,left,bottom],[maxX<size-1,right,top,right,bottom],[minY>0,left,top,right,top],[maxY<size-1,left,bottom,right,bottom]])if(show)root.append(svg('line',{x1,y1,x2,y2,class:'board-crop-boundary'}));}
  for(const [x,y]of(size===19?[3,9,15].flatMap(x=>[3,9,15].map(y=>[x,y])):[[2,2],[6,2],[4,4],[2,6],[6,6]]))if(x>=minX&&x<=maxX&&y>=minY&&y<=maxY)root.append(svg('circle',{cx:atX(x),cy:atY(y),r:Math.min(3.1,step*.09),fill:'#6c583c'}));
  for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
-  const color=state.board[y][x],cx=atX(x),cy=atY(y),g=svg('g',{class:'intersection',role:state.lesson?.interaction==='choose_answer'?'img':'button',tabindex:state.lesson?.interaction==='choose_answer'?'-1':'0','aria-label':`${cols[x]}${size-y} ${color===1?'黑子':color===2?'白子':'空位'}`});
+  const color=view.board[y][x],cx=atX(x),cy=atY(y),g=svg('g',{class:'intersection',role:view.lesson?.interaction==='choose_answer'?'img':'button',tabindex:view.lesson?.interaction==='choose_answer'?'-1':'0','aria-label':`${cols[x]}${size-y} ${color===1?'黑子':color===2?'白子':'空位'}`});
   g.append(svg('rect',{x:cx-step/2,y:cy-step/2,width:step,height:step,fill:'transparent',rx:7,class:'hit'}));
-  if(color){g.append(svg('ellipse',{cx:cx+1,cy:cy+3,rx:step*.445,ry:step*.43,fill:'#5c48243a'}),svg('circle',{cx,cy,r:step*.435,fill:`url(#${color===1?'blackStone':'whiteStone'})`,stroke:color===1?'#1c2620':'#b7b6a4','stroke-width':.6}));if(state.last_move?.x===x&&state.last_move?.y===y)g.append(svg('circle',{cx,cy,r:Math.min(5,step*.13),fill:'none',stroke:color===1?'#f1e7cc':'#526957','stroke-width':2}));}
+  if(color){g.append(svg('ellipse',{cx:cx+1,cy:cy+3,rx:step*.445,ry:step*.43,fill:'#5c48243a'}),svg('circle',{cx,cy,r:step*.435,fill:`url(#${color===1?'blackStone':'whiteStone'})`,stroke:color===1?'#1c2620':'#b7b6a4','stroke-width':.6}));if(view.last_move?.x===x&&view.last_move?.y===y)g.append(svg('circle',{cx,cy,r:Math.min(5,step*.13),fill:'none',stroke:color===1?'#f1e7cc':'#526957','stroke-width':2}));}
   if(inspection?.stones?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:step*.46,fill:'none',stroke:'#58896d','stroke-width':3}));
   if(inspection?.liberties?.some(s=>s.x===x&&s.y===y))g.append(svg('circle',{cx,cy,r:Math.min(9,step*.2),fill:'#f4fbdb',stroke:'#597a42','stroke-width':2}));
-  if(pendingMove?.x===x&&pendingMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.4,fill:state.to_play===1?'#253b34':'#fffdf7',opacity:.55,stroke:'#b7853c','stroke-width':2,'stroke-dasharray':'3 2'}));
+  if(pendingMove?.x===x&&pendingMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.4,fill:view.to_play===1?'#253b34':'#fffdf7',opacity:.55,stroke:'#b7853c','stroke-width':2,'stroke-dasharray':'3 2'}));
   if(!color&&optimisticMove?.x===x&&optimisticMove?.y===y)g.append(svg('circle',{cx,cy,r:step*.435,fill:`url(#${optimisticMove.color===1?'blackStone':'whiteStone'})`,opacity:.65,stroke:'#b7853c','stroke-width':2,class:'optimistic-stone'}));
   if(selectedPoints.some(p=>p[0]===x&&p[1]===y))g.append(svg('path',{d:`M ${cx} ${cy-step*.27} L ${cx-step*.25} ${cy+step*.22} L ${cx+step*.25} ${cy+step*.22} Z`,fill:'none',stroke:'#bd6f26','stroke-width':Math.max(2,step*.07),'stroke-linejoin':'round'}));
-  const mark=state.marks?.find(m=>m.x===x&&m.y===y);if(mark&&!(mark.label==='气'&&inspection)){g.append(svg('circle',{cx,cy,r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:cx,y:cy+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'));}
+  const mark=view.marks?.find(m=>m.x===x&&m.y===y);if(mark&&!(mark.label==='气'&&inspection)){g.append(svg('circle',{cx,cy,r:Math.min(16,step*.32),fill:color?'#b7853cd9':'#f4eee0e8',stroke:'#a17635','stroke-width':2}),svg('text',{x:cx,y:cy+1,'text-anchor':'middle','dominant-baseline':'middle',fill:color?'#fff':'#735224','font-size':Math.min(14,step*.4),'font-weight':700},mark.label||'·'));}
   const onClick=()=>{
-   if(state.lesson?.interaction==='choose_answer')return;
-   if(state.lesson?.interaction==='select_stones'){
-    if(busy)return;if(state.lesson_attempted||state.demo_active){toast('本题已作答，请重练或换题。');return;}if(color!==state.lesson.selection_color){toast('这道题只需选择白子。');return;}
+   if(typeof sandbox!=='undefined'&&sandbox){if(color)inspectLocal(x,y);else sandboxPlay(x,y);return;}
+   if(view.lesson?.interaction==='choose_answer')return;
+   if(view.lesson?.interaction==='select_stones'){
+    if(busy)return;if(view.lesson_attempted||view.demo_active){toast('本题已作答，请重练或换题。');return;}if(color!==view.lesson.selection_color){toast('这道题只需选择白子。');return;}
     const index=selectedPoints.findIndex(p=>p[0]===x&&p[1]===y);if(index>=0)selectedPoints.splice(index,1);else selectedPoints.push([x,y]);inspection=null;pendingMove=null;render();return;
    }
    if(color){inspectLocal(x,y);return;}if(busy)return;
-   if(state.computer_turn){toast('现在轮到电脑，请等它落子。');return;}
-   if((state.lesson_attempted&&!state.lesson_playout)||state.demo_active){toast(state.demo_active?'请先返回原局面。':'本题已作答，请重练或换题。');return;}
+   if(view.computer_turn){toast('现在轮到电脑，请等它落子。');return;}
+   if((view.lesson_attempted&&!view.lesson_playout)||view.demo_active){toast(view.demo_active?'请先返回原局面。':'本题已作答，请重练或换题。');return;}
    clearInspection();
-   if($('confirm-enabled').checked){pendingMove={x,y,revision:state.revision,profile:state.profile?.id};render();$('pending-move').scrollIntoView({block:'nearest'});return;}
+   if($('confirm-enabled').checked){pendingMove={x,y,revision:view.revision,profile:view.profile?.id};render();$('pending-move').scrollIntoView({block:'nearest'});return;}
    act('play',{x,y});
   };
   g.addEventListener('click',onClick);g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onClick()}});root.append(g);
@@ -573,8 +577,8 @@ function inspectionText(){
  return text;
 }
 function inspectLocal(x,y){
- if(!state)return;inspection=localInspection(state.board,x,y);pendingMove=null;
- const record=inspection.stones.length&&needsInspectionHelp(state);
+ if(!state)return;inspection=localInspection(boardView().board,x,y);pendingMove=null;
+ const record=!sandbox&&inspection.stones.length&&needsInspectionHelp(state);
  if(record){pendingInspectionHelp.add(inspectionHelpKey(state));storePendingInspectionHelp();}
  renderBoard();renderInspectionText();renderPending();$('inspection').hidden=false;
  if(record&&!busy&&navigator.onLine)void act('inspect',{x,y});
@@ -962,4 +966,73 @@ function renderBoardChrome(){
  $('inspection').hidden=!$('inspection').textContent;
  const actions=document.querySelector('.board-actions');actions.hidden=[...actions.children].every(b=>b.hidden);
  $('pass').hidden=state.mode==='lesson'&&!state.lesson_playout;
+ renderSandboxChrome();
 }
+
+// ---- Sound effects: short synthesized tones, no audio files, can be muted. ----
+const SOUND_STORAGE='go-coach-sound';
+let audioContext=null;
+function soundEnabled(){try{return localStorage.getItem(SOUND_STORAGE)!=='off'}catch{return true}}
+function unlockAudio(){if(audioContext||!soundEnabled())return;const Context=globalThis.AudioContext||globalThis.webkitAudioContext;if(!Context)return;try{audioContext=new Context();}catch{audioContext=null}}
+function tone(frequency,start,duration,{type='sine',volume=.22}={}){
+ const ctx=audioContext;if(!ctx)return;const osc=ctx.createOscillator(),gain=ctx.createGain(),t=ctx.currentTime+start;
+ osc.type=type;osc.frequency.setValueAtTime(frequency,t);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(volume,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);
+ osc.connect(gain).connect(ctx.destination);osc.start(t);osc.stop(t+duration+.05);
+}
+function playSound(kind){
+ if(!soundEnabled())return;unlockAudio();const ctx=audioContext;if(!ctx)return;if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+ if(kind==='right'){tone(659,0,.18);tone(784,.11,.18);tone(1047,.22,.38,{volume:.25});}
+ else if(kind==='wrong'){tone(330,0,.22,{type:'triangle',volume:.25});tone(247,.18,.4,{type:'triangle',volume:.25});}
+ else if(kind==='step'){tone(880,0,.12,{volume:.12});}
+ else if(kind==='stone'){tone(1400,0,.05,{type:'square',volume:.05});}
+}
+// Plays only for the learner's own answer, never for polling or other devices.
+function playResultSound(previous,next,action){
+ if(!previous||!next||next.mode!=='lesson'||!['play','submit_answer','submit_selection'].includes(action))return;
+ if(previous.profile?.id!==next.profile?.id||previous.lesson?.id!==next.lesson?.id)return;
+ const before=previous.lesson_progress?.status,after=next.lesson_progress?.status,correct=next.assessment?.correct;
+ if(after==='solved'&&before!=='solved')return playSound('right');
+ if(['failed','unlisted'].includes(after)&&before!==after)return playSound('wrong');
+ if(next.revision===previous.revision||previous.lesson_playout)return;
+ // A one-move problem: the first answer decides; a multi-move one chimes softly on each right step.
+ if(!previous.lesson_attempted&&next.lesson_attempted&&!next.lesson?.sequence){if(correct===true)return playSound('right');if(correct===false)return playSound('wrong');}
+ if(after==='playing'&&correct===true)return playSound('step');
+}
+document.addEventListener('pointerdown',unlockAudio,{once:true,capture:true});
+
+// ---- Free board (自己摆棋): try both colours on a copy of the problem, saves nothing. ----
+let sandbox=null;
+function boardView(){if(!sandbox||!state)return state;return {...state,board:sandbox.board,last_move:sandbox.last,marks:[],to_play:sandbox.toPlay,computer_turn:false};}
+function sandboxGroup(board,x,y){const size=board.length,color=board[y][x],stones=[],libs=new Set(),seen=new Set([x+','+y]),todo=[[x,y]];while(todo.length){const [a,b]=todo.pop();stones.push([a,b]);for(const [c,d] of [[a-1,b],[a+1,b],[a,b-1],[a,b+1]]){if(c<0||d<0||c>=size||d>=size)continue;const v=board[d][c],k=c+','+d;if(!v)libs.add(k);else if(v===color&&!seen.has(k)){seen.add(k);todo.push([c,d]);}}}return {stones,liberties:libs.size};}
+function sandboxPlay(x,y){
+ const board=sandbox.board.map(row=>[...row]),color=sandbox.toPlay;if(board[y][x])return;board[y][x]=color;let captured=0;
+ for(const [a,b] of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){if(a<0||b<0||a>=board.length||b>=board.length||board[b][a]!==3-color)continue;const g=sandboxGroup(board,a,b);if(!g.liberties){captured+=g.stones.length;for(const [c,d] of g.stones)board[d][c]=0;}}
+ if(!sandboxGroup(board,x,y).liberties){toast('这一步自己没有气，不能下。');return;}
+ const k=board.flat().join('');if(sandbox.history.some(h=>h.board.flat().join('')===k)){toast('打劫：不能马上提回，先在别处下一手。');return;}
+ sandbox.history.push({board:sandbox.board,toPlay:sandbox.toPlay,last:sandbox.last});sandbox.board=board;sandbox.last={x,y};sandbox.toPlay=3-color;inspection=null;
+ playSound('stone');sandbox.note=captured?`${color===1?'黑':'白'}提掉 ${captured} 子。`:'';render();
+}
+function startSandbox(fromStart=false){
+ if(!state)return;const board=(fromStart?state.initial_board:state.board)||state.board;
+ sandbox={board:board.map(row=>[...row]),toPlay:fromStart?(state.initial_player||state.to_play):state.to_play,last:fromStart?null:state.last_move,history:[],note:'',profileId:state.profile?.id,lessonId:state.lesson?.id,mode:state.mode};
+ pendingMove=null;inspection=null;render();
+}
+function renderSandboxChrome(){
+ const bar=$('sandbox-bar'),on=!!sandbox;if(!bar)return;
+ bar.hidden=!on;$('sandbox-start').hidden=on||!state||state.mode!=='lesson'||state.demo_active||state.lesson?.interaction==='choose_answer'||state.lesson?.interaction==='select_stones'&&!state.lesson_attempted;
+ document.querySelector('.board-card')?.classList.toggle('sandbox-active',on);
+ if(on){
+  for(const id of ['open-coach','next-result','undo','pass','restart','ai-move'])$(id).hidden=true;
+  $('sandbox-turn').textContent=`自己摆棋 · 轮到${sandbox.toPlay===1?'黑':'白'}`+(sandbox.note?' · '+sandbox.note:'');
+  $('sandbox-undo').disabled=!sandbox.history.length;
+  $('turn-pill').className='turn-pill'+(sandbox.toPlay===2?' white':'');$('turn-pill').querySelector('span').textContent=`摆棋 · 轮到${sandbox.toPlay===1?'黑':'白'}棋`;
+ }
+ const actions=document.querySelector('.board-actions');actions.hidden=[...actions.children].every(b=>b.hidden);
+}
+$('sandbox-start').onclick=()=>startSandbox(false);
+$('sandbox-undo').onclick=()=>{if(!sandbox?.history.length)return;const h=sandbox.history.pop();Object.assign(sandbox,h,{note:''});inspection=null;render();};
+$('sandbox-switch').onclick=()=>{if(!sandbox)return;sandbox.toPlay=3-sandbox.toPlay;sandbox.note='';render();};
+$('sandbox-reset').onclick=()=>startSandbox(true);
+$('sandbox-exit').onclick=()=>{sandbox=null;inspection=null;render();};
+$('sound-enabled').checked=soundEnabled();
+$('sound-enabled').onchange=e=>{try{localStorage.setItem(SOUND_STORAGE,e.target.checked?'on':'off')}catch{}if(e.target.checked){unlockAudio();playSound('right');}};

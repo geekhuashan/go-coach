@@ -4,7 +4,8 @@ import {builtinLessons,loadCatalog,snapshotVersion,fullLesson,publicCatalogText,
 import {growthFor} from './growth.mjs';
 import {clone} from './rules.mjs';
 import {learning,recommend,publicLesson,validateLesson,practice,availableLesson} from './curriculum.mjs';
-import {lessonState,applyAction,navigationLessonId,computerTurn,normalizeLessonPlayout,publicState,sgf} from './game.mjs';
+import {lessonState,applyAction,navigationLessonId,computerTurn,normalizeLessonPlayout,lessonPlayoutActive,publicState,sgf} from './game.mjs';
+import {lessonRegion,inRegion,localFallbackMove} from './local-reply.mjs';
 import {studyPath} from './study-path.mjs';
 import {EXPLAIN_VERSION} from './explain.mjs';
 import {digest,equal,cookies,authenticated,makeSession,sessionCookie,profileCookie,encrypt,decrypt} from './auth.mjs';
@@ -92,12 +93,16 @@ export async function bridge(env,path,state){
  if(!cloudflare&&!vps)fail('计算服务尚未连接，仍可练题和双人对弈。',503);
  const payload={};for(const name of ['size','board','initial_board','moves','to_play','initial_player','revision'])payload[name]=state[name];
  if(path==='review')payload.review=state.review;
+ const region=path==='move'&&lessonPlayoutActive(state)?lessonRegion(state):null;if(region)payload.region=region;
  const playing=path==='move'||path==='review',reviewing=path==='review';
  const attempts=[
   cloudflare&&{config:cloudflare,warmOnly:playing,budget:playing?timeoutBudget(env.ENGINE_CONTAINER_TIMEOUT_MS,reviewing?10000:8000,10000):timeoutBudget(env.ENGINE_CONTAINER_TIMEOUT_MS,15000,15000)},
   vps&&{config:vps,warmOnly:false,budget:playing?timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,reviewing?8000:6000,8000):timeoutBudget(env.ENGINE_FALLBACK_TIMEOUT_MS,15000,15000)},
  ].filter(Boolean);
- for(const attempt of attempts){try{const result=await backendRequest(attempt.config,path,payload,attempt.budget,attempt.warmOnly);return {...result,engine_backend:attempt.config.backend};}catch(e){if(e.retryable!==true)throw e;}}
+ for(const attempt of attempts){try{const result=await backendRequest(attempt.config,path,payload,attempt.budget,attempt.warmOnly);
+  // An engine that predates the region field may still answer far away; keep the reply local.
+  if(region&&!inRegion(region,result))return {...localFallbackMove(state,region),engine_backend:attempt.config.backend,local_fallback:true};
+  return {...result,engine_backend:attempt.config.backend};}catch(e){if(e.retryable!==true)throw e;}}
  const work=reviewing?'复核':path==='move'?'应手':'分析';
  fail(attempts.length>1?`两个KataGo通道均未完成${work}，请稍后重试；练题和双人对弈仍可用。`:`${attempts[0].config.label}计算服务暂时未完成${work}，请稍后重试；练题和双人对弈仍可用。`,503);
 }
