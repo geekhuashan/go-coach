@@ -175,7 +175,7 @@ async function act(type,extra={}){
   return;
  }
  cancelExplanation();
- const operation={controller:new AbortController(),profileId:state.profile?.id,reply:type==='play',move:type==='play'?{x:extra.x,y:extra.y,color:state.to_play,revision:state.revision,profileId:state.profile?.id}:null};actionRequest=operation;
+ const operation={controller:new AbortController(),profileId:state.profile?.id,reply:type==='play'&&(typeof lessonReplyAllowed!=='function'||lessonReplyAllowed()),move:type==='play'?{x:extra.x,y:extra.y,color:state.to_play,revision:state.revision,profileId:state.profile?.id}:null};actionRequest=operation;
  pendingMove=null;busy=true;busyAction=type;if(type==='ai_move'){aiAttemptKey=`${computerKey()}:${state.revision}`;aiFailedKey=null;}document.body.setAttribute('aria-busy','true');render();
  try{let next;
  for(let attempt=0;attempt<2;attempt++){
@@ -608,7 +608,7 @@ $('cancel-move').onclick=()=>{pendingMove=null;if(state)render()};
 $('confirm-move').onclick=()=>{const move=pendingMove;if(!move||!state)return;if(move.revision!==state.revision||move.profile!==state.profile?.id){pendingMove=null;render();return}act('play',{x:move.x,y:move.y})};
 $('clear-selection').onclick=()=>{selectedPoints=[];selectedAnswer=null;if(state)render()};$('submit-selection').onclick=()=>{if(selectedPoints.length)act('submit_selection',{points:selectedPoints.map(p=>[...p])})};
 $('board-zoom').onclick=()=>{boardZoom=!boardZoom;if(state)render()};
-$('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').onclick=()=>act('hint');$('restart').onclick=()=>{if(state.lesson)act('retry');else startMatch(true)};$('ai-move').onclick=()=>{aiAttemptKey=null;aiFailedKey=null;act('ai_move')};$('restore-demo').onclick=()=>act('restore_demo');$('demo-next').onclick=()=>act('demo_next');$('lesson-why-play').onclick=()=>act('solution');
+$('undo').onclick=()=>act('undo');$('pass').onclick=()=>act('pass');$('hint').onclick=()=>act('hint');$('restart').onclick=()=>{if(state.lesson)act('retry');else startMatch(true)};$('ai-move').onclick=()=>{aiAttemptKey=null;aiFailedKey=null;if(state?.mode==='lesson')playoutOptIn=playoutKey();act('ai_move')};$('restore-demo').onclick=()=>act('restore_demo');$('demo-next').onclick=()=>act('demo_next');$('lesson-why-play').onclick=()=>act('solution');
 $('review-move').onclick=()=>act('review_move');
 $('practice-mode').onchange=()=>{if(!canNavigatePractice()||!state||state.demo_active){if(state)renderPractice();return;}act('practice_mode',{mode:$('practice-mode').value});};
 $('chapter-previous').onclick=()=>moveChapterQuestion(-1);$('chapter-next').onclick=()=>moveChapterQuestion(1);$('chapter-question-toggle').onclick=toggleChapterQuestions;
@@ -626,7 +626,7 @@ $('lesson-import-form').onsubmit=async e=>{
  finally{busy=false;$('import-lesson').disabled=false;}
 };
 function computerKey(){return state?.computer_turn?`${state.profile?.id||'profile'}:${state.match?.id||state.match_id||state.lesson?.id||state.mode}:${state.revision}:${state.move_number}:${state.to_play}`:null}
-function scheduleComputer(){setTimeout(()=>{const key=computerKey();if(!busy&&key&&!state.demo_active&&!state.ended&&state.engine?.available&&`${key}:${state.revision}`!==aiAttemptKey&&key!==aiFailedKey)act('ai_move')},0)}
+function scheduleComputer(){setTimeout(()=>{const key=computerKey();if(!busy&&key&&!state.demo_active&&!state.ended&&state.engine?.available&&!(typeof playoutPaused==='function'&&playoutPaused())&&`${key}:${state.revision}`!==aiAttemptKey&&key!==aiFailedKey)act('ai_move')},0)}
 function selectMode(mode){if(busy)return;selectedMode=mode;selectionPending=true;if(mode==='lesson'){if(state.mode!=='lesson')act('next_lesson');else {selectionPending=false;renderMatch()}}else renderMatch()}
 function startMatch(useCurrent=false){
  const match=useCurrent?state.match:null, mode=match?.mode||selectedMode;
@@ -664,8 +664,8 @@ function renderMatch(){
   $('ai-move').disabled=busy||!state.engine?.available;
   if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'电脑暂时没有完成落子。可点击“重试电脑落子”，或悔棋后继续。':'现在轮到电脑，落子后会自动回到你。';
  }else if(state.mode==='lesson'){
-  const playout=!!state.lesson_playout;$('ai-move').hidden=!playout||!state.computer_turn||state.demo_active||state.ended;$('ai-move').textContent=busy?'陪练思考中…':aiFailedKey===computerKey()?'重试 KataGo 应手':'KataGo 准备落子…';$('ai-move').disabled=busy||!state.engine?.available;$('pass').disabled=!playout||state.ended||state.demo_active||state.computer_turn;
-  if(playout){$('coach-eyebrow').textContent='练习续弈 · KataGo 根据当前局面应手';if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'陪练暂时没有完成应手，可点击按钮重试。':'现在轮到 KataGo，它落子后你可以继续下。';}
+  const playout=!!state.lesson_playout;$('ai-move').hidden=!playout||!state.computer_turn||state.demo_active||state.ended;const paused=playoutPaused();$('ai-move').textContent=busy?'陪练思考中…':aiFailedKey===computerKey()?'重试 KataGo 应手':paused?'看对手怎么下':'KataGo 准备落子…';$('ai-move').disabled=busy||!state.engine?.available;$('pass').disabled=!playout||state.ended||state.demo_active||state.computer_turn;
+  if(playout){$('coach-eyebrow').textContent='练习续弈 · KataGo 根据当前局面应手';if(state.computer_turn&&!inspection)$('inspection').textContent=aiFailedKey===computerKey()?'陪练暂时没有完成应手，可点击按钮重试。':paused?'先停一停：可以再试一次，自己摆棋找原因，或者看看对手会怎么下。':'现在轮到 KataGo，它落子后你可以继续下。';}
  }
  const backend=state.engine_backend||state.match?.engine_backend;
   $('engine-source').hidden=state.match?.mode!=='human_ai'||!['cloudflare','vps'].includes(backend);$('engine-source').textContent=backend==='cloudflare'?'最近一次 AI 落子：Cloudflare 计算服务':backend==='vps'?'最近一次 AI 落子：VPS 后备通道':'';
@@ -976,6 +976,7 @@ function renderBoardChrome(){
 function tidyLessonFeedback(){
  const answered=state.mode==='lesson'&&state.lesson_attempted&&!state.lesson_playout&&!state.demo_active;
  $('turn-pill').hidden=answered&&!(typeof sandbox!=='undefined'&&sandbox);
+ const paused=playoutPaused();$('restart').className=paused?'primary':'secondary';$('restart').style.order=paused?'-2':'';if(paused){$('restart').textContent='再试一次';$('next-result').className='secondary';$('ai-move').className='secondary';$('undo').hidden=$('pass').hidden=true;$('turn-pill').hidden=true;}else{$('next-result').className='primary';$('ai-move').className='primary';}
  const title=$('lesson-why-title'),explained=state.assessment?.correct===true&&!$('lesson-why').hidden&&!state.demo_active;
  if(explained){$('inline-assessment').hidden=true;if(!title.textContent.startsWith('✓ '))title.textContent='✓ 做对了 · '+title.textContent;}
 }
@@ -1077,3 +1078,10 @@ $('sound-enabled').checked=soundEnabled();
 $('sound-enabled').onchange=e=>{try{localStorage.setItem(SOUND_STORAGE,e.target.checked?'on':'off')}catch{}if(e.target.checked){unlockAudio();playSound('right');}};
 if($('sound-test-right'))$('sound-test-right').onclick=()=>{unlockAudio();playSound('right');};
 if($('sound-test-wrong'))$('sound-test-wrong').onclick=()=>{unlockAudio();playSound('wrong');};
+
+// ---- After a miss the problem pauses: retry, set stones freely, or ask to see the opponent's reply. ----
+// KataGo no longer answers a wrong move by itself; it joins only after the learner asks for it.
+let playoutOptIn=null;
+function playoutKey(){return state?.mode==='lesson'&&state.lesson?`${state.profile?.id}:${state.lesson.id}`:null;}
+function lessonReplyAllowed(){if(state?.mode!=='lesson')return true;if(!state.lesson_playout)playoutOptIn=null;return !!playoutOptIn&&playoutOptIn===playoutKey();}
+function playoutPaused(){return !!state&&state.mode==='lesson'&&!!state.lesson_playout&&!!state.computer_turn&&!state.demo_active&&!state.ended&&playoutOptIn!==playoutKey();}

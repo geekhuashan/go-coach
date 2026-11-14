@@ -217,3 +217,5 @@ input,select{font:inherit}input:focus-visible,select:focus-visible,summary:focus
 .board-settings-list{display:flex;flex-direction:column;gap:8px}.sound-settings-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}.sound-test-actions{display:flex;gap:8px}.sound-test-actions button{min-height:40px;padding:7px 12px}
 .board-actions{grid-template-columns:repeat(3,minmax(0,1fr))}.board-actions button{min-height:42px}
 .board-controls .board-actions #next-result{order:-1}.board-controls .board-actions button:not(#next-result){white-space:nowrap;padding-left:4px;padding-right:4px;font-size:14px}
+.board-controls .board-actions #restart.primary{grid-column:1 / -1}.board-controls .board-actions #next-result.secondary{order:5;grid-column:auto}
+.board-controls .board-actions #ai-move.secondary{grid-column:auto}

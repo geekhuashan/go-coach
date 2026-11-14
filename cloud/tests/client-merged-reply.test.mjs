@@ -70,3 +70,22 @@ test('rejected merged plays remove the optimistic stone without changing the boa
  const h=client(),{c,calls}=h,pending=c.act('play',{x:1,y:1});calls[0].reply({error:'这里不能落子。'},400);await pending;
  assert.equal(h.stones().length,0);assert.equal(c.state.board[1][1],0);assert.equal(c.busy,false);assert.equal(c.writeRecovery,null);
 });
+test('a wrong lesson move pauses: no merged reply, no automatic ai_move, until the learner asks to see the reply',async()=>{
+ const lesson=(extra={})=>position({mode:'lesson',lesson:{id:'one'},match:null,...extra});
+ const h=client(lesson()),{c,calls}=h;
+ vm.runInContext('var playoutOptIn=null;'+['playoutKey','lessonReplyAllowed','playoutPaused'].map(code).join('\n'),c);
+ const pending=c.act('play',{x:1,y:1});
+ assert.equal(JSON.parse(calls[0].options.body).reply,undefined);
+ const wrong=lesson({revision:2,lesson_playout:true,board:[[0,0,0],[0,1,0],[0,0,0]],move_number:1,to_play:2,computer_turn:true});
+ calls[0].reply(wrong);await pending;await h.runScheduled();
+ assert.equal(calls.length,1);assert.equal(c.playoutPaused(),true);
+ // Asking for the opponent's move opts in: KataGo answers now and after each later move.
+ vm.runInContext("playoutOptIn=playoutKey()",c);assert.equal(c.playoutPaused(),false);
+ const reply=c.act('ai_move');assert.equal(JSON.parse(calls[1].options.body).type,'ai_move');
+ calls[1].reply(lesson({revision:3,lesson_playout:true,board:[[2,0,0],[0,1,0],[0,0,0]],move_number:2}));await reply;
+ const next=c.act('play',{x:2,y:2});assert.equal(JSON.parse(calls[2].options.body).reply,true);
+ calls[2].reply(lesson({revision:4,lesson_playout:true,move_number:4}));await next;
+ // Retrying clears the opt-in: the next miss pauses again.
+ c.setState(lesson({revision:5}));const again=c.act('play',{x:0,y:2});
+ assert.equal(JSON.parse(calls[3].options.body).reply,undefined);calls[3].reply(lesson({revision:6}));await again;
+});
