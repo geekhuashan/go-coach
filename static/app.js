@@ -86,7 +86,7 @@ async function refresh(){
 async function reloadLessonCatalog(version=null){
  if(catalogRequest?.epoch===authEpoch)return catalogRequest;
  const epoch=authEpoch,pending=(async()=>{
-  const data=await request('/api/lessons',{retryRead:false});
+  const data=await request('/api/lessons',{timeoutMs:25000,retryRead:true});
   if(epoch!==authEpoch||!authenticated)return false;
   const items=Array.isArray(data)?data:data?.lessons;
   if(!Array.isArray(items))throw transientError('练习目录暂时未载入，稍后会自动重试。','response');
