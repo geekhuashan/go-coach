@@ -1,7 +1,7 @@
 {
  "/app.js": {
-  "v": "20261114-menu3",
-  "sha256": "3099d13f3cb0272507af897bf9f66ab4e8f2a87af0e8c73324e1d3761d8e7f3c"
+  "v": "20261114-clean2",
+  "sha256": "51548b54fda015cf59710273c0985535dbd1d6235f568ef9841399ed454d7f3d"
  },
  "/growth.css": {
   "v": "20261015-growth",
@@ -20,7 +20,7 @@
   "sha256": "050d38c8d7e2cac9e62d602289cbc594f414f3db5d937bc48196ea8fa8627239"
  },
  "/style.css": {
-  "v": "20261114-menu1",
-  "sha256": "5aeb58522578acbcda6e4b26c79b0f9170ecf68e821324280e2073677ca53eea"
+  "v": "20261114-clean3",
+  "sha256": "48ca8ab2b34822f784b5401cec8f8ac9787afc1ec88def5fc94e9d910ca4b413"
  }
 }
